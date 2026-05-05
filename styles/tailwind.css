@@ -17,13 +17,13 @@
   --color-black: #0f172a;
   --color-off-black: #1e293b;
 
-  --color-gray: #6b7280;
+  --color-gray: #6b7281;
 
   /* MAIN COLORS */
   /* --------------------- */
   /* Main Blues */
   --color-blue: #4ea3e3;
-  --color-blue-1: #2563eb;
+  --color-blue-1: #2563ee;
   --color-blue-2: #1d4ed8;
   --color-dark-blue: #162e5c;
 
@@ -33,6 +33,6 @@
 }
 @layer components {
   .my-custom-style-example {
-    @apply bg-blue-1;
+    @apply bg-green;
   }
 }
