@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=\, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Document</title>
+  </head>
+  <!-- replace the bg-color -->
+  <body class="bg-[#FF6700]">
+    <!-- outer container -->
+    <div class="flex flex-row justify-center items-start">
+      <!-- placeholder for the image in big screen -->
+      <div class="md:block md:w-1/2 hidden">
+        <img
+          src="./images/Rectangle 9.jpg"
+          alt=""
+          class="h-screen object-cover w-full"
+        />
+      </div>
+
+      <!--headers and form  -->
+      <div
+        class="flex flex-col w-1/2 items-center justify-center space-y-5 mt-10"
+      >
+        <!-- logo and header container -->
+        <div class="flex flex-row">
+          <img src="" alt="" />
+          <h1 class="font-bold text-2xl text-white">Pantry Swap</h1>
+        </div>
+
+        <p class="text-center font-bold pb-10 text-white">
+          Help Your Community Prevent Food Waste.
+        </p>
+
+        <!-- form for log in -->
+        <form
+          action="submit" id="LoginForm"
+          class="bg-white rounded-lg shadow-sm flex flex-col p-4 space-y-6 md:w-1/2 w-full min-h-50"
+        >
+          <div class="flex flex-col space-y-1">
+            <label class="font-bold" for="">Email</label>
+            <input
+              type="text"
+              placeholder="Email"
+              class="text-sm border  border-gray-300 rounded-lg p-2"
+            />
+          </div>
+
+          <div class="flex flex-col space-y-1">
+            <label class="font-bold" for="">Password</label>
+            <input
+              type="password"
+              placeholder="Password"
+              class="text-sm border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="bg-[#FF6700] rounded-lg w-fit p-1 px-4 text-white cursor-pointer"
+          >
+            Login
+          </button>
+        </form>
+
+        <!-- form for sign up, we remain on the same page -->
+        <form
+          action="submit" id="SignUpForm"
+          class="hidden bg-white rounded-lg shadow-sm flex flex-col p-4 space-y-6 md:w-1/2 w-full min-h-50"
+        >
+          <div class="flex flex-col space-y-1">
+            <label class="font-bold" for="">Name</label>
+            <input
+              type="text"
+              placeholder="Name"
+              class="text-sm border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+
+          <div class="flex flex-col space-y-1">
+            <label class="font-bold" for="">Email</label>
+            <input
+              type="text"
+              placeholder="Email"
+              class="text-sm border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+
+          <div class="flex flex-col space-y-1">
+            <label class="font-bold" for="">Password</label>
+            <input
+              type="password"
+              placeholder="Password"
+              class="text-sm border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="bg-[#FF6700] rounded-lg w-fit p-1 px-4 text-white cursor-pointer"
+          >
+            Create Account
+          </button>
+        </form>
+
+        <button type="button" id="SignUpButton" class="text-white text-sm cursor-pointer">
+          Not registered? <span class="underline">Create an account</span>
+        </button>
+      </div>
+    </div>
+
+    <script src="./src/scripts/login.js"></script>
+  </body>
+</html>
