@@ -42,6 +42,7 @@
             <label class="font-bold" for="">Email</label>
             <input
               type="text"
+              id="emailLogin"
               placeholder="Email"
               class="text-sm border  border-gray-300 rounded-lg p-2"
             />
@@ -51,13 +52,18 @@
             <label class="font-bold" for="">Password</label>
             <input
               type="password"
+              id="passwordLogin"
               placeholder="Password"
               class="text-sm border border-gray-300 rounded-lg p-2"
             />
           </div>
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="RememberLogin" name="Remember Me"><span>Remember Me</span>
+        </div>
 
           <button
             type="submit"
+            id="LoginBtn"
             class="bg-[#FF6700] rounded-lg w-fit p-1 px-4 text-white cursor-pointer"
           >
             Login
@@ -73,6 +79,7 @@
             <label class="font-bold" for="">Name</label>
             <input
               type="text"
+              id="name"
               placeholder="Name"
               class="text-sm border border-gray-300 rounded-lg p-2"
             />
@@ -83,6 +90,7 @@
             <input
               type="text"
               placeholder="Email"
+              id="emailSignup"
               class="text-sm border border-gray-300 rounded-lg p-2"
             />
           </div>
@@ -91,13 +99,19 @@
             <label class="font-bold" for="">Password</label>
             <input
               type="password"
+              id="passwordSignup"
               placeholder="Password"
               class="text-sm border border-gray-300 rounded-lg p-2"
             />
           </div>
 
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="RememberSignup" name="Remember Me"><span>Remember Me</span>
+        </div>
+
           <button
             type="submit"
+            id="signupBtn"
             class="bg-[#FF6700] rounded-lg w-fit p-1 px-4 text-white cursor-pointer"
           >
             Create Account
