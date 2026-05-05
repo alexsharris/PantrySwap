@@ -6,7 +6,7 @@ class Navbar extends HTMLElement {
 
     renderNavbar(){
     this.innerHTML = `
-    <nav class="bg-white text-[#FF6700] font-extrabold z-20 relative p-6">
+    <nav class="bg-white text-[#FF6700] font-extrabold z-20 relative p-6 md:drop-shadow-xl">
         <div class="flex min-w-full md:relative md:w-auto justify-between">
             <div class="flex gap-2 text-2xl self-center">
                 <img src="/images/Pantry_Swap_Icon.png" class="size-9">
@@ -33,7 +33,7 @@ class Navbar extends HTMLElement {
             </div>
         </div>
 
-        <div class="flex w-screen justify-between gap-2 visible md:hidden fixed inset-x-0 bottom-0 bg-white md:relative h-16 p-2">
+        <div class="flex w-screen justify-between gap-2 visible md:hidden fixed inset-x-0 bottom-0 right-0 left-0 bg-white md:relative h-16 p-2 ">
             <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="buyBtnDesktop">
             Buy
             </button>
