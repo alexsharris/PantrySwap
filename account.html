@@ -6,59 +6,95 @@
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
-  <body>
+  <body >
     <site-navbar></site-navbar>
-    <!-- form -->
-    <form
-      action=""
-      class="flex flex-col md:max-w-2xl p-10 space-y-4 bg-white shadow-lg mx-auto"
-    >
-      <h1>My account</h1>
-      <!-- profile image and name container -->
-      <div class="flex flex-row gap-7">
-        <img src="" alt="" />
-        <!-- container of name and city -->
-        <div class="flex flex-col gap-1">
-          <p id="UserCurrentName">John Smith</p>
-          <p id="Usercity">Vancouver</p>
-        </div>
-      </div>
-      <button type="button" class="border-1 border-black w-fit p-1 rounded-md">
-        Upload Photo
-      </button>
+    <main>
+      <!-- form -->
+      <form
+        action=""
+        class="flex flex-col w-full min-h-full p-6 md:max-w-2xl md:p-10 space-y-4 bg-white md:shadow-2xl md:rounded-md md:mx-auto md:my-8 pb-25 md:pb-5"
+      >
+        <h1 class="mb-10 font-bold">My account</h1>
 
-      <!-- input elements -->
-      <!-- name -->
-      <div class="flex flex-col gap-1">
-        <label for="">Name</label>
-        <input
-          type="text"
-          id="UserNewName"
-          class="border border-black rounded-md"
-        />
-      </div>
-      <!-- email -->
-      <label for="">Email</label>
-      <input
-        type="text"
-        id="UserNewEmail"
-        class="border border-black rounded-md"
-      />
-      <!-- contact -->
-      <label for="">Contact Informatio for Buyers</label>
-      <input
-        type="text"
-        id="UserNewphone"
-        class="border border-black rounded-md"
-      />
-      <!-- town -->
-      <label for="">Town / city</label>
-      <input
-        type="text"
-        id="UserNewCity"
-        class="border border-black rounded-md"
-      />
-    </form>
+        <!-- profile image and name container -->
+        <div class="flex flex-row gap-7">
+          <img
+            src="images/businessShark.jpg"
+            alt=""
+            class="object-cover rounded-full w-20 h-20"
+          />
+
+          <!-- container of name and city -->
+          <div class="flex flex-col gap-1">
+            <p class="font-bold" id="UserCurrentName">John Smith</p>
+            <p id="Usercity">Vancouver</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="border border-gray-400 text-gray-400 w-fit p-2 rounded-md"
+        >
+          Upload Photo
+        </button>
+
+        <!-- input elements -->
+        <!-- name -->
+        <div class="flex flex-col gap-1">
+          <label for="">Name</label>
+          <input
+            type="text"
+            id="UserNewName"
+            class="border border-gray-500 rounded-md py-1"
+          />
+        </div>
+
+        <!-- email -->
+        <div class="flex flex-col gap-1">
+          <label for="">Email</label>
+          <input
+            type="text"
+            id="UserNewEmail"
+            class="border border-gray-500 rounded-md py-1"
+          />
+        </div>
+
+        <!-- contact -->
+        <div class="flex flex-col gap-1">
+          <label for="">Contact Informatio for Buyers</label>
+          <input
+            type="text"
+            id="UserNewphone"
+            class="border border-gray-500 rounded-md py-1"
+          />
+        </div>
+
+        <!-- town -->
+        <div class="flex flex-col gap-1">
+          <label for="">Town / city</label>
+          <input
+            type="text"
+            id="UserNewCity"
+            class="border border-gray-500 rounded-md py-1"
+          />
+        </div>
+
+        <!-- buttons -->
+        <div class="flex flex-row gap-3 mt-3">
+          <button
+            type="button"
+            class="bg-red-700 text-white w-fit p-2 rounded-md"
+          >
+            Delete Account
+          </button>
+          <button
+            type="button"
+            class="border border-gray-500 w-fit p-2 rounded-md"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </main>
 
     <script src="./src/components/navbar.js"></script>
   </body>
