@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* ===================================================================== */
+/* COLORS */
+/* ===================================================================== */
+@theme {
+  /* NEUTRALS */
+  /* --------------------- */
+  --color-white: #f9fafb;
+  --color-off-white: #f5f7fa;
+  /* Transparent Whites */
+  --color-white-t1: rgb(249 250 251 / 0.75);
+  --color-white-t2: rgb(249 250 251 / 0.5);
+  --color-white-t3: rgb(249 250 251 / 0.3);
+  --color-white-t4: rgb(249 250 251 / 0.15);
+
+  --color-black: #0f172a;
+  --color-off-black: #1e293b;
+
+  --color-gray: #6b7281;
+
+  /* MAIN COLORS */
+  /* --------------------- */
+  /* Main Blues */
+  --color-blue: #4ea3e3;
+  --color-blue-1: #2563ee;
+  --color-blue-2: #1d4ed8;
+  --color-dark-blue: #162e5c;
+
+  /* Accents */
+  --color-green: #34d399;
+  --color-red: #db0d3a;
+}
+@layer components {
+  .my-custom-style-example {
+    @apply bg-green;
+  }
+}
