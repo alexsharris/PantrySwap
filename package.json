@@ -31,18 +31,5 @@
   "bugs": {
     "url": "https://github.com/SABZAK96/2800-202610-DTC01/issues"
   },
-<<<<<<< HEAD
-  "homepage": "https://github.com/SABZAK96/2800-202610-DTC01#readme",
-  "dependencies": {
-    "brcypt": "^1.0.1",
-    "dotenv": "^17.4.2",
-    "ejs": "^5.0.2",
-    "express": "^5.2.1",
-    "express-session": "^1.19.0",
-    "mongoose": "^9.6.1",
-    "session-file-store": "^1.5.0"
-  }
-=======
   "homepage": "https://github.com/SABZAK96/2800-202610-DTC01#readme"
->>>>>>> dev
 }
