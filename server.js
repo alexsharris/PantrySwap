@@ -17,6 +17,9 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 
+app.use(express.static("src"))
+app.use(express.static("."))
+
 // schema for users
 const UserSchema = new mongoose.Schema({
   name: String,
@@ -45,7 +48,7 @@ const ListingsSchema = new mongoose.Schema({
   contact: String,
   description: String,
   category: {
-    type: String,
+    type: [String],
     enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked goods"],
     required: true,
   },
@@ -89,6 +92,40 @@ async function main() {
     console.log("server's up!");
   });
 }
+
+
+app.get("/sell", (req, res) => {
+  res.render("sellListings.ejs");
+});
+
+
+app.get("/buy", (req, res) => {
+  res.render("buyListings.ejs")
+})
+
+
+app.get("/sellerListings", async (req, res) => {
+  try {
+    const listings = await ListingModel.find({seller: req.session.UserID});
+    res.json(listings);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({error: "Server error"});
+  }
+});
+
+
+app.get("/loadListings", async (req, res) => {
+  let filter = {}
+  try{
+    const listings = await ListingModel.find(filter)
+    if (listings.length == 0) return res.status(404).send("No listings found.")
+    res.send(listings)
+  }
+  catch (error){
+    console.log(error)
+  }
+})
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
