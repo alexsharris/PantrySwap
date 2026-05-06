@@ -33,6 +33,10 @@ const UserSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
     },
   ],
+  tutorials: {
+    create: Boolean,
+    search: Boolean,
+    bookmark: Boolean}
 });
 
 // schema of listings
@@ -164,3 +168,38 @@ app.post("/SignUp", async (req, res) => {
 
 });
 
+
+//get current user info
+app.get("/user", async (req, res) => {
+  try {
+    const currentUser = await UserModel.findOne({ _id: req.session.UserID });
+    res.json(currentUser);
+  }
+  catch (error) {
+    console.log(error);
+  }
+});
+
+
+//update user
+app.put("/updateUser/:id", async (req, res) => {
+  try {
+      const updated = await usersModel.findByIdAndUpdate(
+          req.params.id,
+          req.body,
+          {new:true, runValidators:true}
+      );
+
+      if (!updated) {
+          return res.status(400).json({ error: "User not updated" });
+      }
+
+      res.json({
+          message: `${req.body.name} updated successfully`,
+          data: updated
+      });
+  }
+  catch (err) {
+      res.status(404).json({error: err.message});
+  }
+});
