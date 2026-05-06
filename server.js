@@ -85,6 +85,8 @@ app.use(
 );
 
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.set("view engine", "ejs");
 
 main().catch((err) => console.log(err));
@@ -131,8 +133,7 @@ app.get("/loadListings", async (req, res) => {
   }
 })
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+
 
 // Login route
 
@@ -159,20 +160,19 @@ app.post("/Login", async (req, res) => {
         res.redirect("/home");
       }
       // if password doesnt match
-      else res.status(401).send("Invalid credentials");
+      else res.status(401).json({ error: "Invalid credentials"});
     }
     // if user email doesnt exist in the DB
-    else res.status(401).send("Invalid credentials");
+    else res.status(401).json({ error: "Invalid credentials"});
   } catch (error) {
     console.log(error);
-    res.status(500).send("Login failed");
+    res.status(500).json({ error: "Login failed"});
   }
 });
 
 // signup route
 
 app.post("/SignUp", async (req, res) => {
-
   const NewUserEmail = req.body.emailSignup;
   const NewUserName = req.body.name;
   const NewUserPassword = req.body.passwordSignup;
@@ -196,11 +196,62 @@ app.post("/SignUp", async (req, res) => {
     }
 
     res.redirect("/home");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "registration failed"});
+  }
+});
+
+// get route for sending back user information for account page
+app.get("/Account", async (req, res) => {
+  try {
+    const Data = await UserModel.findById({ _id: req.session.UserID });
+    res.json(Data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json( {error: "Internal Server Error!"});
+  }
+});
+
+// put route to update the user document in the DB from the Account page
+app.put("/ChangeData", async (req, res) => {
+  try {
+    const UserNewName = req.body.UserNewName;
+    const UserNewEmail = req.body.UserNewEmail;
+    const UserNewphone = req.body.UserNewphone;
+    const UserNewCity = req.body.UserNewCity;
+
+    // check if the value exists, if so, update the DB
+    const UpdatedFields = {};
+    // use the exact same names in the DB to add the corresponding values to in the dictionary
+    if (UserNewName) UpdatedFields.name = UserNewName;
+    if (UserNewEmail) UpdatedFields.email = UserNewEmail;
+    if (UserNewphone) UpdatedFields.phone = UserNewphone;
+    if (UserNewCity) UpdatedFields.city = UserNewCity;
+
+    const user = await UserModel.findByIdAndUpdate(
+      { _id: req.session.UserID },
+      { $set: UpdatedFields },
+    );
+    res.json({ message: "Updated Successfully!"});
+  } catch (error) {
+    res.status(500).json({ error: "Update failed" });
+  }
+});
+
+// add a route to delete an account
+app.delete("/DeleteAccount", async(req,res)=>{
+  try{
+
+    await UserModel.findByIdAndDelete({_id: req.session.UserID});
+    req.session.destroy(); //kill the session after deleting
+    res.json({ message: "Account deleted" });
+
   }
   catch(error){
 
     console.log(error);
-    res.status(500).send("registration failed");
+    res.status(500).send("Delete failed!");
 
   }
     
