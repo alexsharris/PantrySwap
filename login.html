@@ -4,10 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=\, initial-scale=1.0" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="./public/main.css" />
     <title>Document</title>
   </head>
   <!-- replace the bg-color -->
-  <body class="bg-[#FF6700]">
+  <body class="bg-orange font-sans">
     <!-- outer container -->
     <div class="flex flex-row justify-center items-start">
       <!-- placeholder for the image in big screen -->
@@ -27,17 +28,15 @@
         <div class="flex flex-row justify-center items-center gap-1">
           <!-- brightness-0 turns all the pixels black and invert makes them white -->
           <img src="./images/Pantry_Swap_Icon.png" class="w-5 h-5 brightness-0 invert" alt="" />
-          <h1 class="font-bold text-2xl text-white">Pantry Swap</h1>
+          <h1 class="h1 text-white">Pantry Swap</h1>
         </div>
 
-        <p class="text-center font-bold pb-10 text-white">
-          Help Your Community Prevent Food Waste.
-        </p>
+        <h2 class="text-center pb-10 text-white">Help Your Community Prevent Food Waste.</h2>
 
         <!-- form for log in -->
         <form
           action="submit" id="LoginForm"
-          class="bg-white rounded-lg shadow-sm flex flex-col p-4 space-y-6 md:w-1/2 w-full min-h-50"
+          class="card shadow-sm flex flex-col p-4 space-y-6 md:w-1/2 w-full min-h-50"
         >
           <div class="flex flex-col space-y-1">
             <label class="font-bold" for="">Email</label>
@@ -65,7 +64,7 @@
           <button
             type="submit"
             id="LoginBtn"
-            class="bg-[#FF6700] rounded-lg w-fit p-1 px-4 text-white cursor-pointer"
+            class="box-color-0 rounded-lg w-fit p-1 px-4 cursor-pointer"
           >
             Login
           </button>
@@ -74,7 +73,7 @@
         <!-- form for sign up, we remain on the same page -->
         <form
           action="submit" id="SignUpForm"
-          class="hidden bg-white rounded-lg shadow-sm flex flex-col p-4 space-y-6 md:w-1/2 w-full min-h-50"
+          class="hidden card shadow-sm flex flex-col p-4 space-y-6 md:w-1/2 w-full min-h-50"
         >
           <div class="flex flex-col space-y-1">
             <label class="font-bold" for="">Name</label>
@@ -113,7 +112,7 @@
           <button
             type="submit"
             id="signupBtn"
-            class="bg-[#FF6700] rounded-lg w-fit p-1 px-4 text-white cursor-pointer"
+            class="rounded-lg w-fit p-1 px-4 box-color-0 cursor-pointer"
           >
             Create Account
           </button>
