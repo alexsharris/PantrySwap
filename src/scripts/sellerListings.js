@@ -53,7 +53,6 @@ document.addEventListener("click", async (event) => {
 
   if (!button) return;
   const listingID = button.id.split("-")[1];
-  console.log(eventID);
   
   const res = await fetch(`/buy?eventID=${listingID}`)
  
