@@ -37,10 +37,15 @@ form.addEventListener("submit", async(e)=>{
     if(City) {UserNewCity = City;}
 
     const Response = await fetch("http://localhost:3000/ChangeData", {
-      method: "POST",
+      method: "PUT",
       redirect: "follow",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ UserNewName, UserNewEmail, UserNewphone, UserNewCity}),
     });
 
-})
+});
+
+// add delete functionality
+document.getElementById("DeleteAccount").addEventListener("click", async()=>{
+    const Response = await fetch("http://localhost:3000/DeleteAccount" , { method: "DELETE" })
+}) 

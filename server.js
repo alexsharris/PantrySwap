@@ -118,13 +118,13 @@ app.post("/Login", async (req, res) => {
         res.redirect("/home");
       }
       // if password doesnt match
-      else res.status(401).send("Invalid credentials");
+      else res.status(401).json({ error: "Invalid credentials"});
     }
     // if user email doesnt exist in the DB
-    else res.status(401).send("Invalid credentials");
+    else res.status(401).json({ error: "Invalid credentials"});
   } catch (error) {
     console.log(error);
-    res.status(500).send("Login failed");
+    res.status(500).json({ error: "Login failed"});
   }
 });
 
@@ -158,7 +158,7 @@ app.post("/SignUp", async (req, res) => {
     res.redirect("/home");
   } catch (error) {
     console.log(error);
-    res.status(500).send("registration failed");
+    res.status(500).json({ error: "registration failed"});
   }
 });
 
@@ -169,12 +169,12 @@ app.get("/Account", async (req, res) => {
     res.json(Data);
   } catch (error) {
     console.log(error);
-    res.status(500).send("Internal Server Error!");
+    res.status(500).json( {error: "Internal Server Error!"});
   }
 });
 
-// post route to update the user document in the DB from the Account page
-app.post("/ChangeData", async (req, res) => {
+// put route to update the user document in the DB from the Account page
+app.put("/ChangeData", async (req, res) => {
   try {
     const UserNewName = req.body.UserNewName;
     const UserNewEmail = req.body.UserNewEmail;
@@ -193,8 +193,23 @@ app.post("/ChangeData", async (req, res) => {
       { _id: req.session.UserID },
       { $set: UpdatedFields },
     );
-    res.send("Updated Successfully!");
+    res.json({ message: "Updated Successfully!"});
   } catch (error) {
     res.status(500).json({ error: "Update failed" });
   }
 });
+
+// add a route to delete an account
+app.delete("/DeleteAccount", async(req,res)=>{
+  try{
+
+    await UserModel.findByIdAndDelete({_id: req.session.UserID});
+    req.session.destroy(); //kill the session after deleting
+    res.json({ message: "Account deleted" });
+
+  }
+  catch(error){
+    console.log(error);
+    res.status(500).json({ error: "Delete failed" });
+  }
+})
