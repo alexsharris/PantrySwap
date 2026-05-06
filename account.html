@@ -13,7 +13,7 @@
     
       <!-- form -->
       <form
-        action=""
+        action="submit" id="AccountForm"
         class="flex flex-col w-full min-h-full p-6 md:max-w-xl md:p-10 space-y-4 md:rounded-3xl md:bg-white md:shadow-[0_4px_10px_rgba(0,0,0,0.10)] md:mx-auto md:my-8 pb-25 md:pb-5"
       >
         <h1 class="mb-10 font-bold">My account</h1>
@@ -62,7 +62,7 @@
 
         <!-- contact -->
         <div class="flex flex-col gap-1">
-          <label for="">Contact Informatio for Buyers</label>
+          <label for="">Contact Information for Buyers</label>
           <input
             type="text"
             id="UserNewphone"
@@ -89,13 +89,13 @@
             Delete Account
           </button>
           <button
-            type="button"
+            type="submit"
             class="button box-color-5 border border-medium-grey hover-outline hover-accent-text "
           >
             Save Changes
           </button>
         </div>
       </form>
-    
+    <script src="/src/scripts/account.js"></script>
   </body>
 </html>

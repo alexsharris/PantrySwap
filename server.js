@@ -131,7 +131,6 @@ app.post("/Login", async (req, res) => {
 // signup route
 
 app.post("/SignUp", async (req, res) => {
-
   const NewUserEmail = req.body.emailSignup;
   const NewUserName = req.body.name;
   const NewUserPassword = req.body.passwordSignup;
@@ -141,7 +140,11 @@ app.post("/SignUp", async (req, res) => {
 
   // create a new user in DB
   try {
-    const user = await UserModel.create({ name: NewUserName, password: HashedPassword, email: NewUserEmail });
+    const user = await UserModel.create({
+      name: NewUserName,
+      password: HashedPassword,
+      email: NewUserEmail,
+    });
 
     // setting up the session for the new user
     req.session.email = NewUserEmail;
@@ -153,14 +156,45 @@ app.post("/SignUp", async (req, res) => {
     }
 
     res.redirect("/home");
-  }
-  catch(error){
-
+  } catch (error) {
     console.log(error);
     res.status(500).send("registration failed");
-
   }
-    
-
 });
 
+// get route for sending back user information for account page
+app.get("/Account", async (req, res) => {
+  try {
+    const Data = await UserModel.findById({ _id: user.session.UserID });
+    res.json(Data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error!");
+  }
+});
+
+// post route to update the user document in the DB from the Account page
+app.post("/ChangeData", async (req, res) => {
+  try {
+    const UserNewName = req.body.UserNewName;
+    const UserNewEmail = req.body.UserNewEmail;
+    const UserNewphone = req.body.UserNewphone;
+    const UserNewCity = req.body.UserNewCity;
+
+    // check if the value exists, if so, update the DB
+    const UpdatedFields = {};
+    // use the exact same names in the DB to add the corresponding values to in the dictionary
+    if (UserNewName) UpdatedFields.name = UserNewName;
+    if (UserNewEmail) UpdatedFields.email = UserNewEmail;
+    if (UserNewphone) UpdatedFields.phone = UserNewphone;
+    if (UserNewCity) UpdatedFields.city = UserNewCity;
+
+    const user = await UserModel.findByIdAndUpdate(
+      { _id: req.session.UserID },
+      { $set: UpdatedFields },
+    );
+    res.send("Updated Successfully!");
+  } catch (error) {
+    res.status(500).json({ error: "Update failed" });
+  }
+});
