@@ -165,7 +165,7 @@ app.post("/SignUp", async (req, res) => {
 // get route for sending back user information for account page
 app.get("/Account", async (req, res) => {
   try {
-    const Data = await UserModel.findById({ _id: user.session.UserID });
+    const Data = await UserModel.findById({ _id: req.session.UserID });
     res.json(Data);
   } catch (error) {
     console.log(error);
