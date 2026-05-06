@@ -3,21 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Pantry Swap</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script type="module" src="/src/components/navbar.js"></script>
+    <link rel="stylesheet" href="./public/main.css" />
   </head>
-  <body >
+  <body class="site-margins">
     <site-navbar></site-navbar>
-    <main>
+    
       <!-- form -->
       <form
         action=""
-        class="flex flex-col w-full min-h-full p-6 md:max-w-2xl md:p-10 space-y-4 bg-white md:shadow-2xl md:rounded-md md:mx-auto md:my-8 pb-25 md:pb-5"
+        class="flex flex-col w-full min-h-full p-6 md:max-w-xl md:p-10 space-y-4 md:rounded-3xl md:bg-white md:shadow-[0_4px_10px_rgba(0,0,0,0.10)] md:mx-auto md:my-8 pb-25 md:pb-5"
       >
         <h1 class="mb-10 font-bold">My account</h1>
 
         <!-- profile image and name container -->
-        <div class="flex flex-row gap-7">
+        <div class="flex flex-row items-center gap-7">
           <img
             src="images/businessShark.jpg"
             alt=""
@@ -26,13 +28,13 @@
 
           <!-- container of name and city -->
           <div class="flex flex-col gap-1">
-            <p class="font-bold" id="UserCurrentName">John Smith</p>
+            <h2 class="font-bold" id="UserCurrentName">John Smith</h2>
             <p id="Usercity">Vancouver</p>
           </div>
         </div>
         <button
           type="button"
-          class="border border-gray-400 text-gray-400 w-fit p-2 rounded-md"
+          class="button box-color-5 border border-medium-grey w-fit hover-outline hover-accent-text "
         >
           Upload Photo
         </button>
@@ -44,7 +46,7 @@
           <input
             type="text"
             id="UserNewName"
-            class="border border-gray-500 rounded-md py-1"
+            placeholder="Name"
           />
         </div>
 
@@ -54,7 +56,7 @@
           <input
             type="text"
             id="UserNewEmail"
-            class="border border-gray-500 rounded-md py-1"
+            placeholder="Email"
           />
         </div>
 
@@ -64,7 +66,7 @@
           <input
             type="text"
             id="UserNewphone"
-            class="border border-gray-500 rounded-md py-1"
+            placeholder="Phone Number"
           />
         </div>
 
@@ -74,7 +76,7 @@
           <input
             type="text"
             id="UserNewCity"
-            class="border border-gray-500 rounded-md py-1"
+            placeholder="City"
           />
         </div>
 
@@ -82,20 +84,18 @@
         <div class="flex flex-row gap-3 mt-3">
           <button
             type="button"
-            class="bg-red-700 text-white w-fit p-2 rounded-md"
+            class="button box-color-4 hover-bright"
           >
             Delete Account
           </button>
           <button
             type="button"
-            class="border border-gray-500 w-fit p-2 rounded-md"
+            class="button box-color-5 border border-medium-grey hover-outline hover-accent-text "
           >
             Save Changes
           </button>
         </div>
       </form>
-    </main>
-
-    <script src="./src/components/navbar.js"></script>
+    
   </body>
 </html>
