@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pantry Swap</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script type="module" src="/src/components/navbar.js"></script>
+    <link rel="stylesheet" href="./public/main.css" />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <site-navbar></site-navbar>
+    <div class="site-margins">
+      <div class="grid grid-cols-2 gap-6">
+        <!-- Headers -->
+        <div class="card w-full">
+          <h1 class="">Headers</h1>
+          <hr />
+          <h1>Header 1</h1>
+          <h2>Header 2</h2>
+          <h3>Header 3</h3>
+          <h4>Header 4</h4>
+          <h5>Header 5</h5>
+          <h6>Header 6</h6>
+          <p>paragraph</p>
+        </div>
+        <!-- Colors -->
+        <div class="card w-full">
+          <h1 class="">Custom Colors</h1>
+          <hr />
+          <div class="flex flex-col gap-3 p-4">
+            <div class="rounded-full px-4 bg-orange">
+              <p class="font-bold text-lg text-white">orange</p>
+            </div>
+            <div class="rounded-full px-4 bg-peach">
+              <p class="font-bold text-lg text-black">peach</p>
+            </div>
+            <div class="rounded-full px-4 bg-light-brown">
+              <p class="font-bold text-lg text-white">light-brown</p>
+            </div>
+            <div class="rounded-full px-4 bg-light-grey">
+              <p class="font-bold text-lg text-black">light-grey</p>
+            </div>
+            <div class="rounded-full px-4 bg-medium-grey">
+              <p class="font-bold text-lg text-white">medium-grey</p>
+            </div>
+            <div class="rounded-full px-4 bg-red">
+              <p class="font-bold text-lg text-white">red</p>
+            </div>
+            <div class="rounded-full px-4 bg-green">
+              <p class="font-bold text-lg text-white">green</p>
+            </div>
+            <h2>Color Combos</h2>
+            <hr />
+            <div class="rounded-full px-4 box-color-0">
+              <p class="font-bold text-lg">box-color-0</p>
+            </div>
+            <div class="rounded-full px-4 box-color-1">
+              <p class="font-bold text-lg">box-color-1</p>
+            </div>
+            <div class="rounded-full px-4 box-color-2">
+              <p class="font-bold text-lg">box-color-2</p>
+            </div>
+            <div class="rounded-full px-4 box-color-3">
+              <p class="font-bold text-lg">box-color-3</p>
+            </div>
+            <div class="rounded-full px-4 box-color-4">
+              <p class="font-bold text-lg">box-color-4</p>
+            </div>
+            <div class="rounded-full px-4 box-color-5">
+              <p class="font-bold text-lg">box-color-5</p>
+            </div>
+          </div>
+        </div>
+        <!-- Cards -->
+        <div class="card w-full flex flex-col gap-4">
+          <h1 class="">Cards + Misc</h1>
+          <hr class="mb-4" />
+          <h2 class="">Cards</h2>
+          <hr />
+          <div class="card">card</div>
+          <div class="card bg-orange">
+            card with color override: class="card bg-orange"
+          </div>
+
+          <div class="card">
+            <h2>card with items</h2>
+            <p>card item class: card-item</p>
+            <div class="card-item">card item 1</div>
+            <div class="card-item">card item 2</div>
+            <div class="card-item">card item 4</div>
+            <div class="card-item">card item 5</div>
+          </div>
+
+          <h2 class="">Buttons</h2>
+          <hr />
+          <div class="grid grid-cols-4 gap-5">
+            <button class="hover-outline">default</button>
+            <button class="box-color-0 hover-outline">
+              default button with: box-color-0
+            </button>
+            <button class="box-color-1 hover-outline">
+              default button with: box-color-1
+            </button>
+            <button class="box-color-2 hover-outline">
+              default button with: box-color-2
+            </button>
+            <button class="box-color-3 hover-outline">
+              default button with: box-color-3
+            </button>
+            <button class="box-color-4 hover-outline">
+              default button with: box-color-4
+            </button>
+            <button class="box-color-5 hover-outline">
+              default button with: box-color-5
+            </button>
+          </div>
+          <h2 class="">Button Hovers</h2>
+          <hr />
+          <div class="grid grid-cols-4 gap-5">
+            <button class="box-color-4 hover-outline">hover-outline</button>
+            <button class="box-color-4 hover-bright">hover-bright</button>
+            <button class="box-color-4 hover-accent-text">
+              hover-accent-text
+            </button>
+            <button class="box-color-4 hover-accent-text hover:text-green">
+              hover-accent-text with color override: class="hover-accent-text
+              hover:text-green"
+            </button>
+          </div>
+        </div>
+        <!-- Inputs -->
+        <div class="card w-full">
+          <h1 class="">Inputs</h1>
+          <form class="flex flex-col gap-4 mt-4">
+            <div class="flex flex-col gap-1">
+              <label class="">Name</label>
+              <input type="text" placeholder="Enter your name" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="">Email</label>
+              <input type="email" placeholder="you@example.com" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="">Password</label>
+              <input type="password" placeholder="••••••••" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="">Select option</label>
+              <select>
+                <option value="">Choose one</option>
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="">Message</label>
+              <textarea rows="4" placeholder="Write something..."></textarea>
+            </div>
+
+            <div class="flex flex-row gap-3 items-center mt-2">
+              <input type="checkbox" class="w-5 h-5 accent-orange" />
+              <label class="text-sm text-medium-grey"
+                >Accept terms and conditions</label
+              >
+            </div>
+
+            <button class="box-color-0 hover-bright">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -13,6 +13,7 @@ const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 10; // How strong the hashing should be
 
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 
@@ -76,6 +77,7 @@ app.use(
   }),
 );
 
+app.use(cors());
 app.set("view engine", "ejs");
 
 main().catch((err) => console.log(err));
@@ -87,3 +89,78 @@ async function main() {
     console.log("server's up!");
   });
 }
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Login route
+
+app.post("/Login", async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ email: req.body.emailLogin });
+
+    // check if user with that email address exists
+    if (user) {
+      const PasswordMatched = await bcrypt.compare(
+        req.body.passwordLogin,
+        user.password,
+      );
+
+      // check if password matched set up the session
+      if (PasswordMatched) {
+        req.session.email = req.body.emailLogin;
+        req.session.UserID = user._id;
+
+        if (req.body.RememberLogin) {
+          // we can keep the cookie if remember me checked for 2 weeks in milliseconds
+          req.session.cookie.maxAge = 14 * 24 * 3600 * 1000;
+        }
+        res.redirect("/home");
+      }
+      // if password doesnt match
+      else res.status(401).send("Invalid credentials");
+    }
+    // if user email doesnt exist in the DB
+    else res.status(401).send("Invalid credentials");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Login failed");
+  }
+});
+
+// signup route
+
+app.post("/SignUp", async (req, res) => {
+
+  const NewUserEmail = req.body.emailSignup;
+  const NewUserName = req.body.name;
+  const NewUserPassword = req.body.passwordSignup;
+
+  // hash password to store it in DB
+  const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
+
+  // create a new user in DB
+  try {
+    const user = await UserModel.create({ name: NewUserName, password: HashedPassword, email: NewUserEmail });
+
+    // setting up the session for the new user
+    req.session.email = NewUserEmail;
+    req.session.UserID = user._id;
+
+    if (req.body.RememberSignup) {
+      // we can keep the cookie if remember me checked for 2 weeks in milliseconds
+      req.session.cookie.maxAge = 14 * 24 * 3600 * 1000;
+    }
+
+    res.redirect("/home");
+  }
+  catch(error){
+
+    console.log(error);
+    res.status(500).send("registration failed");
+
+  }
+    
+
+});
+
