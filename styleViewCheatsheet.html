@@ -82,6 +82,16 @@
           <div class="card bg-orange">
             card with color override: class="card bg-orange"
           </div>
+
+          <div class="card">
+            <h2>card with items</h2>
+            <p>card item class: card-item</p>
+            <div class="card-item">card item 1</div>
+            <div class="card-item">card item 2</div>
+            <div class="card-item">card item 4</div>
+            <div class="card-item">card item 5</div>
+          </div>
+
           <h2 class="">Buttons</h2>
           <hr />
           <div class="grid grid-cols-4 gap-5">
@@ -120,7 +130,49 @@
           </div>
         </div>
         <!-- Inputs -->
-        <div class="card w-full"><h1 class="">Inputs</h1></div>
+        <div class="card w-full">
+          <h1 class="">Inputs</h1>
+          <form class="flex flex-col gap-4 mt-4">
+            <div class="flex flex-col gap-1">
+              <label class="">Name</label>
+              <input type="text" placeholder="Enter your name" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="">Email</label>
+              <input type="email" placeholder="you@example.com" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="">Password</label>
+              <input type="password" placeholder="••••••••" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="">Select option</label>
+              <select>
+                <option value="">Choose one</option>
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="">Message</label>
+              <textarea rows="4" placeholder="Write something..."></textarea>
+            </div>
+
+            <div class="flex flex-row gap-3 items-center mt-2">
+              <input type="checkbox" class="w-5 h-5 accent-orange" />
+              <label class="text-sm text-medium-grey"
+                >Accept terms and conditions</label
+              >
+            </div>
+
+            <button class="box-color-0 hover-bright">Submit</button>
+          </form>
+        </div>
       </div>
     </div>
   </body>
