@@ -201,14 +201,22 @@ app.post("/SignUp", async (req, res) => {
 
 });
 
-//deleteListing route
+//serve the edit listing page
+app.get('/EditListing', (req, res) => {
+  res.render('editListingPage.ejs')
+})
+
+//delete listing route - soft deleting only
 app.delete('/DeleteListing/:listingID', async (req, res) => {
   const listingID = req.params.listingID
   try {
-    await ListingModel.deleteOne({_id:listingID})
+    const listingRecord = await ListingModel.findOne({_id:listingID})
+    listingRecord.status = "deleted"
+    await listingRecord.save()
     res.sendStatus(200)
   }catch(error){
-    console.log('Error deleting listing:', error)
+    console.log(error)
+    res.status(500).send('Listing could not be deleted.')
   }
 })
 
@@ -217,29 +225,46 @@ app.put('/UnlistListing/:listingID', async (req, res) => {
   const listingID = req.params.listingID
   try{
     const listingRecord = await ListingModel.findOne({_id:listingID})
-    listingRecord.status.type = "unlisted"
+    listingRecord.status = "unlisted"
+    await listingRecord.save()
     res.sendStatus(200)
   }
   catch(error){
     console.log(error);
-    res.sendStatus(500).send('Could not unlist listing')
+    res.status(500).send('Could not unlist listing')
+  }
+})
+
+//load one listing
+app.get('/LoadListing/:listingID', async (req, res) => {
+  const listingID = req.params.listingID
+  try{
+    const listingRecord = await ListingModel.findOne({_id: listingID})
+    res.status(200).send(listingRecord)
+  }
+  catch(error){
+    console.log(error);
+    res.status(500).send('Could not load listing')
   }
 })
 
 //Save Listing route
 app.put('/EditListing/:listingID', async (req, res) => {
   const listingID = req.params.listingID
-  const {newTitle, newLocation, newPrice, newContact, newDescription, newCategory} = req.body
+  const {newImage, newTitle, newLocation, newPrice, newContact, newDescription, newCategory} = req.body
   try{
       const listingRecord = ListingModel.findOne({_id: listingID})
       
+      if (newImage) listingRecord.image = newImage
       if (newTitle) listingRecord.title = newTitle
       if (newLocation) listingRecord.location = newLocation
       if (newPrice) listingRecord.price = newPrice
       if (newContact) listingRecord.contact = newContact
       if (newDescription) listingRecord.description = newDescription
       if (newCategory) listingRecord.category = newCategory
-
-
+  }
+  catch(error){
+    console.log(error);
+    res.status(500).send('Edit listing form could not be saved.')
   }
 })
