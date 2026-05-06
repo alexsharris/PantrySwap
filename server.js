@@ -99,6 +99,11 @@ app.get("/sell", (req, res) => {
 });
 
 
+app.get("/buy", (req, res) => {
+  res.render("buyListings.ejs")
+})
+
+
 app.get("/sellerListings", async (req, res) => {
   try {
     const listings = await ListingModel.find({seller: req.session.UserID});
@@ -108,6 +113,20 @@ app.get("/sellerListings", async (req, res) => {
     res.status(500).json({error: "Server error"});
   }
 });
+
+
+app.get("/loadListings", async (req, res) => {
+  let filter = {}
+  try{
+    const listings = await ListingModel.find(filter)
+    if (listings.length == 0) return res.status(404).send("No listings found.")
+    res.send(listings)
+  }
+  catch (error){
+    console.log(error)
+  }
+})
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
