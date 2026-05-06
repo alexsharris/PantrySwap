@@ -1,7 +1,7 @@
 // ============================================
 // BUTTONS
 // ============================================
-function createButtons(functions) {
+function createButtons(functions, autoClose) {
   let buttons = [];
 
   if (!functions || functions.length === 0) {
@@ -10,7 +10,7 @@ function createButtons(functions) {
     formatButton(btn, "box-color-0", "hover-outline");
     buttons.push(btn);
     btn.addEventListener("click", () => console.log("Confirmed"));
-    btn.addEventListener("click", closeWindow);
+    if (autoClose) btn.addEventListener("click", closePopupWindow);
     return buttons;
   }
 
@@ -21,7 +21,7 @@ function createButtons(functions) {
     formatButton(btn, fnObj.color, fnObj.hover);
 
     btn.addEventListener("click", fnObj.onClick);
-    btn.addEventListener("click", closeWindow);
+    if (autoClose) btn.addEventListener("click", closePopupWindow);
     buttons.push(btn);
   });
 
@@ -35,23 +35,22 @@ function formatButton(buttonEl, buttonColor, buttonHover) {
 // ============================================
 // DISPLAY
 // ============================================
-export function displaySimpleWindow(message, functions, includeOverlay = true) {
+export function displaySimpleWindow(message, functions, autoClose = true) {
   let formattedMessage = `<h2 class="font-bold">${message}</h2>`;
-  displayWindow(formattedMessage, functions, includeOverlay);
+  displayWindow(formattedMessage, functions, autoClose);
 }
 
-export function displayWindow(message, functions = "", includeOverlay = true) {
+export function displayWindow(message, functions = "", autoClose = true) {
+  document.body.style.overflow = "hidden";
+
   const window = document.createElement("div");
 
   // add a full screen blocker window
   window.className = `
     fixed inset-0 z-[100]
-    flex items-center justify-center
+    flex items-center justify-center overlay
     `;
   window.id = "popup-window";
-  if (includeOverlay) {
-    window.classList.add("overlay");
-  }
 
   // create content card
   const card = document.createElement("div");
@@ -62,7 +61,7 @@ export function displayWindow(message, functions = "", includeOverlay = true) {
   messageEl.className = "max-w-[80%] text-center";
   messageEl.innerHTML = message;
 
-  const newButtons = createButtons(functions);
+  const newButtons = createButtons(functions, autoClose);
   const buttonContainer = document.createElement("div");
   buttonContainer.className = "flex justify-between gap-2 pt-5";
   newButtons.forEach((btn) => buttonContainer.appendChild(btn));
@@ -74,20 +73,23 @@ export function displayWindow(message, functions = "", includeOverlay = true) {
   document.body.appendChild(window);
 }
 
-function closeWindow() {
+export function closePopupWindow() {
   const popupWindow = document.getElementById("popup-window");
   popupWindow.remove();
+  document.body.style.overflow = "auto";
 }
 
-// // ============================================
-// // EXAMPLES
-// // ============================================
+// ============================================
+// EXAMPLES
+// ============================================
+// Defined functions for each button
+// =================================
 // const buttons = [
 //   {
 //     label: "yes, delete",
 //     color: "box-color-0",
 //     hover: "hover-outline",
-//     onClick: () => console.log("Confirmed"),
+//     onClick: () => console.log("Deleted"),
 //   },
 //   {
 //     label: "no, cancel",
@@ -98,27 +100,85 @@ function closeWindow() {
 // ];
 // displaySimpleWindow("Are you sure you want to delete this listing?", buttons);
 
-displaySimpleWindow(
-  `<div class="flex flex-col items-center justify-center">
-    <div class="text-orange-500">
-        <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="76"
-        height="76"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        >
-        <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
-        </svg>
-    </div>
-    <div>Listing deleted</div>
-  </div>`,
-  [
-    {
-      label: "Go back to my listings",
-      color: "box-color-1",
-      hover: "hover-bright",
-      onClick: () => console.log("Cancelled"),
-    },
-  ],
-);
+// =================================
+// Custom message formatting
+// =================================
+// displaySimpleWindow(
+//   `<div class="flex flex-col items-center justify-center">
+//     <div class="text-orange-500">
+//         <svg
+//         xmlns="http://www.w3.org/2000/svg"
+//         width="76"
+//         height="76"
+//         viewBox="0 0 24 24"
+//         fill="currentColor"
+//         >
+//         <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+//         </svg>
+//     </div>
+//     <div>Listing deleted</div>
+//   </div>`,
+//   [
+//     {
+//       label: "Go back to my listings",
+//       color: "box-color-1",
+//       hover: "hover-bright",
+//       onClick: () => console.log("Cancelled"),
+//     },
+//   ],
+// );
+// =================================
+// Custom form
+// =================================
+
+// const buttons = [
+//   {
+//     label: "Add food",
+//     color: "box-color-0",
+//     hover: "hover-outline",
+//     onClick: addFood,
+//   },
+//   {
+//     label: "cancel",
+//     color: "box-color-1",
+//     hover: "hover-outline",
+//     onClick: closePopupWindow,
+//   },
+// ];
+
+// function addFood() {
+//   const foodForm = document.getElementById("food-form");
+//   const formData = new FormData(foodForm);
+
+//   let isValid = true;
+
+//   for (const [key, value] of formData.entries()) {
+//     console.log(value);
+//     if (!value.trim()) isValid = false;
+//   }
+
+//   if (isValid) {
+//     closePopupWindow();
+//   } else {
+//     if (foodForm.querySelector(".form-error")) return;
+
+//     const error = document.createElement("div");
+//     error.className = "form-error text-red text-sm";
+//     error.textContent = "Required fields missing";
+
+//     foodForm.appendChild(error);
+//   }
+// }
+// const form = `
+// <form id="food-form" class="flex flex-col gap-4 mt-4 text-start">
+//   <div class="flex flex-col gap-1">
+//     <label>Name</label>
+//     <input type="text" name="name" placeholder="Gala apples" />
+//   </div>
+//   <div class="flex flex-col gap-1">
+//     <label>Quantity</label>
+//     <input type="text" name="quantity" placeholder="2" />
+//   </div>
+// </form>`;
+
+// displaySimpleWindow("Add food" + form, buttons, false);
