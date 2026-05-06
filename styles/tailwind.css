@@ -74,23 +74,57 @@
 /* INPUTS */
 /* ===================================================================== */
 @layer components {
+  input,
+  textarea,
+  select {
+    @apply w-full rounded-xl border border-light-brown bg-white px-4 py-3 text-sm text-black outline-none transition;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply border-orange ring-2 ring-orange/30;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-medium-grey;
+  }
+
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    @apply bg-peach text-medium-grey cursor-not-allowed opacity-70;
+  }
+
+  label {
+    @apply font-bold text-black text-xl;
+  }
 }
 
 /* ===================================================================== */
 /* CUSTOM CLASSES */
 /* ===================================================================== */
 @layer components {
+  /* For x margins on each page */
   .site-margins {
     @apply py-5 md:py-10 px-20 flex-1;
   }
+
+  /* Cards and windows */
   .card {
-    @apply rounded-3xl bg-white p-4 shadow-[0_4px_10px_rgba(0,0,0,0.10)];
+    @apply rounded-3xl bg-white shadow-[0_4px_10px_rgba(0,0,0,0.10)] overflow-hidden p-4;
   }
+  .card-item {
+    @apply border-t border-peach px-4 py-4 -mx-4;
+  }
+
+  /* Buttons */
   button {
     @apply py-3 px-10 rounded-xl font-semibold;
   }
   .hover-bright {
-    @apply hover:brightness-120 transition;
+    @apply hover:brightness-120 hover:drop-shadow-lg hover:saturate-150 transition;
   }
   .hover-outline {
     @apply hover:shadow-lg hover:ring-4 hover:ring-orange transition;
