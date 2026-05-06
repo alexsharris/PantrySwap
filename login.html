@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=\, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="./public/main.css" />
+    <title>Document</title>
+  </head>
+  <!-- replace the bg-color -->
+  <body class="bg-orange font-sans">
+    <!-- outer container -->
+    <div class="flex flex-row justify-center items-start">
+      <!-- placeholder for the image in big screen -->
+      <div class="md:block md:w-1/2 hidden">
+        <img
+          src="./images/Rectangle 9.jpg"
+          alt=""
+          class="h-screen object-cover w-full"
+        />
+      </div>
+
+      <!--headers and form  -->
+      <div
+        class="flex flex-col w-1/2 items-center justify-center space-y-5 mt-10"
+      >
+        <!-- logo and header container -->
+        <div class="flex flex-row justify-center items-center gap-1">
+          <!-- brightness-0 turns all the pixels black and invert makes them white -->
+          <img src="./images/Pantry_Swap_Icon.png" class="w-5 h-5 brightness-0 invert" alt="" />
+          <h1 class="h1 text-white">Pantry Swap</h1>
+        </div>
+
+        <h2 class="text-center pb-10 text-white">Help Your Community Prevent Food Waste.</h2>
+
+        <!-- form for log in -->
+        <form
+          action="submit" id="LoginForm"
+          class="card shadow-sm flex flex-col p-4 space-y-6 md:w-1/2 w-full min-h-50"
+        >
+          <div class="flex flex-col space-y-1">
+            <label class="font-bold" for="">Email</label>
+            <input
+              type="text"
+              id="emailLogin"
+              placeholder="Email"
+              class="text-sm border  border-gray-300 rounded-lg p-2"
+            />
+          </div>
+
+          <div class="flex flex-col space-y-1">
+            <label class="font-bold" for="">Password</label>
+            <input
+              type="password"
+              id="passwordLogin"
+              placeholder="Password"
+              class="text-sm border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="RememberLogin" name="Remember Me"><span>Remember Me</span>
+        </div>
+
+          <button
+            type="submit"
+            id="LoginBtn"
+            class="box-color-0 rounded-lg w-fit p-1 px-4 cursor-pointer"
+          >
+            Login
+          </button>
+        </form>
+
+        <!-- form for sign up, we remain on the same page -->
+        <form
+          action="submit" id="SignUpForm"
+          class="hidden card shadow-sm flex flex-col p-4 space-y-6 md:w-1/2 w-full min-h-50"
+        >
+          <div class="flex flex-col space-y-1">
+            <label class="font-bold" for="">Name</label>
+            <input
+              type="text"
+              id="name"
+              placeholder="Name"
+              class="text-sm border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+
+          <div class="flex flex-col space-y-1">
+            <label class="font-bold" for="">Email</label>
+            <input
+              type="text"
+              placeholder="Email"
+              id="emailSignup"
+              class="text-sm border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+
+          <div class="flex flex-col space-y-1">
+            <label class="font-bold" for="">Password</label>
+            <input
+              type="password"
+              id="passwordSignup"
+              placeholder="Password"
+              class="text-sm border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="RememberSignup" name="Remember Me"><span>Remember Me</span>
+        </div>
+
+          <button
+            type="submit"
+            id="signupBtn"
+            class="rounded-lg w-fit p-1 px-4 box-color-0 cursor-pointer"
+          >
+            Create Account
+          </button>
+        </form>
+
+        <button type="button" id="SignUpButton" class="text-white text-sm cursor-pointer">
+          Not registered? <span class="underline">Create an account</span>
+        </button>
+      </div>
+    </div>
+
+    <script src="./src/scripts/login.js"></script>
+  </body>
+</html>
