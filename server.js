@@ -109,6 +109,7 @@ app.post("/Login", async (req, res) => {
       // check if password matched set up the session
       if (PasswordMatched) {
         req.session.email = req.body.emailLogin;
+        req.session.UserID = user._id;
 
         if (req.body.RememberLogin) {
           // we can keep the cookie if remember me checked for 2 weeks in milliseconds
@@ -140,10 +141,11 @@ app.post("/SignUp", async (req, res) => {
 
   // create a new user in DB
   try {
-    await UserModel.create({ name: NewUserName, password: HashedPassword, email: NewUserEmail });
+    const user = await UserModel.create({ name: NewUserName, password: HashedPassword, email: NewUserEmail });
 
     // setting up the session for the new user
     req.session.email = NewUserEmail;
+    req.session.UserID = user._id;
 
     if (req.body.RememberSignup) {
       // we can keep the cookie if remember me checked for 2 weeks in milliseconds
