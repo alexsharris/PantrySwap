@@ -17,6 +17,9 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 
+app.use(express.static("src"))
+app.use(express.static("."))
+
 // schema for users
 const UserSchema = new mongoose.Schema({
   name: String,
@@ -45,7 +48,7 @@ const ListingsSchema = new mongoose.Schema({
   contact: String,
   description: String,
   category: {
-    type: String,
+    type: [String],
     enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked goods"],
     required: true,
   },
@@ -90,6 +93,21 @@ async function main() {
   });
 }
 
+
+app.get("/sell", (req, res) => {
+  res.render("sellListings.ejs");
+});
+
+
+app.get("/sellerListings", async (req, res) => {
+  try {
+    const listings = await ListingModel.find({seller: req.session.UserID});
+    res.json(listings);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({error: "Server error"});
+  }
+});
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
