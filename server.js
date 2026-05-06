@@ -36,6 +36,10 @@ const UserSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
     },
   ],
+  tutorials: {
+    create: Boolean,
+    search: Boolean,
+    bookmark: Boolean}
 });
 
 // schema of listings
@@ -81,6 +85,8 @@ app.use(
 );
 
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.set("view engine", "ejs");
 
 main().catch((err) => console.log(err));
@@ -99,6 +105,11 @@ app.get("/sell", (req, res) => {
 });
 
 
+app.get("/buy", (req, res) => {
+  res.render("buyListings.ejs")
+})
+
+
 app.get("/sellerListings", async (req, res) => {
   try {
     const listings = await ListingModel.find({seller: req.session.UserID});
@@ -108,8 +119,21 @@ app.get("/sellerListings", async (req, res) => {
     res.status(500).json({error: "Server error"});
   }
 });
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+
+
+app.get("/loadListings", async (req, res) => {
+  let filter = {}
+  try{
+    const listings = await ListingModel.find(filter)
+    if (listings.length == 0) return res.status(404).send("No listings found.")
+    res.send(listings)
+  }
+  catch (error){
+    console.log(error)
+  }
+})
+
+
 
 // Login route
 
@@ -227,7 +251,52 @@ app.delete("/DeleteAccount", async(req,res)=>{
 
   }
   catch(error){
+
     console.log(error);
-    res.status(500).json({ error: "Delete failed" });
+    res.status(500).send("Delete failed!");
+
   }
-})
+    
+
+});
+
+
+//get current user info
+app.get("/user", async (req, res) => {
+  try {
+    const currentUser = await UserModel.findOne({ _id: req.session.UserID });
+    res.json(currentUser);
+  }
+  catch (error) {
+    console.log(error);
+  }
+});
+
+
+//update user
+app.put("/updateUser/:id", async (req, res) => {
+  try {
+      const updated = await usersModel.findByIdAndUpdate(
+          req.params.id,
+          req.body,
+          {new:true, runValidators:true}
+      );
+
+      if (!updated) {
+          return res.status(400).json({ error: "User not updated" });
+      }
+
+      res.json({
+          message: `${req.body.name} updated successfully`,
+          data: updated
+      });
+  }
+  catch (err) {
+      res.status(404).json({error: err.message});
+  }
+});
+
+
+app.get("/tutorial", (req, res) => {
+  res.render("tutorial.ejs");
+});
