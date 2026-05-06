@@ -164,3 +164,45 @@ app.post("/SignUp", async (req, res) => {
 
 });
 
+//deleteListing route
+app.delete('/DeleteListing/:listingID', async (req, res) => {
+  const listingID = req.params.listingID
+  try {
+    await ListingModel.deleteOne({_id:listingID})
+    res.sendStatus(200)
+  }catch(error){
+    console.log('Error deleting listing:', error)
+  }
+})
+
+//Unlist Listing route
+app.put('/UnlistListing/:listingID', async (req, res) => {
+  const listingID = req.params.listingID
+  try{
+    const listingRecord = await ListingModel.findOne({_id:listingID})
+    listingRecord.status.type = "unlisted"
+    res.sendStatus(200)
+  }
+  catch(error){
+    console.log(error);
+    res.sendStatus(500).send('Could not unlist listing')
+  }
+})
+
+//Save Listing route
+app.put('/EditListing/:listingID', async (req, res) => {
+  const listingID = req.params.listingID
+  const {newTitle, newLocation, newPrice, newContact, newDescription, newCategory} = req.body
+  try{
+      const listingRecord = ListingModel.findOne({_id: listingID})
+      
+      if (newTitle) listingRecord.title = newTitle
+      if (newLocation) listingRecord.location = newLocation
+      if (newPrice) listingRecord.price = newPrice
+      if (newContact) listingRecord.contact = newContact
+      if (newDescription) listingRecord.description = newDescription
+      if (newCategory) listingRecord.category = newCategory
+
+
+  }
+})
