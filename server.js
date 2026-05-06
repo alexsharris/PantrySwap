@@ -182,11 +182,9 @@ app.post("/SignUp", async (req, res) => {
 
   // create a new user in DB
   try {
-    const user = await UserModel.create({
-      name: NewUserName,
-      password: HashedPassword,
-      email: NewUserEmail,
-    });
+    const user = await UserModel.create({ name: NewUserName, password: HashedPassword, email: NewUserEmail,
+      tutorials: {create:false, bookmark:false, search:false}
+     });
 
     // setting up the session for the new user
     req.session.email = NewUserEmail;
