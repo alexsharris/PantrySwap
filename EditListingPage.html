@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create a Listing Page</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         * {
             border: solid 1px;
@@ -12,16 +13,157 @@
 </head>
 <body>
     <nav></nav>
-    <!-- Header -->
-    <div id="" class="flex">
-        <div id="" class="flex">
-            <div id="" class="">Edit</div>
-            <div id="" class="">Listing</div>
+    <div id="" class=""></div>
+    <!-- page container S-->
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div id="" class="flex justify-between pt-16 pb-8">
+            <div id="" class="flex gap-8">
+                <div id="" class="">Edit Listing</div>
+                <div id="" class="">Listed</div>
+            </div>
+            <div id="" class="flex">
+                <button id="" class="">Unlist</button>
+                <button id="" class="">Delete</button>
+            </div>
         </div>
-        <div id="" class="flex">
-            <div id="" class="">Unlist</div>
-            <div id="" class="">Delete</div>
+        <!-- end of header -->
+
+        <hr class="py-4">
+
+        <!-- main content S-->
+        <div id="" class="flex gap-8">
+            <!-- left -->
+            <div id="" class="flex flex-col w-1/3 gap-2">
+                <div id="" class="">Image</div>
+                <div id="" class="flex-initial rounded-lg"><img src="images\pantry_share_img_13.jpg" alt=""></div>
+            </div>
+            <!-- Right -->
+            <div id="" class="flex w-2/3 pt-8">
+                <form class="w-full space-y-4" action="/editListing" method="PUT">
+                    <!-- short text inputs S -->
+                    <div id="" class="grid grid-cols-2 gap-6">
+                        <div id="" class="flex flex-col gap-1">
+                            <label class="font-bold" for="editTitle">Title</label>
+                            <input class="rounded-lg p-2" type="text" id="editTitle" name="editTitle" placeholder="Fresh fruits and vegetables" required>
+                        </div>
+                        <div id="" class="flex flex-col gap-1">
+                            <label class="font-bold" for="editLocation">Location</label>
+                            <input class="rounded-lg p-2" type="text" id="editLocation" name="editLocation" placeholder="V1Y 2KX" required>
+                        </div>
+                        <div id="" class="flex flex-col gap-1">
+                            <label class="font-bold" for="editPrice">Price</label>
+                            <input class="rounded-lg p-2" type="text" id="editPrice" name="editPrice" placeholder="Free" required>
+                        </div>
+                        <div id="" class="flex flex-col gap-1">
+                            <label class="font-bold" for="editContact">Contact Phone Number</label>
+                            <input class="rounded-lg p-2" type="text" id="editContact" name="editContact" placeholder="604 123 4567" required>
+                        </div>
+                    </div>
+                    <!-- short text inputs E -->
+
+                    <!-- description -->
+                    <div id="" class="flex flex-col w-full gap-1">
+                        <label class="font-bold" for="editDescription">Description</label>
+                        <textarea id="" class="rounded-lg p-2 h-30" name="editDescription" placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus natus cupiditate quas corporis, accusantium repellat?"></textarea>
+                    </div>
+
+                    <!-- foods S-->
+                    <div id="" class="flex flex-col w-full gap-1">
+                        <label class="font-bold" for="editFoods">Foods</label>
+                        <!-- foods list -->
+                        <div id="foodsList" class="">
+                            <div id="" class="flex justify-between rounded-lg">
+                                <!-- left -->
+                                <div id="" class="py-2 px-4">Gala Apples</div>
+                                <!-- right -->
+                                <div id="" class="flex">
+                                    <!-- minus -->
+                                    <div id="" class="py-2 px-6">-</div>
+                                    <!-- quant -->
+                                    <div id="" class="py-2 px-8">3</div>
+                                    <!-- plus -->
+                                    <div id="" class="py-2 px-6">+</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add food button -->
+                        <div id="" class="flex justify-between rounded-lg">
+                            <!-- left -->
+                            <div id="" class="py-2 px-4">Add food</div>
+                            <!-- right -->
+                            <div id="" class="py-2 px-6">+</div>
+                        </div>
+                    </div>
+                    <!-- foods E -->
+
+                    <!-- categories S-->
+                    <div id="" class="font-bold">
+                        Categories
+                        <div id="categoriesList" class="grid grid-cols-4 pt-4 gap-4">
+                            <!-- category card -->
+                            <div id="" class="flex flex-col rounded-lg p-1">
+                                <div id="" class="flex justify-end"><input class="w-6 h-6 appearance-none border-2 border-gray-400 rounded-full cursor-pointer checked:[background-image:radial-gradient(circle,#22c55e_50%,white_30%)]" type="radio"></div>
+                                <div id="" class="flex justify-center">
+                                    <img src="images\vegetables.svg" alt="">
+                                </div>
+                                <div id="" class="flex justify-center">Produce</div>
+                            </div>
+
+                            <div id="" class="flex flex-col rounded-lg p-1">
+                                <div id="" class="flex justify-end"><input class="w-6 h-6 appearance-none border-2 border-gray-400 rounded-full cursor-pointer checked:[background-image:radial-gradient(circle,#22c55e_50%,white_30%)]" type="radio"></div>
+                                <div id="" class="flex justify-center">
+                                    <img src="images\meat.svg" alt="">
+                                </div>
+                                <div id="" class="flex justify-center text">Meat</div>
+                            </div>
+
+                            <div id="" class="flex flex-col rounded-lg p-1">
+                                <div id="" class="flex justify-end">
+                                    <input class="w-6 h-6 appearance-none border-2 border-gray-400 rounded-full cursor-pointer checked:[background-image:radial-gradient(circle,#22c55e_50%,white_30%)]" type="radio">
+                                </div>
+                                <div id="" class="flex justify-center">
+                                    <img src="images\dairy.svg" alt="">
+                                </div>
+                                <div id="" class="flex justify-center text">Dairy</div>
+                            </div>
+
+                            <div id="" class="flex flex-col rounded-lg p-1">
+                                <div id="" class="flex justify-end">
+                                    <input class="w-6 h-6 appearance-none border-2 border-gray-400 rounded-full cursor-pointer checked:[background-image:radial-gradient(circle,#22c55e_50%,white_30%)]" type="radio">
+                                </div>
+                                <div id="" class="flex justify-center">
+                                    <img src="images\baked goods.svg" alt="">
+                                </div>
+                                <div id="" class="flex justify-center text">Baked Goods</div>
+                            </div>
+
+                            <div id="" class="flex flex-col rounded-lg p-1">
+                                <div id="" class="flex justify-end">
+                                    <input class="w-6 h-6 appearance-none border-2 border-gray-400 rounded-full cursor-pointer checked:[background-image:radial-gradient(circle,#22c55e_50%,white_30%)]" type="radio">
+                                </div>
+                                <div id="" class="flex justify-center">
+                                    <img src="images\cooked meals.svg" alt="">
+                                </div>
+                                <div id="" class="flex justify-center text">Cooked Meals</div>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                        
+                    </div>
+                    <!-- categories E -->
+
+
+                </form>
+
+            </div>
         </div>
+        <!-- main content E -->
     </div>
+    <!-- page container E -->
+
 </body>
 </html>
