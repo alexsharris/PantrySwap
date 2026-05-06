@@ -17,6 +17,9 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 
+app.use(express.static("src"))
+app.use(express.static("."))
+
 // schema for users
 const UserSchema = new mongoose.Schema({
   name: String,
@@ -202,4 +205,9 @@ app.put("/updateUser/:id", async (req, res) => {
   catch (err) {
       res.status(404).json({error: err.message});
   }
+});
+
+
+app.get("/tutorial", (req, res) => {
+  res.render("tutorial.ejs");
 });
