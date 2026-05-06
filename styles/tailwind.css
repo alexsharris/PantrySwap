@@ -20,7 +20,32 @@
   --color-red: #d22e2e;
   --color-green: #3ca850;
 }
-
+/* ===================================================================== */
+/* COLOR COMBOS */
+/* ===================================================================== */
+@layer components {
+  .box-color-0 {
+    @apply bg-orange text-white;
+  }
+  .box-color-1 {
+    @apply bg-peach text-light-brown;
+  }
+  .box-color-2 {
+    @apply bg-peach text-orange;
+  }
+  .box-color-3 {
+    @apply bg-light-grey text-medium-grey;
+  }
+  .box-color-4 {
+    @apply bg-red text-white;
+  }
+  .box-color-5 {
+    @apply bg-white text-medium-grey;
+  }
+  .overlay {
+    @apply bg-black/60;
+  }
+}
 /* ===================================================================== */
 /* HEADERS + TEXT */
 /* ===================================================================== */
@@ -47,29 +72,7 @@
     @apply text-[13px];
   }
 }
-/* ===================================================================== */
-/* COLOR COMBOS */
-/* ===================================================================== */
-@layer components {
-  .box-color-0 {
-    @apply bg-orange text-white;
-  }
-  .box-color-1 {
-    @apply bg-peach text-light-brown;
-  }
-  .box-color-2 {
-    @apply bg-peach text-orange;
-  }
-  .box-color-3 {
-    @apply bg-light-grey text-medium-grey;
-  }
-  .box-color-4 {
-    @apply bg-red text-white;
-  }
-  .box-color-5 {
-    @apply bg-white text-medium-grey;
-  }
-}
+
 /* ===================================================================== */
 /* INPUTS */
 /* ===================================================================== */
