@@ -3,6 +3,11 @@ import {
   closePopupWindow,
   displayWindow,
 } from "../scripts/popupWindow.js";
+import {
+  getDayName,
+  getDayWithSuffix,
+  getMonthName,
+} from "../scripts/dateTime.js";
 const bellSVG = [
   `<svg
         xmlns="http://www.w3.org/2000/svg"
@@ -60,8 +65,11 @@ const formatWindow = (notificationItems) => {
 };
 
 const formatNotificationItem = (notification) => {
+  const date = notification.createdAt;
+  const month = getMonthName(date);
+  const dayStr = getDayWithSuffix(date);
   return `<div class="card-item px-10 ">
-          <p class="text-light-brown">${notification.createdAt}</p>
+          <p class="text-light-brown">${month} ${dayStr}</p>
           <h2 class="">${notification.message}</h2>
         </div>`;
 };
