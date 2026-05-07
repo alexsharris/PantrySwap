@@ -26,14 +26,46 @@ function prefillForm(listingRecord){
     document.getElementById('editCookedMeals').checked = listingRecord.category.includes('Cooked Meals')? true : false
 }
 
-function loadFoods(){
-    
+function loadFoods(listingRecord){
+    const foodsArray = listingRecord.foods
+
+    const foodsList = document.getElementById('foodsList')
+    foodsList.innerHTML = ""
+
+    foodsArray.forEach((food) => {
+        const foodBar = document.createElement('div')
+        foodBar.className = "flex justify-between rounded-lg text-light-brown border-[#9b9b9b] border-solid border"
+        foodBar.innerHTML = `
+            <!-- left -->
+            <div id="" class="py-2 px-4">${food.name}</div>
+            <!-- right -->
+            <div id="" class="flex">
+                <!-- minus -->
+                <div id="minusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">-</div>
+                <!-- quant -->
+                <div id="itemQuant" class="py-2 px-8 border-[#9b9b9b] border-solid border-l">${food.quantity}</div>
+                <!-- plus -->
+                <div id="plusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">+</div>
+            </div>
+        `
+        foodBar.querySelector("#minusQuant").addEventListener("click", () => {
+            if (food.quantity > 0) food.quantity = food.quantity - 1
+            console.log("food quantity:", food.quantity);
+        })
+
+        foodBar.querySelector('#plusQuant').addEventListener("click", () => {
+            food.quantity = food.quantity + 1
+        })
+
+        foodsList.appendChild(foodBar)
+    })
 }
 
 
 async function initializePage(){
-    const listing = await loadListingData()
-    prefillForm(listing)
+    const data = await loadListingData()
+    prefillForm(data)
+    loadFoods(data)
 }
 
 initializePage()
