@@ -48,8 +48,10 @@ const ListingsSchema = new mongoose.Schema({
   contact: String,
   description: String,
   category: {
-    type: [String],
-    enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked goods"],
+    type: [{
+      type: String,
+      enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked goods"],
+    }],
     required: true,
   },
   foods: [{ name: String, quantity: Number }],
@@ -253,7 +255,7 @@ app.put('/EditListing/:listingID', async (req, res) => {
   const listingID = req.params.listingID
   const {newImage, newTitle, newLocation, newPrice, newContact, newDescription, newCategory} = req.body
   try{
-      const listingRecord = ListingModel.findOne({_id: listingID})
+      const listingRecord = await ListingModel.findOne({_id: listingID})
       
       if (newImage) listingRecord.image = newImage
       if (newTitle) listingRecord.title = newTitle
@@ -262,6 +264,8 @@ app.put('/EditListing/:listingID', async (req, res) => {
       if (newContact) listingRecord.contact = newContact
       if (newDescription) listingRecord.description = newDescription
       if (newCategory) listingRecord.category = newCategory
+      
+      await listingRecord.save()
   }
   catch(error){
     console.log(error);

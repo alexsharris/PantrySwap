@@ -49,7 +49,7 @@
             </div>
             <!-- Right -->
             <div id="" class="flex min-[915px]:w-2/3 pt-8">
-                <form class="w-full space-y-4" action="/editListing" method="PUT">
+                <form class="w-full space-y-4" action="/EditListing" method="PUT">
                     <!-- short text inputs S -->
                     <div id="" class="grid min-[915px]:grid-cols-2 gap-6">
                         <div id="" class="flex flex-col gap-1">
@@ -74,7 +74,7 @@
                     <!-- description -->
                     <div id="" class="flex flex-col w-full gap-1">
                         <label class="" for="editDescription">Description</label>
-                        <textarea id="" class="h-30 border-[#9b9b9b] placeholder-[#d8c3bb]" name="editDescription" placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus natus cupiditate quas corporis, accusantium repellat?"></textarea>
+                        <textarea id="editDescription" class="h-30 border-[#9b9b9b] placeholder-[#d8c3bb]" name="editDescription" placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus natus cupiditate quas corporis, accusantium repellat?"></textarea>
                     </div>
 
                     <!-- foods S-->
@@ -88,11 +88,11 @@
                                 <!-- right -->
                                 <div id="" class="flex">
                                     <!-- minus -->
-                                    <div id="" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">-</div>
+                                    <div id="minusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">-</div>
                                     <!-- quant -->
-                                    <div id="" class="py-2 px-8 border-[#9b9b9b] border-solid border-l">3</div>
+                                    <div id="itemQuant" class="py-2 px-8 border-[#9b9b9b] border-solid border-l">3</div>
                                     <!-- plus -->
-                                    <div id="" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">+</div>
+                                    <div id="plusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">+</div>
                                 </div>
                             </div>
                         </div>
@@ -114,7 +114,7 @@
                             <!-- category card -->
                             <div id="" class="flex flex-col rounded-lg p-2 border border-[#9b9b9b]">
                                 <div id="" class="flex justify-end">
-                                    <input class="w-6 h-6 accent-white" type="checkbox">
+                                    <input id="editProduce" class="w-6 h-6 accent-white" type="checkbox">
                                 </div>
                                 <div id="" class="flex justify-center">
                                     <img src="images\vegetables.svg" alt="">
@@ -124,7 +124,7 @@
 
                             <div id="" class="flex flex-col rounded-lg p-2 border border-[#9b9b9b]">
                                 <div id="" class="flex justify-end">
-                                    <input class="w-6 h-6 accent-white" type="checkbox">
+                                    <input id="editMeat" class="w-6 h-6 accent-white" type="checkbox">
                                 </div>
                                 <div id="" class="flex justify-center">
                                     <img src="images\meat.svg" alt="">
@@ -134,7 +134,7 @@
 
                             <div id="" class="flex flex-col rounded-lg p-2 border border-[#9b9b9b]">
                                 <div id="" class="flex justify-end">
-                                    <input class="w-6 h-6 accent-white" type="checkbox">
+                                    <input id="editDairy" class="w-6 h-6 accent-white" type="checkbox">
                                 </div>
                                 <div id="" class="flex justify-center">
                                     <img src="images\dairy.svg" alt="">
@@ -144,7 +144,7 @@
 
                             <div id="" class="flex flex-col rounded-lg p-2 border border-[#9b9b9b]">
                                 <div id="" class="flex justify-end">
-                                    <input class="w-6 h-6 accent-white" type="checkbox">
+                                    <input id="editBakedGoods" class="w-6 h-6 accent-white" type="checkbox">
                                 </div>
                                 <div id="" class="flex justify-center">
                                     <img src="images\baked goods.svg" alt="">
@@ -154,7 +154,7 @@
 
                             <div id="" class="flex flex-col rounded-lg p-2 border border-[#9b9b9b]">
                                 <div id="" class="flex justify-end">
-                                    <input class="w-6 h-6 accent-white" type="checkbox">
+                                    <input id="editCookedMeals" class="w-6 h-6 accent-white" type="checkbox">
                                 </div>
                                 <div id="" class="flex justify-center">
                                     <img src="images\cooked meals.svg" alt="">
