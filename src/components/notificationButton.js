@@ -23,6 +23,27 @@ const bellSVG = [
         </svg>`,
 ];
 
+const seedNotifications = [
+  {
+    message: "Your listing has received a new offer.",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1001",
+    createdAt: new Date(),
+  },
+  {
+    message: "Your item was successfully sold.",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1002",
+    createdAt: new Date(),
+  },
+  {
+    message: "Someone commented on your listing.",
+    hasSeen: false,
+    listing: "680fa1d23c4b2a001f9d1003",
+    createdAt: new Date(),
+  },
+];
+
 class NotificationButton extends HTMLElement {
   constructor() {
     super();
@@ -46,6 +67,10 @@ class NotificationButton extends HTMLElement {
   }
 
   setNotifications(notifications) {
+    notifications = seedNotifications;
+    this.hasNotifications = notifications.some(
+      (notif) => notif.hasSeen == false,
+    );
     console.log(notifications);
   }
 

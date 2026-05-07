@@ -32,6 +32,7 @@ const UserSchema = new mongoose.Schema({
   notifications: [
     {
       message: String,
+      hasSeen: Boolean,
       listing: String, // _id of the related listing
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
     },
