@@ -157,7 +157,7 @@ app.post("/Login", async (req, res) => {
           // we can keep the cookie if remember me checked for 2 weeks in milliseconds
           req.session.cookie.maxAge = 14 * 24 * 3600 * 1000;
         }
-        res.redirect("/home");
+        res.redirect("/buy");
       }
       // if password doesnt match
       else res.status(401).json({ error: "Invalid credentials"});
@@ -195,7 +195,7 @@ app.post("/SignUp", async (req, res) => {
       req.session.cookie.maxAge = 14 * 24 * 3600 * 1000;
     }
 
-    res.redirect("/home");
+    res.redirect("/buy");
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "registration failed"});
