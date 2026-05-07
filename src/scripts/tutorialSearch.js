@@ -1,7 +1,7 @@
-//if(!currentUser.tutorials.bookmark)
+//Display tutorial
 const searchTutorial = async function() {
     const currentUser = await fetch("/user")
-    if(true) {
+    if(!currentUser.search.create) {
 
         //Display tutorial
         let tutorialContainer = document.createElement("div");
@@ -36,19 +36,18 @@ const searchTutorial = async function() {
         tutorialContainer.innerHTML = stepOne + stepTwo;
         document.body.prepend(tutorialContainer);
 
-        // Set bookmark tutorial to True
-        // const res = await fetch(`/updateUser/id=${currentUser._id}`, {
-        //     method: "PUT",
-        //     headers: {
-        //         "Content-Type": "application/json"
-        //     },
-        //     body: JSON.stringify({
-        //         name: currentUser.name,
-        //         tutorials: {bookmark: true}
-        //     })
-        // });
+        // Set search tutorial to True
+        const res = await fetch(`/updateUser/${currentUser._id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "tutorials.search": true
+            })
+        });
+    
     }
-
     else {
         return;
     }

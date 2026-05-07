@@ -152,7 +152,7 @@ app.post("/Login", async (req, res) => {
           // we can keep the cookie if remember me checked for 2 weeks in milliseconds
           req.session.cookie.maxAge = 14 * 24 * 3600 * 1000;
         }
-        res.redirect("/home");
+        res.redirect("/buy");
       }
       // if password doesnt match
       else res.status(401).json({ error: "Invalid credentials" });
@@ -193,15 +193,46 @@ app.post("/SignUp", async (req, res) => {
       req.session.cookie.maxAge = 14 * 24 * 3600 * 1000;
     }
 
-    res.redirect("/home");
+    res.redirect("/buy");
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "registration failed" });
   }
 });
 
+// setting up a middleware to protect the following routes for non-logged in users
+
+function isAuthenticated(req, res, next) {
+  if (req.session.UserID) next();
+  else res.redirect("/Login");
+}
+
+// ==================================================================
+// any route that needs protection for non-logged in users goes after this line
+// ==================================================================
+
+app.use(isAuthenticated);
+
 // get route for sending back user information for account page
 app.get("/Account", async (req, res) => {
+  try {
+    res.sendFile(__dirname + "/account.html");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error!" });
+  }
+});
+
+app.get("/AccountData", async (req, res) => {
+  try {
+    res.sendFile(__dirname + "/account.html");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error!" });
+  }
+});
+
+app.get("/AccountData", async (req, res) => {
   try {
     const Data = await UserModel.findById({ _id: req.session.UserID });
     res.json(Data);
@@ -274,7 +305,7 @@ app.put("/updateUser/:id", async (req, res) => {
     }
 
     res.json({
-      message: `${req.body.name} updated successfully`,
+      message: `Updated successfully`,
       data: updated,
     });
   } catch (err) {
@@ -285,6 +316,22 @@ app.put("/updateUser/:id", async (req, res) => {
 app.get("/tutorial", (req, res) => {
   res.render("tutorial.ejs");
 });
+
+// routes for rendering listing details page and loading it dynamically
+app.get("/listingDetails/:id", async (req, res) => {
+  try {
+    const listing = await ListingModel.findById({ _id: req.params.id });
+    const user = await UserModel.findById(
+      { _id: listing.seller },
+      { city: 1, name: 1 },
+    );
+    res.render("listingDetails", { listing, user });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+});
+
 app.get("/home", (req, res) => {
   res.redirect("/test.html");
 });
