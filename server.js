@@ -202,8 +202,30 @@ app.post("/SignUp", async (req, res) => {
   }
 });
 
+// setting up a middleware to protect the following routes for non-logged in users
+
+function isAuthenticated(req, res, next) {
+  if (req.session.UserID) next();
+  else res.redirect("/Login");
+}
+
+// ==================================================================
+// any route that needs protection for non-logged in users goes after this line
+// ==================================================================
+
+app.use(isAuthenticated);
+
 // get route for sending back user information for account page
 app.get("/Account", async (req, res) => {
+  try {
+    res.sendFile(__dirname + "/account.html");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json( {error: "Internal Server Error!"});
+  }
+});
+
+app.get("/AccountData", async (req, res) => {
   try {
     const Data = await UserModel.findById({ _id: req.session.UserID });
     res.json(Data);
