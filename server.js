@@ -298,3 +298,17 @@ app.put("/updateUser/:id", async (req, res) => {
 app.get("/tutorial", (req, res) => {
   res.render("tutorial.ejs");
 });
+
+// routes for rendering listing details page and loading it dynamically
+app.get("/listingDetails/:id", async(req,res)=>{
+   
+  try{
+    const listing = await ListingModel.findById({_id: req.params.id});
+    const user = await UserModel.findById({_id: listing.seller}, {city: 1, name: 1});
+    res.render("listingDetails", {listing, user});
+  }
+  catch(error){
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+})
