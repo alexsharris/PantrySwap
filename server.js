@@ -285,7 +285,7 @@ app.put("/updateUser/:id", async (req, res) => {
       }
 
       res.json({
-          message: `${req.body.name} updated successfully`,
+          message: `Updated successfully`,
           data: updated
       });
   }
