@@ -1,3 +1,8 @@
+import {
+  displaySimpleWindow,
+  closePopupWindow,
+  displayWindow,
+} from "../scripts/popupWindow.js";
 const bellSVG = [
   `<svg
         xmlns="http://www.w3.org/2000/svg"
@@ -25,6 +30,12 @@ const bellSVG = [
 
 const seedNotifications = [
   {
+    message: "Someone commented on your listing.",
+    hasSeen: false,
+    listing: "680fa1d23c4b2a001f9d1003",
+    createdAt: new Date(),
+  },
+  {
     message: "Your listing has received a new offer.",
     hasSeen: true,
     listing: "680fa1d23c4b2a001f9d1001",
@@ -36,19 +47,55 @@ const seedNotifications = [
     listing: "680fa1d23c4b2a001f9d1002",
     createdAt: new Date(),
   },
-  {
-    message: "Someone commented on your listing.",
-    hasSeen: false,
-    listing: "680fa1d23c4b2a001f9d1003",
-    createdAt: new Date(),
-  },
 ];
+
+const formatWindow = (notificationItems) => {
+  return `
+          <div class="flex justify-between px-10 py-5">
+            <h1>Notifications</h1>
+            <div class="text-medium-grey">${bellSVG[0]}</div>
+          </div>
+          ${notificationItems || `<div class="card-item px-10 text-light-brown">No notifications yet!</div>`}
+          <div class="border-b border-peach px-4 -mx-4"></div>`;
+};
+
+const formatNotificationItem = (notification) => {
+  return `<div class="card-item px-10 ">
+          <p class="text-light-brown">${notification.createdAt}</p>
+          <h2 class="">${notification.message}</h2>
+        </div>`;
+};
+
+function notificationItems(notifications) {
+  let output = "";
+  notifications.forEach((notif) => {
+    output += formatNotificationItem(notif);
+  });
+  return output;
+}
+
+function showWindow(notifications) {
+  notifications = seedNotifications;
+  displayWindow(
+    formatWindow(notificationItems(notifications)),
+    [
+      {
+        label: "Close",
+        color: "box-color-0",
+        hover: "hover-outline",
+        onClick: () => console.log("Close"),
+      },
+    ],
+    true,
+    `card min-w-1/2`,
+  );
+}
 
 class NotificationButton extends HTMLElement {
   constructor() {
     super();
     this.user = null;
-    this.hasNotifications = false;
+    this.notifications = [];
     this.renderBtn();
     this.addEventListener("click", this.clickEvent);
   }
@@ -61,21 +108,14 @@ class NotificationButton extends HTMLElement {
       const response = await fetch("http://localhost:3000/user");
       const data = await response.json();
       this.user = data;
+      this.notifications = this.user.notifications;
     } catch (error) {
       console.error("Error fetching user:", error);
     }
   }
 
-  setNotifications(notifications) {
-    notifications = seedNotifications;
-    this.hasNotifications = notifications.some(
-      (notif) => notif.hasSeen == false,
-    );
-    console.log(notifications);
-  }
-
   clickEvent() {
-    console.log("BUTTON CLICKED");
+    showWindow(this.notifications);
   }
   // ======================
   // RENDER LOGIC
@@ -83,8 +123,12 @@ class NotificationButton extends HTMLElement {
 
   async renderBtn() {
     await this.getUser();
-    if (this.user) this.setNotifications(this.user.notifications);
-    const buttonClass = this.hasNotifications
+
+    const hasNotifications = this.notifications
+      ? this.notifications.some((notif) => notif.hasSeen == false)
+      : false;
+
+    const buttonClass = hasNotifications
       ? `text-orange hover:text-black`
       : `text-medium-grey hover:text-black`;
 

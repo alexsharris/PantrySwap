@@ -40,7 +40,12 @@ export function displaySimpleWindow(message, functions, autoClose = true) {
   displayWindow(formattedMessage, functions, autoClose);
 }
 
-export function displayWindow(message, functions = "", autoClose = true) {
+export function displayWindow(
+  message,
+  functions = "",
+  autoClose = true,
+  customCardStle = "",
+) {
   document.body.style.overflow = "hidden";
 
   const window = document.createElement("div");
@@ -54,11 +59,15 @@ export function displayWindow(message, functions = "", autoClose = true) {
 
   // create content card
   const card = document.createElement("div");
-  card.className =
-    "card flex flex-col items-center justify-center p-7 md:max-w-1/4 max-w-1/2 md:min-w-2/5 min-w-3/4";
-
   const messageEl = document.createElement("div");
-  messageEl.className = "max-w-[80%] text-center";
+  if (customCardStle) {
+    card.className = customCardStle;
+  } else {
+    card.className =
+      "card flex flex-col items-center justify-center p-7 md:max-w-1/4 max-w-1/2 md:min-w-2/5 min-w-3/4";
+    messageEl.className = "max-w-[80%] text-center";
+  }
+
   messageEl.innerHTML = message;
 
   const newButtons = createButtons(functions, autoClose);
