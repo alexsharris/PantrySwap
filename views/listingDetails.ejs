@@ -12,18 +12,16 @@
     <!-- navbar -->
     <site-navbar></site-navbar>
     <!-- main content -->
-    <div class="site-margins">
+    <div class="site-margins w-11/12 mx-auto">
       <!-- Add main content here! -->
 
-      <h1 class="mb-5">View Listing</h1>
-
       <!-- listing image and seller initial info container -->
-      <div class="card flex flex-col gap-5 h-113 p-0 mb-7">
+      <div class="card flex flex-col gap-5 h-113 p-0 mb-7 ">
         <img
           id="listingImage"
           src= "/<%= listing.image %>"
           alt=""
-          class="object-cover w-full h-3/4"
+          class="object-cover w-full h-3/4 mx-auto md:mx-0"
         />
         <!-- container of seller img, name and city -->
         <div class="flex flex-row gap-4 justify-start items-center px-5">
@@ -31,7 +29,7 @@
             id="sellerImage"
             src="/images/businessShark.jpg"
             alt=""
-            class="object-cover rounded-full w-15 h-15"
+            class="object-cover rounded-full size-15"
           />
 
           <!-- name and city container -->
