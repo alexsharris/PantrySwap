@@ -3,8 +3,12 @@
 // this function will fetch informtaion from DB to present as the default placeholders in the form
 async function GetDefaultInformation(){
 
-    const ServerResponse = await fetch("http://localhost:3000/Account");
+    const ServerResponse = await fetch("/AccountData");
     const ServerResponseJson = await ServerResponse.json();
+
+    // assign user's name and city
+    document.getElementById("UserCurrentName").innerHTML = ServerResponseJson.name;
+    document.getElementById("Usercity").innerHTML = ServerResponseJson.city || "Unknown";
     
     // assign the information retrieved to each placeholder
     document.getElementById("UserNewName").placeholder = ServerResponseJson.name;
@@ -36,16 +40,16 @@ form.addEventListener("submit", async(e)=>{
     if(Phone) {UserNewphone = Phone;}
     if(City) {UserNewCity = City;}
 
-    const Response = await fetch("http://localhost:3000/ChangeData", {
+    const Response = await fetch("/ChangeData", {
       method: "PUT",
       redirect: "follow",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ UserNewName, UserNewEmail, UserNewphone, UserNewCity}),
     });
-
+    await GetDefaultInformation();
 });
 
 // add delete functionality
 document.getElementById("DeleteAccount").addEventListener("click", async()=>{
-    const Response = await fetch("http://localhost:3000/DeleteAccount" , { method: "DELETE" })
+    const Response = await fetch("/DeleteAccount", { method: "DELETE" });
 }) 
