@@ -65,13 +65,13 @@ const formatWindow = (notificationItems) => {
 };
 
 const formatNotificationItem = (notification) => {
-  const date = notification.createdAt;
+  const date = new Date(notification.createdAt);
   const month = getMonthName(date);
   const dayStr = getDayWithSuffix(date);
   const hasSeen = notification.hasSeen;
   return `<div class="card-item px-10 ">
           <p class="text-light-brown">${month} ${dayStr}</p>
-          <h2 class="${hasSeen ? `text-light-brown` : `text-orange`}">${notification.message}</h2>
+          <h2 class="${hasSeen ? `text-black` : `text-orange`}">${notification.message}</h2>
         </div>`;
 };
 
@@ -111,37 +111,31 @@ class NotificationButton extends HTMLElement {
   // ======================
   // LOGIC
   // ======================
-
   async getUser() {
-    try {
-      const response = await fetch("/user");
-      const data = await response.json();
-      this.userId = data._id;
+    const response = await fetch("/user");
+    const data = await response.json();
+
+    if (
+      data.notifications.length === 0 ||
+      data.notifications.length !== seedNotifications.length
+    ) {
+      await fetch(`/updateUser/${data._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notifications: seedNotifications }),
+      });
+
+      const refreshed = await fetch("/user");
+      const refreshedData = await refreshed.json();
+
+      this.user = refreshedData;
+      this.notifications = refreshedData.notifications;
+    } else {
       this.user = data;
-      this.notifications = this.user.notifications;
-    } catch (error) {
-      console.error("Error fetching user:", error);
+      this.notifications = data.notifications;
     }
 
-    // Seed if no notifications
-    if (this.user && this.user.notifications.length === 0) {
-      try {
-        const response = await fetch("http://localhost:3000/user");
-        const data = await response.json();
-        console.log(data);
-        await fetch(`/updateUser/${data._id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            notifications: seedNotifications,
-          }),
-        });
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    }
+    this.userId = this.user._id;
   }
 
   async clickEvent() {
@@ -175,17 +169,16 @@ class NotificationButton extends HTMLElement {
   async renderBtn() {
     await this.getUser();
 
-    const hasNotifications = this.notifications
+    const hasUnreadNotifications = this.notifications
       ? this.notifications.some((notif) => notif.hasSeen == false)
       : false;
-
-    const buttonClass = hasNotifications
+    const buttonClass = hasUnreadNotifications
       ? `text-orange hover:text-black`
       : `text-medium-grey hover:text-black`;
 
     this.innerHTML = `
       <button class="${buttonClass} p-0">
-      ${hasNotifications ? bellSVG[1] : bellSVG[0]}
+      ${hasUnreadNotifications ? bellSVG[1] : bellSVG[0]}
       </button>
     `;
   }
