@@ -315,7 +315,6 @@ app.get("/user", async (req, res) => {
 app.put("/updateUser/:id", async (req, res) => {
   try {
     console.log(req.body);
-    Z;
     const updateFields = {};
 
     if (req.body?.["tutorials.search"] !== undefined) {
