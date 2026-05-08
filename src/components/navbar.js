@@ -1,10 +1,12 @@
-class Navbar extends HTMLElement {
-    constructor() {
-        super()
-        this.renderNavbar()
-    }
+import "./notificationButton.js";
 
-    renderNavbar(){
+class Navbar extends HTMLElement {
+  constructor() {
+    super();
+    this.renderNavbar();
+  }
+
+  renderNavbar() {
     this.innerHTML = `
     <nav class="bg-white text-[#FF6700] font-extrabold z-20 relative p-6 md:drop-shadow-xl">
         <div class="flex min-w-full md:relative md:w-auto justify-between">
@@ -14,22 +16,25 @@ class Navbar extends HTMLElement {
                 Pantry Swap
                 </h1>
             </div>
-            <div class="flex gap-12 self-center">
-                <div class="flex gap-6 md:visible md:w-auto w-0 invisible">
-                    <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="buyBtnDesktop">
-                    Buy
-                    </button>
-                    <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="sellBtnDesktop">
-                    Sell
-                    </button>
-                    <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="savedBtnDesktop">
-                    Saved
-                    </button>
-                    <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="accountBtnDesktop">
-                    Account
-                    </button>
+            <div class="flex justify-end gap-3">
+                <div class="flex gap-12 self-center">
+                    <div class="flex gap-6 md:visible md:w-auto w-0 invisible">
+                        <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="buyBtnDesktop">
+                        Buy
+                        </button>
+                        <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="sellBtnDesktop">
+                        Sell
+                        </button>
+                        <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="savedBtnDesktop">
+                        Saved
+                        </button>
+                        <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="accountBtnDesktop">
+                        Account
+                        </button>
+                
+                    </div>
                 </div>
-                <img src="/images/bell-svgrepo-com.svg" class="size-6 self-center">
+                <notification-btn></notification-btn>
             </div>
         </div>
 
@@ -48,11 +53,10 @@ class Navbar extends HTMLElement {
             </button>
         </div>
     </nav>
-    `
-}
-
+    `;
+  }
 }
 
 // bg-[#FF6700]
 
-customElements.define("site-navbar", Navbar)
+customElements.define("site-navbar", Navbar);

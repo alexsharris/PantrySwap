@@ -15,10 +15,10 @@ document.addEventListener("DOMContentLoaded", async() => {
                         <h4 class="text-orange font-semibold">$${newListing.price}</h4>
                     </div>
                     <div class="flex justify-between gap-2">
-                        <button class="bg-orange rounded-xl py-2 mb-4 text-white font-semibold cursor-pointer">
+                        <button class="bg-orange rounded-xl py-2 mb-4 text-white font-semibold cursor-pointer" id="${newListing._id}ViewBtn">
                         View
                         </button>
-                        <button class="bg-light-grey rounded-xl py-2 mb-4 text-black font-semibold cursor-pointer">
+                        <button class="bg-light-grey rounded-xl py-2 mb-4 text-black font-semibold cursor-pointer hidden">
                         Edit
                         </button>
                     </div>
@@ -29,5 +29,11 @@ document.addEventListener("DOMContentLoaded", async() => {
         listingDiv = document.createElement("div")
         listingDiv.innerHTML = listingHTML
         listingHolder.appendChild(listingDiv)
+        document.getElementById(`${newListing._id}ViewBtn`).addEventListener('click', ()=> {
+            console.log(newListing._id)
+            window.location.assign(`http://localhost:3000/listingDetails/${newListing._id}`)
+        })
+
+        })
+
     })
-})

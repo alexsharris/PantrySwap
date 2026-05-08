@@ -18,7 +18,7 @@ const LoginForm = document
 
     // make the post request to get the user
 
-    const Response = await fetch("http://localhost:3000/Login", {
+    const Response = await fetch("/Login", {
       method: "POST",
       redirect: "follow",
       headers: { "Content-Type": "application/json" },
@@ -47,7 +47,7 @@ const SignUpForm = document
 
     // making the post request to send new user info to the server
 
-    const Response = await fetch("http://localhost:3000/SignUp", {
+    const Response = await fetch("/SignUp", {
       method: "POST",
       redirect: "follow",
       headers: { "Content-Type": "application/json" },
