@@ -8,9 +8,9 @@ const bookmarkTutorial = async function() {
         tutorialContainer.classList.add("tutorialContainer", "absolute", "bg-black/40", "flex", "top-0", "left-0", "px-10", "h-screen", "w-full", "z-25", "items-center", "justify-center");
 
         let stepOne = `
-            <div id="stepOne" class="relative flex flex-col bg-white rounded-lg pb-5 px-10 pt-10 max-w-60 justify-center shadow-xl">
+            <div id="stepOne" class="relative flex flex-col bg-white rounded-lg pb-5 px-10 pt-10 max-w-70 justify-center shadow-xl">
                 <button class="closeButton absolute top-2 right-2 rounded-full w-7 h-7 bg-[#D9D9D9]"><img src="images/closeIcon.png" class="p-2"></button>
-                <img src="images/tutorialBookmarkStep1.png" class="mb-5">
+                <img src="images/tutorialBookmarkStep1.png" class="mb-5 p-2">
                 <h2 class="text-lg text-bold text-center font-bold mb-5  leading-[1.1]">Select the bookmark button to add to your collection</h2>
                 <button class="nextButtonTwo bg-[#FF6700] rounded-lg px-4 py-2 mb-5 text-white font-bold">Next</button>
                 <div class="progressBar flex justify-center gap-2">
@@ -21,9 +21,9 @@ const bookmarkTutorial = async function() {
         `
 
         let stepTwo = `
-            <div id="stepTwo" class="relative flex flex-col bg-white rounded-lg pb-5 px-10 pt-10 max-w-60 justify-center shadow-xl hidden">
+            <div id="stepTwo" class="relative flex flex-col bg-white rounded-lg pb-5 px-10 pt-10 max-w-70 justify-center shadow-xl hidden">
                 <button class="closeButton absolute top-2 right-2 rounded-full w-7 h-7 bg-[#D9D9D9]"><img src="images/closeIcon.png" class="p-2"></button>
-                <img src="images/tutorialBookmarkStep2.png" class="mb-5">
+                <img src="images/tutorialBookmarkStep2.png" class="mb-5 p-2">
                 <h2 class="text-lg text-bold text-center font-bold mb-5  leading-[1.1]">View bookmarks in the saved tab</h2>
                 <button class="closeButton bg-[#FF6700] rounded-lg px-4 py-2 mb-5 text-white font-bold">Close</button>
                 <div class="progressBar flex justify-center gap-2">
