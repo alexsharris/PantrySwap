@@ -1,15 +1,27 @@
 //Display tutorial
-const searchTutorial = async function() {
-    const response = await fetch("/user")
-    const currentUser =  await response.json();
-    console.log(currentUser)
-    if(!currentUser.tutorials.search) {
+const searchTutorial = async function () {
+  const response = await fetch("/user");
+  const currentUser = await response.json();
+  console.log(currentUser);
+  if (!currentUser.tutorials.search) {
+    //Display tutorial
+    let tutorialContainer = document.createElement("div");
+    tutorialContainer.classList.add(
+      "tutorialContainer",
+      "absolute",
+      "bg-black/40",
+      "flex",
+      "top-0",
+      "left-0",
+      "px-10",
+      "h-screen",
+      "w-full",
+      "z-25",
+      "items-center",
+      "justify-center",
+    );
 
-        //Display tutorial
-        let tutorialContainer = document.createElement("div");
-        tutorialContainer.classList.add("tutorialContainer", "absolute", "bg-black/40", "flex", "top-0", "left-0", "px-10", "h-screen", "w-full", "z-25", "items-center", "justify-center");
-
-        let stepOne = `
+    let stepOne = `
             <div id="stepOne" class="relative flex flex-col bg-white rounded-lg pb-5 px-10 pt-10 max-w-70 justify-center shadow-xl">
                 <button class="closeButton absolute top-2 right-2 rounded-full w-7 h-7 bg-[#D9D9D9]"><img src="images/closeIcon.png" class="p-2"></button>
                 <img src="images/tutorialSearchStep1.png" class="mb-5 p-2">
@@ -20,9 +32,9 @@ const searchTutorial = async function() {
                     <div class="bg-[#D9D9D9] rounded-full h-2 w-2"></div>
                 </div>
             </div>
-        `
+        `;
 
-        let stepTwo = `
+    let stepTwo = `
             <div id="stepTwo" class="relative flex flex-col bg-white rounded-lg pb-5 px-10 pt-10 max-w-70 justify-center shadow-xl hidden">
                 <button class="closeButton absolute top-2 right-2 rounded-full w-7 h-7 bg-[#D9D9D9]"><img src="images/closeIcon.png" class="p-2"></button>
                 <img src="images/tutorialSearchStep2.png" class="mb-5 p-2">
@@ -33,30 +45,30 @@ const searchTutorial = async function() {
                     <div class="bg-[#FF6700] rounded-full h-2 w-2"></div>
                 </div>
             </div>
-        `
+        `;
 
-        tutorialContainer.innerHTML = stepOne + stepTwo;
-        document.body.prepend(tutorialContainer);
+    tutorialContainer.innerHTML = stepOne + stepTwo;
+    document.body.prepend(tutorialContainer);
 
-        // Set search tutorial to True
-        const res = await fetch(`/updateUser/${currentUser._id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                "tutorials.search": true
-            })
-        });
-    
-    }
-    else {
-        return;
-    }
-}
+    // Set search tutorial to True
+    const res = await fetch(
+      `http://localhost:3000/updateUser/${currentUser._id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "tutorials.search": true,
+        }),
+      },
+    );
+  } else {
+    return;
+  }
+};
 
-
-document.addEventListener("load", searchTutorial())
+document.addEventListener("load", searchTutorial());
 
 document.addEventListener("click", async (event) => {
   if (event.target.closest(".closeButton")) {
