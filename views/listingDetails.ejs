@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pantry Swap</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script type="module" src="/src/components/navbar.js"></script>
+    <link rel="stylesheet" href="/public/main.css" />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <!-- navbar -->
+    <site-navbar></site-navbar>
+    <!-- main content -->
+    <div class="site-margins w-11/12 mx-auto">
+      <!-- Add main content here! -->
+
+      <!-- listing image and seller initial info container -->
+      <div class="card flex flex-col gap-5 h-113 p-0 mb-7 ">
+        <img
+          id="listingImage"
+          src= "/<%= listing.image %>"
+          alt=""
+          class="object-cover w-full h-3/4 mx-auto md:mx-0"
+        />
+        <!-- container of seller img, name and city -->
+        <div class="flex flex-row gap-4 justify-start items-center px-5">
+          <img
+            id="sellerImage"
+            src="/images/businessShark.jpg"
+            alt=""
+            class="object-cover rounded-full size-15"
+          />
+
+          <!-- name and city container -->
+          <div class="flex flex-col gap-1">
+            <h5 id="sellerName"><%= user.name %></h5>
+            <p id="city"><%= user.city || "Unknown" %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- listing details contains 2 containers -->
+      <section
+        class="grid md:grid-cols-2 items-start gap-5 md:gap-24 md:pb-0 pb-25"
+      >
+        <!-- title description and bookmarking -->
+        <div class="flex flex-col justify-start gap-5">
+          <!-- title and price container -->
+          <div class="flex flex-col">
+            <h1 id="listTitle"><%= listing.title %></h1>
+
+            <!-- the syntax for this is a shortened if statement, db stores numbers so if zero its Free -->
+            <!-- otherwise concatenate '$' string with the price (string as a final result) -->
+            <h3 id="price" class="text-orange">
+              <%= listing.price == 0? "Free" : "$" + listing.price %>
+            </h3>
+          </div>
+
+          <!-- button for bookmarking -->
+          <button
+            type="button"
+            id="bookmark"
+            class="button box-color-0 w-50 whitespace-nowrap flex flex-row gap-1 justify-center items-center hover-bright"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="white"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6 shrink-0"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+              />
+            </svg>
+            Save For Later
+          </button>
+
+          <!-- description -->
+          <div class="flex flex-col gap-1">
+            <h3 class="font-bold">Description</h3>
+            <p id="description">
+              <%= listing.description %>
+            </p>
+          </div>
+        </div>
+
+        <!-- contents pickup info and contact -->
+        <div class="flex flex-col justify-start gap-6">
+          <!-- contents -->
+          <div class="flex flex-col gap-3">
+            <h3 class="font-bold">Contents</h3>
+
+            <% listing.foods.forEach(food =>{
+              %><div
+              class="card bg-peach box-color-1 flex flex-row justify-between"
+            >
+              <div><%= food.name %></div>
+              <div>X<span><%= food.quantity %></span></div>
+            </div> 
+               <%
+            })
+            %>
+            
+          </div>
+
+          <!-- container of pickup info -->
+          <div class="flex flex-col gap-2">
+            <h3 class="font-bold">Pickup Location</h3>
+            <p id="address"><%= listing.location %></p>
+          </div>
+
+          <!-- container of phone -->
+          <div class="flex flex-col gap-2">
+            <h3 class="font-bold">Contact Information</h3>
+            <p class="flex flex-row items-center gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="black"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
+                />
+              </svg>
+              <!-- display listing.contact if it exists, otherwise fall back to user.phone. -->
+              <%= listing.contact ? listing.contact : user.phone %>
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- scripts -->
+    <script src="/src/scripts/listingDetails.js"></script>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantry Swap</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script type="module" src="/src/components/navbar.js"></script>
+    <script src="/src/scripts/buyListings.js" defer></script>
+    <link rel="stylesheet" href="./public/main.css"/>
+    <script src="/src/scripts/tutorialSearch.js" defer></script>
+</head>
+<body class="min-h-screen flex flex-col">
+    <site-navbar></site-navbar>
+    <!-- main body starts here -->
+     <div class="site-margins mx-auto max-w-screen">
+        <!-- category and distance buttons -->
+        <div class="flex gap-2 mb-8 ml-8 md:ml-0">
+            <button class="border-2 rounded-full p-2 border-[#DCDCDC] font-semibold min-w-24 cursor-pointer" id="categoriesBtn">
+                Categories
+            </button>
+            <button class="border-2 rounded-full p-2 border-[#DCDCDC] font-semibold min-w-24 cursor-pointer" id="distanceBtn">
+                Distance
+            </button>
+        </div>
+
+        <!-- div for holding listings, for now holds placeholder cards -->
+        <div class="flex flex-col md:flex-row flex-wrap gap-10 mx-auto mb-20" id="listingsHolder">
+        </div>
+     </div>
+</body>
+</html>

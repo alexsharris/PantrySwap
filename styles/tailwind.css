@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/* ===================================================================== */
+/* COLORS */
+/* ===================================================================== */
+@theme {
+  --font-sans: "Outfit", sans-serif;
+
+  /* ============================= */
+  /* COLORS */
+  /* ============================= */
+
+  /* NEUTRALS */
+  --color-light-grey: #d9d9d9;
+  --color-medium-grey: #9b9b9b;
+  /* Main Colors */
+  --color-orange: #ff6700;
+  --color-peach: #f6e8e8;
+  --color-light-brown: #a07564;
+  --color-red: #d22e2e;
+  --color-green: #3ca850;
+}
+/* ===================================================================== */
+/* COLOR COMBOS */
+/* ===================================================================== */
+@layer components {
+  .box-color-0 {
+    @apply bg-orange text-white;
+  }
+  .box-color-1 {
+    @apply bg-peach text-light-brown;
+  }
+  .box-color-2 {
+    @apply bg-peach text-orange;
+  }
+  .box-color-3 {
+    @apply bg-light-grey text-medium-grey;
+  }
+  .box-color-4 {
+    @apply bg-red text-white;
+  }
+  .box-color-5 {
+    @apply bg-white text-medium-grey;
+  }
+  .overlay {
+    @apply bg-black/60;
+  }
+  .text-light-brown {
+    @apply text-light-brown;
+  }
+}
+/* ===================================================================== */
+/* HEADERS + TEXT */
+/* ===================================================================== */
+@layer base {
+  h1 {
+    @apply text-[32px] font-bold;
+  }
+  h2 {
+    @apply text-[22px] font-bold;
+  }
+  h3 {
+    @apply text-[22px];
+  }
+  h4 {
+    @apply text-[22px];
+  }
+  h5 {
+    @apply text-[22px];
+  }
+  h6 {
+    @apply text-[22px];
+  }
+  p {
+    @apply text-[13px];
+  }
+}
+
+/* ===================================================================== */
+/* INPUTS */
+/* ===================================================================== */
+@layer components {
+  input,
+  textarea,
+  select {
+    @apply w-full rounded-xl border border-light-brown bg-white px-4 py-3 text-sm text-black outline-none transition;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply border-orange ring-2 ring-orange/30;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-medium-grey;
+  }
+
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    @apply bg-peach text-medium-grey cursor-not-allowed opacity-70;
+  }
+
+  label {
+    @apply font-bold text-black text-xl;
+  }
+}
+
+/* ===================================================================== */
+/* CUSTOM CLASSES */
+/* ===================================================================== */
+@layer components {
+  /* For x margins on each page */
+  .site-margins {
+    @apply py-5 md:py-10 md:px-20 flex-1;
+  }
+
+  /* Cards and windows */
+  .card {
+    @apply rounded-3xl bg-white shadow-[0_4px_10px_rgba(0,0,0,0.10)] overflow-hidden p-4;
+  }
+  .card-item {
+    @apply border-t border-peach px-4 py-4 -mx-4;
+  }
+
+  /* Buttons */
+  button {
+    @apply py-3 px-10 rounded-xl font-semibold;
+  }
+  .hover-bright {
+    @apply hover:brightness-120 hover:drop-shadow-lg hover:saturate-150 transition;
+  }
+  .hover-outline {
+    @apply hover:shadow-lg hover:ring-4 hover:ring-orange transition;
+  }
+  .hover-accent-text {
+    @apply hover:text-orange transition;
+  }
+}
