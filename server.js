@@ -54,7 +54,7 @@ const ListingsSchema = new mongoose.Schema({
   category: {
     type: [{
       type: String,
-      enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked goods"],
+      enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked Goods"],
     }],
     required: true,
   },
@@ -266,7 +266,7 @@ app.get('/EditListing', (req, res) => {
 })
 
 //delete listing route - soft deleting only
-app.delete('/DeleteListing/:listingID', async (req, res) => {
+app.put('/DeleteListing/:listingID', async (req, res) => {
   const listingID = req.params.listingID
   try {
     const listingRecord = await ListingModel.findOne({_id:listingID})
@@ -307,22 +307,48 @@ app.get('/LoadListing/:listingID', async (req, res) => {
   }
 })
 
-//Save Listing route
-app.put('/EditListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
-  const {newImage, newTitle, newLocation, newPrice, newContact, newDescription, newCategory} = req.body
+//Create listing route
+app.post('/CreateListing', (req, res) => {
+  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory} = req.body
   try{
       const listingRecord = await ListingModel.findOne({_id: listingID})
       
-      if (newImage) listingRecord.image = newImage
-      if (newTitle) listingRecord.title = newTitle
-      if (newLocation) listingRecord.location = newLocation
-      if (newPrice) listingRecord.price = newPrice
-      if (newContact) listingRecord.contact = newContact
-      if (newDescription) listingRecord.description = newDescription
-      if (newCategory) listingRecord.category = newCategory
+      if (updatedImage) listingRecord.image = updatedImage
+      if (updatedTitle) listingRecord.title = updatedTitle
+      if (updatedLocation) listingRecord.location = updatedLocation
+      if (updatedPrice) listingRecord.price = updatedPrice
+      if (updatedContact) listingRecord.contact = updatedContact
+      if (updatedDescription) listingRecord.description = updatedDescription
+      if (updatedCategory) listingRecord.category = updatedCategory
       
       await listingRecord.save()
+      res.sendStatus(200)
+  }
+  catch(error){
+    console.log(error);
+    res.status(500).send('Edit listing form could not be saved.')
+  }
+})
+
+
+//Save Listing route
+app.put('/EditListing/:listingID', async (req, res) => {
+  const listingID = req.params.listingID
+  console.log('This is the req.body:', req.body);
+  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory} = req.body
+  try{
+      const listingRecord = await ListingModel.findOne({_id: listingID})
+      
+      if (updatedImage) listingRecord.image = updatedImage
+      if (updatedTitle) listingRecord.title = updatedTitle
+      if (updatedLocation) listingRecord.location = updatedLocation
+      if (updatedPrice) listingRecord.price = updatedPrice
+      if (updatedContact) listingRecord.contact = updatedContact
+      if (updatedDescription) listingRecord.description = updatedDescription
+      if (updatedCategory) listingRecord.category = updatedCategory
+      
+      await listingRecord.save()
+      res.sendStatus(200)
   }
   catch(error){
     console.log(error);
