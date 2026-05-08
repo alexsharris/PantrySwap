@@ -1,8 +1,7 @@
 //Display tutorial
-//(!currentUser.tutorials.bookmark)
 const bookmarkTutorial = async function() {
     const currentUser = await fetch("/user")
-    if(true) {
+    if(!currentUser.tutorials.bookmark) {
 
         //Display tutorial
         let tutorialContainer = document.createElement("div");

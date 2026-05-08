@@ -1,7 +1,7 @@
 //Display tutorial
 const searchTutorial = async function() {
     const currentUser = await fetch("/user")
-    if(true) {
+    if(!currentUser.tutorials.search) {
 
         //Display tutorial
         let tutorialContainer = document.createElement("div");

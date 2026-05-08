@@ -1,7 +1,7 @@
 //Display tutorial
 const createTutorial = async function() {
     const currentUser = await fetch("/user")
-    if(true) {
+    if(!currentUser.tutorials.create) {
 
         //Display tutorial
         let tutorialContainer = document.createElement("div");
