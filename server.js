@@ -89,6 +89,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.set("view engine", "ejs");
 
+
 main().catch((err) => console.log(err));
 
 async function main() {
@@ -294,12 +295,35 @@ app.delete("/DeleteAccount", async(req,res)=>{
 
 //get current user info
 app.get("/user", async (req, res) => {
+  console.log("USER ROUTE HIT");
+  console.log(req.session);
+
   try {
-    const currentUser = await UserModel.findOne({ _id: req.session.UserID });
+    if (!req.session.UserID) {
+      return res.status(401).json({
+        error: "No session"
+      });
+    }
+
+    const currentUser = await UserModel.findById(
+      req.session.UserID
+    );
+
+    if (!currentUser) {
+      return res.status(404).json({
+        error: "User not found"
+      });
+    }
+
     res.json(currentUser);
-  }
-  catch (error) {
+
+  } catch (error) {
+
     console.log(error);
+
+    res.status(500).json({
+      error: error.message
+    });
   }
 });
 
@@ -307,23 +331,31 @@ app.get("/user", async (req, res) => {
 //update user
 app.put("/updateUser/:id", async (req, res) => {
   try {
+
+      console.log(req.body);
+
       const updated = await UserModel.findByIdAndUpdate(
           req.params.id,
-          req.body,
-          {new:true, runValidators:true}
+          {
+            $set: {
+              "tutorials.search": req.body.tutorialSearch
+            }
+          },
+          {
+            new: true,
+            runValidators: true
+          }
       );
 
-      if (!updated) {
-          return res.status(400).json({ error: "User not updated" });
-      }
+      res.json(updated);
 
-      res.json({
-          message: `Updated successfully`,
-          data: updated
+  } catch (err) {
+
+      console.log(err);
+
+      res.status(500).json({
+          error: err.message
       });
-  }
-  catch (err) {
-      res.status(404).json({error: err.message});
   }
 });
 
