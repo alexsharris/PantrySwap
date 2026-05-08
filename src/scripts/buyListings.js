@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         listingHolder.appendChild(listingDiv)
         document.getElementById(`${newListing._id}ViewBtn`).addEventListener('click', ()=> {
             console.log(newListing._id)
-            window.location.assign(`http://localhost:3000/${newListing._id}`)
+            window.location.assign(`http://localhost:3000/listingDetails/${newListing._id}`)
         })
 
         })
