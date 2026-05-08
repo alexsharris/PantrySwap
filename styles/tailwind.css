@@ -45,11 +45,14 @@
   .overlay {
     @apply bg-black/60;
   }
+  .text-light-brown {
+    @apply text-light-brown;
+  }
 }
 /* ===================================================================== */
 /* HEADERS + TEXT */
 /* ===================================================================== */
-@layer components {
+@layer base {
   h1 {
     @apply text-[32px] font-bold;
   }
