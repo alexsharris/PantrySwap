@@ -325,6 +325,10 @@ app.put("/updateUser/:id", async (req, res) => {
       updateFields["tutorials.create"] = req.body["tutorials.create"];
     }
 
+    if (req.body?.["tutorials.bookmark"] !== undefined) {
+      updateFields["tutorials.bookmark"] = req.body["tutorials.bookmark"];
+    }
+
     if (req.body?.notifications !== undefined) {
       updateFields.notifications = req.body.notifications;
     }
@@ -354,6 +358,10 @@ app.put("/updateUser/:id", async (req, res) => {
       error: err.message,
     });
   }
+});
+
+app.get("/bookmark", (req, res) => {
+  res.sendFile(__dirname + "/bookmark.html");
 });
 
 app.get("/tutorial", (req, res) => {
