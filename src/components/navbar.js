@@ -16,22 +16,25 @@ class Navbar extends HTMLElement {
                 Pantry Swap
                 </h1>
             </div>
-            <div class="flex gap-12 self-center">
-                <div class="flex gap-6 md:visible md:w-auto w-0 invisible">
-                    <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="buyBtnDesktop">
-                    Buy
-                    </button>
-                    <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="sellBtnDesktop">
-                    Sell
-                    </button>
-                    <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="savedBtnDesktop">
-                    Saved
-                    </button>
-                    <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="accountBtnDesktop">
-                    Account
-                    </button>
-                    <notification-btn></notification-btn>
+            <div class="flex justify-end gap-3">
+                <div class="flex gap-12 self-center">
+                    <div class="flex gap-6 md:visible md:w-auto w-0 invisible">
+                        <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="buyBtnDesktop">
+                        Buy
+                        </button>
+                        <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="sellBtnDesktop">
+                        Sell
+                        </button>
+                        <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="savedBtnDesktop">
+                        Saved
+                        </button>
+                        <button class="hover:bg-[#F6E8E8] text-[#9B9B9B] hover:text-[#FF6700] rounded-lg p-2 min-w-18" id="accountBtnDesktop">
+                        Account
+                        </button>
+                
+                    </div>
                 </div>
+                <notification-btn></notification-btn>
             </div>
         </div>
 
