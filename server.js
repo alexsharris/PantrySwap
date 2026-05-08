@@ -321,6 +321,10 @@ app.put("/updateUser/:id", async (req, res) => {
       updateFields["tutorials.search"] = req.body["tutorials.search"];
     }
 
+     if (req.body?.["tutorials.create"] !== undefined) {
+      updateFields["tutorials.create"] = req.body["tutorials.create"];
+    }
+
     if (req.body?.notifications !== undefined) {
       updateFields.notifications = req.body.notifications;
     }
