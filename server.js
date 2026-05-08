@@ -307,21 +307,24 @@ app.get('/LoadListing/:listingID', async (req, res) => {
   }
 })
 
+// Serves the create listing page
+app.get('/CreateListing', async (req, res) => {
+  res.render('createListingPage.ejs')
+})
+
 //Create listing route
-app.post('/CreateListing', (req, res) => {
-  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory} = req.body
+app.post('/CreateListing', async (req, res) => {
+  const {image, title, location, price, contact, description, category} = req.body
   try{
-      const listingRecord = await ListingModel.findOne({_id: listingID})
-      
-      if (updatedImage) listingRecord.image = updatedImage
-      if (updatedTitle) listingRecord.title = updatedTitle
-      if (updatedLocation) listingRecord.location = updatedLocation
-      if (updatedPrice) listingRecord.price = updatedPrice
-      if (updatedContact) listingRecord.contact = updatedContact
-      if (updatedDescription) listingRecord.description = updatedDescription
-      if (updatedCategory) listingRecord.category = updatedCategory
-      
-      await listingRecord.save()
+      const newListing = await ListingModel.create({
+        seller: req.session.UserID,
+        image: image,
+        title: title,
+        location: location,
+        price: price,
+        contact: contact,
+        category: category
+      })
       res.sendStatus(200)
   }
   catch(error){
