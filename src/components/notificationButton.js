@@ -104,16 +104,18 @@ const seedNotifications = [
 
 const formatWindow = (notificationItems) => {
   return `
-          <div class="flex justify-between px-10 py-5">
-            <h1>Notifications</h1>
-            <div class="text-medium-grey">${bellSVG[0]}</div>
-          </div>
-            <div class="h-100 overflow-y-auto">
-            ${notificationItems || `<div class="card-item px-10 text-light-brown">No notifications yet!</div>`}
-            </div>
-          <div class="border-b border-peach px-4 -mx-4"></div>`;
+    <div class="flex flex-col max-h-[75vh]">
+      <div class="flex justify-between px-10 py-5 shrink-0">
+        <h1>Notifications</h1>
+        <div class="text-medium-grey">${bellSVG[0]}</div>
+      </div>
+      <div class="flex-1 overflow-y-auto overflow-x-hidden">
+        ${notificationItems || `<div class="card-item px-10 text-light-brown">No notifications yet!</div>`}
+      </div>
+      <div class="border-b border-peach px-4 -mx-4 shrink-0"></div>
+    </div>
+  `;
 };
-
 const formatNotificationItem = (notification) => {
   const date = new Date(notification.createdAt);
   const month = getMonthName(date);
@@ -145,7 +147,7 @@ function showWindow(notifications) {
       },
     ],
     true,
-    `card min-w-1/2`,
+    `card md:max-w-1/4 max-w-1/2 md:min-w-2/5 min-w-3/4`,
   );
 }
 
