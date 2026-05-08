@@ -116,5 +116,6 @@ const buttons = [
 // calling the function to send the delete request
 
 async function deleteAccount() {
-  await fetch("/DeleteAccount", { method: "DELETE" });
+   await fetch("/DeleteAccount", { method: "DELETE" });
+   window.location.href = "/Login";
 }

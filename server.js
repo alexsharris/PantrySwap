@@ -135,7 +135,12 @@ app.get("/loadListings", async (req, res) => {
 
 
 
-// Login route
+// Login routes
+
+app.get("/Login", (req, res) => {
+  res.sendFile(__dirname + "/login.html");
+});
+
 
 app.post("/Login", async (req, res) => {
   try {
@@ -266,8 +271,7 @@ app.delete("/DeleteAccount", async(req,res)=>{
   try{
 
     await UserModel.findByIdAndDelete({_id: req.session.UserID});
-    req.session.destroy(); //kill the session after deleting
-    res.json({ message: "Account deleted" });
+    req.session.destroy(() => res.redirect("/Login"));
 
   }
   catch(error){
