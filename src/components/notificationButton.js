@@ -68,9 +68,10 @@ const formatNotificationItem = (notification) => {
   const date = notification.createdAt;
   const month = getMonthName(date);
   const dayStr = getDayWithSuffix(date);
+  const hasSeen = notification.hasSeen;
   return `<div class="card-item px-10 ">
           <p class="text-light-brown">${month} ${dayStr}</p>
-          <h2 class="">${notification.message}</h2>
+          <h2 class="${hasSeen ? `text-light-brown` : `text-orange`}">${notification.message}</h2>
         </div>`;
 };
 
@@ -83,7 +84,6 @@ function notificationItems(notifications) {
 }
 
 function showWindow(notifications) {
-  notifications = seedNotifications;
   displayWindow(
     formatWindow(notificationItems(notifications)),
     [
@@ -103,9 +103,10 @@ class NotificationButton extends HTMLElement {
   constructor() {
     super();
     this.user = null;
+    this.userId = null;
     this.notifications = [];
     this.renderBtn();
-    this.addEventListener("click", this.clickEvent);
+    this.addEventListener("click", () => this.clickEvent());
   }
   // ======================
   // LOGIC
@@ -113,17 +114,59 @@ class NotificationButton extends HTMLElement {
 
   async getUser() {
     try {
-      const response = await fetch("http://localhost:3000/user");
+      const response = await fetch("/user");
       const data = await response.json();
+      this.userId = data._id;
       this.user = data;
       this.notifications = this.user.notifications;
     } catch (error) {
       console.error("Error fetching user:", error);
     }
+
+    // Seed if no notifications
+    if (this.user && this.user.notifications.length === 0) {
+      try {
+        const response = await fetch("/user");
+        const data = await response.json();
+        console.log(data);
+        await fetch(`/updateUser/${data._id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            notifications: seedNotifications,
+          }),
+        });
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    }
   }
 
-  clickEvent() {
+  async clickEvent() {
     showWindow(this.notifications);
+
+    if (!this.user) return;
+    const updatedNotifications = this.notifications.map((notif) => ({
+      ...notif,
+      hasSeen: true,
+    }));
+
+    await fetch(`/updateUser/${this.userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        notifications: updatedNotifications,
+      }),
+    });
+
+    // update user info
+    await this.getUser();
+
+    this.renderBtn();
   }
   // ======================
   // RENDER LOGIC
@@ -142,7 +185,7 @@ class NotificationButton extends HTMLElement {
 
     this.innerHTML = `
       <button class="${buttonClass} p-0">
-        ${this.hasNotifications ? bellSVG[1] : bellSVG[0]}
+      ${hasNotifications ? bellSVG[1] : bellSVG[0]}
       </button>
     `;
   }

@@ -294,11 +294,10 @@ app.get("/user", async (req, res) => {
 //update user
 app.put("/updateUser/:id", async (req, res) => {
   try {
-    const updated = await usersModel.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true },
-    );
+    const updated = await UserModel.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!updated) {
       return res.status(400).json({ error: "User not updated" });
