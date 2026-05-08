@@ -1,6 +1,6 @@
 //Display tutorial
 const bookmarkTutorial = async function() {
-    const currentUser = await fetch("/user")
+    const currentUser = await (await fetch("/user")).json();
     if(!currentUser.tutorials.bookmark) {
 
         //Display tutorial
