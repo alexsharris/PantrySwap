@@ -41,9 +41,57 @@ const seedNotifications = [
     createdAt: new Date(),
   },
   {
-    message: "Your listing has received a new offer.",
+    message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     hasSeen: true,
     listing: "680fa1d23c4b2a001f9d1001",
+    createdAt: new Date(),
+  },
+  {
+    message: "Your item was successfully sold.",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1002",
+    createdAt: new Date(),
+  },
+  {
+    message: "Your item was successfully sold.",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1002",
+    createdAt: new Date(),
+  },
+  {
+    message: "Your item was successfully sold.",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1002",
+    createdAt: new Date(),
+  },
+  {
+    message: "Your item was successfully sold.",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1002",
+    createdAt: new Date(),
+  },
+  {
+    message: "Your item was successfully sold.",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1002",
+    createdAt: new Date(),
+  },
+  {
+    message: "Your item was successfully sold.",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1002",
+    createdAt: new Date(),
+  },
+  {
+    message: "Your item was successfully sold.",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1002",
+    createdAt: new Date(),
+  },
+  {
+    message: "Your item was successfully sold.",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1002",
     createdAt: new Date(),
   },
   {
@@ -60,7 +108,9 @@ const formatWindow = (notificationItems) => {
             <h1>Notifications</h1>
             <div class="text-medium-grey">${bellSVG[0]}</div>
           </div>
-          ${notificationItems || `<div class="card-item px-10 text-light-brown">No notifications yet!</div>`}
+            <div class="h-100 overflow-y-auto">
+            ${notificationItems || `<div class="card-item px-10 text-light-brown">No notifications yet!</div>`}
+            </div>
           <div class="border-b border-peach px-4 -mx-4"></div>`;
 };
 
