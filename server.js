@@ -17,8 +17,8 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 
-app.use(express.static("src"));
-app.use(express.static("."));
+app.use(express.static("src"))
+app.use(express.static("."))
 
 // schema for users
 const UserSchema = new mongoose.Schema({
@@ -32,7 +32,6 @@ const UserSchema = new mongoose.Schema({
   notifications: [
     {
       message: String,
-      hasSeen: Boolean,
       listing: String, // _id of the related listing
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
     },
@@ -40,8 +39,7 @@ const UserSchema = new mongoose.Schema({
   tutorials: {
     create: Boolean,
     search: Boolean,
-    bookmark: Boolean,
-  },
+    bookmark: Boolean}
 });
 
 // schema of listings
@@ -91,6 +89,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.set("view engine", "ejs");
 
+
 main().catch((err) => console.log(err));
 
 async function main() {
@@ -101,36 +100,48 @@ async function main() {
   });
 }
 
+
 app.get("/sell", (req, res) => {
   res.render("sellListings.ejs");
 });
 
+
 app.get("/buy", (req, res) => {
-  res.render("buyListings.ejs");
-});
+  res.render("buyListings.ejs")
+})
+
 
 app.get("/sellerListings", async (req, res) => {
   try {
-    const listings = await ListingModel.find({ seller: req.session.UserID });
+    const listings = await ListingModel.find({seller: req.session.UserID});
     res.json(listings);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({error: "Server error"});
   }
 });
+
 
 app.get("/loadListings", async (req, res) => {
-  let filter = {};
-  try {
-    const listings = await ListingModel.find(filter);
-    if (listings.length == 0) return res.status(404).send("No listings found.");
-    res.send(listings);
-  } catch (error) {
-    console.log(error);
+  let filter = {}
+  try{
+    const listings = await ListingModel.find(filter)
+    if (listings.length == 0) return res.status(404).send("No listings found.")
+    res.send(listings)
   }
+  catch (error){
+    console.log(error)
+  }
+})
+
+
+
+// Login routes
+
+app.get("/Login", (req, res) => {
+  res.sendFile(__dirname + "/login.html");
 });
 
-// Login route
 
 app.post("/Login", async (req, res) => {
   try {
@@ -152,16 +163,20 @@ app.post("/Login", async (req, res) => {
           // we can keep the cookie if remember me checked for 2 weeks in milliseconds
           req.session.cookie.maxAge = 14 * 24 * 3600 * 1000;
         }
-        res.redirect("/buy");
+        //makes the redirect wait until the session is fully written to session file, because other routes like
+        // user were still loading the previous user who was logged in
+        // redirecting would be trigger without setting the session properly without this
+
+        req.session.save(() => res.redirect("/buy"));
       }
       // if password doesnt match
-      else res.status(401).json({ error: "Invalid credentials" });
+      else res.status(401).json({ error: "Invalid credentials"});
     }
     // if user email doesnt exist in the DB
-    else res.status(401).json({ error: "Invalid credentials" });
+    else res.status(401).json({ error: "Invalid credentials"});
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Login failed" });
+    res.status(500).json({ error: "Login failed"});
   }
 });
 
@@ -177,12 +192,9 @@ app.post("/SignUp", async (req, res) => {
 
   // create a new user in DB
   try {
-    const user = await UserModel.create({
-      name: NewUserName,
-      password: HashedPassword,
-      email: NewUserEmail,
-      tutorials: { create: false, bookmark: false, search: false },
-    });
+    const user = await UserModel.create({ name: NewUserName, password: HashedPassword, email: NewUserEmail,
+      tutorials: {create:false, bookmark:false, search:false}
+     });
 
     // setting up the session for the new user
     req.session.email = NewUserEmail;
@@ -192,11 +204,14 @@ app.post("/SignUp", async (req, res) => {
       // we can keep the cookie if remember me checked for 2 weeks in milliseconds
       req.session.cookie.maxAge = 14 * 24 * 3600 * 1000;
     }
+    //makes the redirect wait until the session is fully written to session file, because other routes like
+    // user were still loading the previous user who was logged in. 
+    // redirecting would be trigger without setting the session properly without this
 
-    res.redirect("/buy");
+    req.session.save(() => res.redirect("/buy"));
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "registration failed" });
+    res.status(500).json({ error: "registration failed"});
   }
 });
 
@@ -219,16 +234,7 @@ app.get("/Account", async (req, res) => {
     res.sendFile(__dirname + "/account.html");
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal Server Error!" });
-  }
-});
-
-app.get("/AccountData", async (req, res) => {
-  try {
-    res.sendFile(__dirname + "/account.html");
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Internal Server Error!" });
+    res.status(500).json( {error: "Internal Server Error!"});
   }
 });
 
@@ -238,7 +244,7 @@ app.get("/AccountData", async (req, res) => {
     res.json(Data);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal Server Error!" });
+    res.status(500).json( {error: "Internal Server Error!"});
   }
 });
 
@@ -262,75 +268,112 @@ app.put("/ChangeData", async (req, res) => {
       { _id: req.session.UserID },
       { $set: UpdatedFields },
     );
-    res.json({ message: "Updated Successfully!" });
+    res.json({ message: "Updated Successfully!"});
   } catch (error) {
     res.status(500).json({ error: "Update failed" });
   }
 });
 
 // add a route to delete an account
-app.delete("/DeleteAccount", async (req, res) => {
-  try {
-    await UserModel.findByIdAndDelete({ _id: req.session.UserID });
-    req.session.destroy(); //kill the session after deleting
-    res.json({ message: "Account deleted" });
-  } catch (error) {
+app.delete("/DeleteAccount", async(req,res)=>{
+  try{
+
+    await UserModel.findByIdAndDelete({_id: req.session.UserID});
+    req.session.destroy(() => res.redirect("/Login"));
+
+  }
+  catch(error){
+
     console.log(error);
     res.status(500).send("Delete failed!");
+
   }
+    
+
 });
+
 
 //get current user info
 app.get("/user", async (req, res) => {
-  console.log(req.session.UserID);
+  console.log("USER ROUTE HIT");
+  console.log(req.session);
+
   try {
-    const currentUser = await UserModel.findOne({ _id: req.session.UserID });
+    if (!req.session.UserID) {
+      return res.status(401).json({
+        error: "No session"
+      });
+    }
+
+    const currentUser = await UserModel.findById(
+      req.session.UserID
+    );
+
+    if (!currentUser) {
+      return res.status(404).json({
+        error: "User not found"
+      });
+    }
+
     res.json(currentUser);
+
   } catch (error) {
+
     console.log(error);
+
+    res.status(500).json({
+      error: error.message
+    });
   }
 });
+
 
 //update user
 app.put("/updateUser/:id", async (req, res) => {
   try {
-    const updated = await UserModel.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
 
-    if (!updated) {
-      return res.status(400).json({ error: "User not updated" });
-    }
+      console.log(req.body);
 
-    res.json({
-      message: `Updated successfully`,
-      data: updated,
-    });
+      const updated = await UserModel.findByIdAndUpdate(
+          req.params.id,
+          {
+            $set: {
+              "tutorials.search": req.body.tutorialSearch
+            }
+          },
+          {
+            new: true,
+            runValidators: true
+          }
+      );
+
+      res.json(updated);
+
   } catch (err) {
-    res.status(404).json({ error: err.message });
+
+      console.log(err);
+
+      res.status(500).json({
+          error: err.message
+      });
   }
 });
+
 
 app.get("/tutorial", (req, res) => {
   res.render("tutorial.ejs");
 });
 
 // routes for rendering listing details page and loading it dynamically
-app.get("/listingDetails/:id", async (req, res) => {
-  try {
-    const listing = await ListingModel.findById({ _id: req.params.id });
-    const user = await UserModel.findById(
-      { _id: listing.seller },
-      { city: 1, name: 1 },
-    );
-    res.render("listingDetails", { listing, user });
-  } catch (error) {
+app.get("/listingDetails/:id", async(req,res)=>{
+   
+  try{
+    const listing = await ListingModel.findById({_id: req.params.id});
+    const user = await UserModel.findById({_id: listing.seller}, {city: 1, name: 1});
+    res.render("listingDetails", {listing, user});
+  }
+  catch(error){
     console.log(error);
     res.status(500).send("Unexpected server error!");
   }
-});
-
-app.get("/home", (req, res) => {
-  res.redirect("/test.html");
-});
+})
