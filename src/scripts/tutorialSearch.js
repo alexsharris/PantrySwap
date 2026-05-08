@@ -1,6 +1,8 @@
 //Display tutorial
 const searchTutorial = async function() {
-    const currentUser = await fetch("/user")
+    const response = await fetch("/user")
+    const currentUser =  await response.json();
+    console.log(currentUser)
     if(!currentUser.tutorials.search) {
 
         //Display tutorial
