@@ -42,6 +42,9 @@ const LoginForm = document
     if (Response.redirected) {
       window.location.href = Response.url;
     }
+    else{
+      document.getElementById("errorMsg").classList.remove("hidden");
+    }
   });
 
 // submitting the signup form
