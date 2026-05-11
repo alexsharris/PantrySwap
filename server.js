@@ -54,10 +54,12 @@ const ListingsSchema = new mongoose.Schema({
   contact: String,
   description: String,
   category: {
-    type: [{
-      type: String,
-      enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked Goods"],
-    }],
+    type: [
+      {
+        type: String,
+        enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked Goods"],
+      },
+    ],
     required: true,
   },
   foods: [{ name: String, quantity: Number }],
@@ -284,103 +286,107 @@ app.delete("/DeleteAccount", async (req, res) => {
 });
 
 //serve the edit listing page
-app.get('/EditListing', (req, res) => {
-  res.render('editListingPage.ejs')
-})
+app.get("/EditListing", (req, res) => {
+  res.render("editListingPage.ejs");
+});
 
 //delete listing route - soft deleting only
-app.put('/DeleteListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
+app.put("/DeleteListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
   try {
-    const listingRecord = await ListingModel.findOne({_id:listingID})
-    listingRecord.status = "deleted"
-    await listingRecord.save()
-    res.sendStatus(200)
-  }catch(error){
-    console.log(error)
-    res.status(500).send('Listing could not be deleted.')
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+    listingRecord.status = "deleted";
+    await listingRecord.save();
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Listing could not be deleted.");
   }
-})
+});
 
 //Unlist Listing route
-app.put('/UnlistListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
-  try{
-    const listingRecord = await ListingModel.findOne({_id:listingID})
-    listingRecord.status = "unlisted"
-    await listingRecord.save()
-    res.sendStatus(200)
-  }
-  catch(error){
+app.put("/UnlistListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+    listingRecord.status = "unlisted";
+    await listingRecord.save();
+    res.sendStatus(200);
+  } catch (error) {
     console.log(error);
-    res.status(500).send('Could not unlist listing')
+    res.status(500).send("Could not unlist listing");
   }
-})
+});
 
 //load one listing
-app.get('/LoadListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
-  try{
-    const listingRecord = await ListingModel.findOne({_id: listingID})
-    res.status(200).send(listingRecord)
-  }
-  catch(error){
+app.get("/LoadListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+    res.status(200).send(listingRecord);
+  } catch (error) {
     console.log(error);
-    res.status(500).send('Could not load listing')
+    res.status(500).send("Could not load listing");
   }
-})
+});
 
 // Serves the create listing page
-app.get('/CreateListing', async (req, res) => {
-  res.render('createListingPage.ejs')
-})
+app.get("/CreateListing", async (req, res) => {
+  res.render("createListingPage.ejs");
+});
 
 //Create listing route
-app.post('/CreateListing', async (req, res) => {
-  const {image, title, location, price, contact, description, category} = req.body
-  try{
-      const newListing = await ListingModel.create({
-        seller: req.session.UserID,
-        image: image,
-        title: title,
-        location: location,
-        price: price,
-        contact: contact,
-        category: category
-      })
-      res.sendStatus(200)
-  }
-  catch(error){
+app.post("/CreateListing", async (req, res) => {
+  const { image, title, location, price, contact, description, category } =
+    req.body;
+  try {
+    const newListing = await ListingModel.create({
+      seller: req.session.UserID,
+      image: image,
+      title: title,
+      location: location,
+      price: price,
+      contact: contact,
+      category: category,
+    });
+    res.sendStatus(200);
+  } catch (error) {
     console.log(error);
-    res.status(500).send('Edit listing form could not be saved.')
+    res.status(500).send("Edit listing form could not be saved.");
   }
-})
-
+});
 
 //Save Listing route
-app.put('/EditListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
-  console.log('This is the req.body:', req.body);
-  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory} = req.body
-  try{
-      const listingRecord = await ListingModel.findOne({_id: listingID})
-      
-      if (updatedImage) listingRecord.image = updatedImage
-      if (updatedTitle) listingRecord.title = updatedTitle
-      if (updatedLocation) listingRecord.location = updatedLocation
-      if (updatedPrice) listingRecord.price = updatedPrice
-      if (updatedContact) listingRecord.contact = updatedContact
-      if (updatedDescription) listingRecord.description = updatedDescription
-      if (updatedCategory) listingRecord.category = updatedCategory
-      
-      await listingRecord.save()
-      res.sendStatus(200)
-  }
-  catch(error){
+app.put("/EditListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  console.log("This is the req.body:", req.body);
+  const {
+    updatedImage,
+    updatedTitle,
+    updatedLocation,
+    updatedPrice,
+    updatedContact,
+    updatedDescription,
+    updatedCategory,
+  } = req.body;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+
+    if (updatedImage) listingRecord.image = updatedImage;
+    if (updatedTitle) listingRecord.title = updatedTitle;
+    if (updatedLocation) listingRecord.location = updatedLocation;
+    if (updatedPrice) listingRecord.price = updatedPrice;
+    if (updatedContact) listingRecord.contact = updatedContact;
+    if (updatedDescription) listingRecord.description = updatedDescription;
+    if (updatedCategory) listingRecord.category = updatedCategory;
+
+    await listingRecord.save();
+    res.sendStatus(200);
+  } catch (error) {
     console.log(error);
-    res.status(500).send('Edit listing form could not be saved.')
+    res.status(500).send("Edit listing form could not be saved.");
   }
-})
+});
 
 //get current user info
 app.get("/user", async (req, res) => {
@@ -422,7 +428,7 @@ app.put("/updateUser/:id", async (req, res) => {
       updateFields["tutorials.search"] = req.body["tutorials.search"];
     }
 
-     if (req.body?.["tutorials.create"] !== undefined) {
+    if (req.body?.["tutorials.create"] !== undefined) {
       updateFields["tutorials.create"] = req.body["tutorials.create"];
     }
 
@@ -461,9 +467,44 @@ app.put("/updateUser/:id", async (req, res) => {
   }
 });
 
+// get the bookmark or saved page
 app.get("/bookmark", (req, res) => {
   res.sendFile(__dirname + "/bookmark.html");
 });
+
+// save a listing into users savedItems
+// addToSet add an element to array if it doesnt exist in it already, ensures avoiding duplicates
+app.post("/bookmarkListing/:id", async (req, res) => {
+  try {
+    const bookmarkedItem = req.params.id;
+    const updatedUserInfo = await UserModel.findByIdAndUpdate(
+      { _id: req.session.UserID },
+      { $addToSet: { savedItems: bookmarkedItem } },
+      { new: true }, // this line is needed to get the updated version and not the old one
+    );
+    res.json(updatedUserInfo.savedItems);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+});
+
+// delete a listing from savedItems
+app.post("/removeBookmark/:id", async (req, res) => {
+  try {
+    const unBookmarkedItem = req.params.id;
+    const updatedUserInfo = await UserModel.findByIdAndUpdate(
+      { _id: req.session.UserID },
+      { $pull: { savedItems: unBookmarkedItem } },
+      { new: true }, // this line is needed to get the updated version and not the old one
+    );
+    res.json(updatedUserInfo.savedItems);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+});
+
 
 app.get("/tutorial", (req, res) => {
   res.render("tutorial.ejs");
