@@ -477,11 +477,12 @@ app.get("/bookmark", (req, res) => {
 app.post("/bookmarkListing/:id", async (req, res) => {
   try {
     const bookmarkedItem = req.params.id;
-    await UserModel.findByIdAndUpdate(
+    const updatedUserInfo = await UserModel.findByIdAndUpdate(
       { _id: req.session.UserID },
       { $addToSet: { savedItems: bookmarkedItem } },
+      { new: true }, // this line is needed to get the updated version and not the old one
     );
-    res.send("Item added to savedItems successfully!");
+    res.json(updatedUserInfo.savedItems);
   } catch (error) {
     console.log(error);
     res.status(500).send("Unexpected server error!");
@@ -492,11 +493,12 @@ app.post("/bookmarkListing/:id", async (req, res) => {
 app.post("/removeBookmark/:id", async (req, res) => {
   try {
     const unBookmarkedItem = req.params.id;
-    await UserModel.findByIdAndUpdate(
+    const updatedUserInfo = await UserModel.findByIdAndUpdate(
       { _id: req.session.UserID },
       { $pull: { savedItems: unBookmarkedItem } },
+      { new: true }, // this line is needed to get the updated version and not the old one
     );
-    res.send("Item removed from savedItems successfully!");
+    res.json(updatedUserInfo.savedItems);
   } catch (error) {
     console.log(error);
     res.status(500).send("Unexpected server error!");
