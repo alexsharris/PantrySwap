@@ -283,6 +283,9 @@ app.delete("/DeleteAccount", async (req, res) => {
   }
 });
 
+// ==================================================================
+// Routes for Create/Edit Listing
+// ==================================================================
 //serve the edit listing page
 app.get('/EditListing', (req, res) => {
   res.render('editListingPage.ejs')
@@ -348,11 +351,17 @@ app.post('/CreateListing', async (req, res) => {
         contact: contact,
         category: category
       })
+
+      await UserModel.findByIdAndUpdate(
+        req.session.UserID, 
+        {'$push': {listedItems: newListing._id}},
+        {new: true}
+      )
       res.sendStatus(200)
   }
   catch(error){
     console.log(error);
-    res.status(500).send('Edit listing form could not be saved.')
+    res.status(500).send('Create listing form could not be saved.')
   }
 })
 

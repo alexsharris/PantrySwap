@@ -1,7 +1,22 @@
+async function loadUserData(){
+    const response = await fetch('/user')
+    const userData = await response.json()
+    console.log(userData);
+    return userData
+}
+
+
+function prefillForm(userRecord){
+    console.log(userRecord);
+    document.getElementById('editLocation').value = userRecord.city || ""
+    document.getElementById('editContact').value = userRecord.phone || ""
+}
+
 //cancel button
 document.getElementById('cancelButton').addEventListener('click', () => {
     window.location.href = "/sell"
 })
+
 
 //save button
 document.getElementById('saveButton').addEventListener('click', async() => {
@@ -28,6 +43,7 @@ document.getElementById('saveButton').addEventListener('click', async() => {
         method: "POST",
         headers: {"content-type": "application/json"},
         body: JSON.stringify({
+            //seller is added in on the server.js
             title: updatedTitle,
             location: updatedLocation,
             price: updatedPrice,
@@ -38,7 +54,14 @@ document.getElementById('saveButton').addEventListener('click', async() => {
         })
     if (response.ok){
         alert('Listing created!')
-        
-        
+        window.location.href = '/sell'
     }
 })
+
+
+async function initializePage(){
+    const data = await loadUserData()
+    prefillForm(data)
+}
+
+initializePage()
