@@ -14,7 +14,6 @@ class Navbar extends HTMLElement {
     this.addEventListeners();
 
     const activeButton = this.getCurrentPageButton();
-    console.log(activeButton);
     if (activeButton) {
       this.visuallySelectButton(activeButton);
     }
