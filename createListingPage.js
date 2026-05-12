@@ -27,6 +27,7 @@ async function initializePage(){
 }
 
 initializePage()
+
 const form = `
 <form id="food-form" class="flex flex-col gap-4 mt-4 text-start">
   <div class="flex flex-col gap-1">

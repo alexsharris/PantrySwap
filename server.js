@@ -372,7 +372,7 @@ app.post('/CreateListing', async (req, res) => {
 app.put('/EditListing/:listingID', async (req, res) => {
   const listingID = req.params.listingID
   console.log('This is the req.body:', req.body);
-  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory} = req.body
+  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory, updatedFoods} = req.body
   try{
       const listingRecord = await ListingModel.findOne({_id: listingID})
       
@@ -383,6 +383,7 @@ app.put('/EditListing/:listingID', async (req, res) => {
       if (updatedContact) listingRecord.contact = updatedContact
       if (updatedDescription) listingRecord.description = updatedDescription
       if (updatedCategory) listingRecord.category = updatedCategory
+      if (updatedFoods) listingRecord.foods = updatedFoods
       
       await listingRecord.save()
       res.sendStatus(200)
