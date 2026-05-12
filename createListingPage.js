@@ -139,8 +139,9 @@ document.getElementById('cancelButton').addEventListener('click', () => {
     window.location.href = "/sell"
 })
 
-//save button
-document.getElementById('saveButton').addEventListener('click', async() => {
+//create button
+document.querySelector('form').addEventListener('submit', async(event) => {
+    event.preventDefault()
     //get back the updated values
     const updatedTitle = document.getElementById('editTitle').value 
     const updatedLocation = document.getElementById('editLocation').value
@@ -152,6 +153,12 @@ document.getElementById('saveButton').addEventListener('click', async() => {
     const updatedDairy = document.getElementById('editDairy').checked
     const updatedBakedGoods = document.getElementById('editBakedGoods').checked
     const updatedCookedMeals = document.getElementById('editCookedMeals').checked
+
+    // //validate required fields not left blank
+    if (foodArray.length == 0){
+        alert('Please add a food item.')
+        return
+    } 
 
     let updatedCategory = []
     updatedProduce == true? updatedCategory.push("Produce") : undefined
