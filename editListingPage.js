@@ -3,6 +3,13 @@
 // const listingID = params.get('id') // this should be passed in to the url once a user clicks on edit a listing from the my listing page
 const listingID = '69fa70e043a7f4dbfc8616fa' //hard coding the listing ID for now until later
 
+import {
+  displaySimpleWindow,
+  closePopupWindow,
+  displayWindow,
+} from "../scripts/popupWindow.js";
+
+
 async function loadListingData(){
     //fetch foods
     const response = await fetch(`/LoadListing/${listingID}`)
@@ -66,12 +73,128 @@ function loadFoods(listingRecord){
 
 
 async function initializePage(){
-    const data = await loadListingData()
+    var data = await loadListingData()
     prefillForm(data)
     loadFoods(data)
+
+    const form = `
+    <form id="food-form" class="flex flex-col gap-4 mt-4 text-start">
+    <div class="flex flex-col gap-1">
+        <label>Name</label>
+        <input type="text" name="name" placeholder="Gala apples" />
+    </div>
+    <div class="flex flex-col gap-1">
+        <label>Quantity</label>
+        <input type="text" name="quantity" placeholder="2" />
+    </div>
+    </form>`;
+
+    const buttons = [
+    {
+        label: "Add food",
+        color: "box-color-0",
+        hover: "hover-outline",
+        onClick: () => addFood(data), // turn into anonymous function because we need to pass data into addFood, but not call it right away
+    },
+    {
+        label: "cancel",
+        color: "box-color-1",
+        hover: "hover-outline",
+        onClick: closePopupWindow,
+    },
+    ];
+
+    //add food button - add inside initialize function because we need the data object
+    document.getElementById('addFoodButton').addEventListener('click', () => {
+        displaySimpleWindow("Add food" + form, buttons, false)
+    })
+
 }
 
 initializePage()
+
+
+
+
+function addFood(listingRecord) {
+  let foodArray = listingRecord.foods
+  console.log("foodsArray:",foodArray);
+
+  const foodForm = document.getElementById("food-form");
+  const formData = new FormData(foodForm);
+
+  console.log("form data: ", formData.entries)
+
+  let isValid = true;
+
+  for (const [key, value] of formData.entries()) {
+    console.log(`key: ${key}, value: ${value}`); //must use fieldData.get('key') to access the values - cannot use fieldData.key
+    if (!value.trim()) isValid = false;
+  }
+
+  if (isValid) {
+
+    const foodsList = document.getElementById('foodsList')
+    const foodBar = document.createElement('div')
+
+    foodBar.innerHTML += `
+    <div id="foodBar" class="flex justify-between rounded-lg text-light-brown border-[#9b9b9b] border-solid border">
+        <!-- left -->
+        <div id="" class="py-2 px-4">${formData.get('name')}</div>
+        <!-- right -->
+        <div id="" class="flex">
+            <!-- minus -->
+            <div id="minusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">-</div>
+            <!-- quant -->
+            <div id="itemQuant" class="py-2 px-8 border-[#9b9b9b] border-solid border-l">${formData.get('quantity')}</div>
+            <!-- plus -->
+            <div id="plusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">+</div>
+        </div>
+    </div>
+    `
+    
+    const itemQuant = foodBar.querySelector('#itemQuant')
+    let quantity = parseInt(formData.get('quantity'))
+
+    foodArray.push({name: formData.get('name'), quantity: quantity})
+    let index = foodArray.length - 1
+
+    foodBar.querySelector('#minusQuant').addEventListener('click', () => {
+        if (quantity > 0){
+            quantity -= 1
+            // itemQuant.textContent = quantity
+            foodArray[index].quantity = quantity
+            loadFoods(listingRecord)
+            console.log("foodArray:", foodArray);
+            if (foodArray[index].quantity == 0){
+                foodArray.pop()
+                foodBar.remove()
+            }
+        }
+        
+    })
+    foodBar.querySelector('#plusQuant').addEventListener('click', () => {
+        if (quantity > 0){
+            quantity += 1
+            // itemQuant.textContent = quantity
+            foodArray[index].quantity = quantity
+            loadFoods(listingRecord)
+            console.log("foodArray:", foodArray);
+        }
+    })
+    foodsList.appendChild(foodBar)
+    closePopupWindow();
+
+  } else {
+    if (foodForm.querySelector(".form-error")) return;
+
+    const error = document.createElement("div");
+    error.className = "form-error text-red text-sm";
+    error.textContent = "Required fields missing";
+
+    foodForm.appendChild(error);
+  }
+}
 
 
 
@@ -99,7 +222,9 @@ document.getElementById('cancelButton').addEventListener('click', () => {
 })
 
 //save button
-document.getElementById('saveButton').addEventListener('click', async() => {
+document.querySelector('form').addEventListener('submit', async(event) => {
+    event.preventDefault()
+
     //get back the updated values
     const updatedTitle = document.getElementById('editTitle').value
     const updatedLocation = document.getElementById('editLocation').value
@@ -112,7 +237,7 @@ document.getElementById('saveButton').addEventListener('click', async() => {
     const updatedBakedGoods = document.getElementById('editBakedGoods').checked
     const updatedCookedMeals = document.getElementById('editCookedMeals').checked
 
-    updatedCategory = []
+    let updatedCategory = []
     updatedProduce == true? updatedCategory.push("Produce") : undefined
     updatedMeat == true? updatedCategory.push("Meat") : undefined
     updatedDairy == true? updatedCategory.push("Dairy") : undefined
@@ -128,7 +253,8 @@ document.getElementById('saveButton').addEventListener('click', async() => {
             updatedPrice: updatedPrice,
             updatedContact: updatedContact,
             updatedDescription: updatedDescription,
-            updatedCategory: updatedCategory
+            updatedCategory: updatedCategory,
+            updatedFoods: foodsArray
         })
 
         })

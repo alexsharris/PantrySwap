@@ -389,6 +389,9 @@ app.delete("/DeleteAccount", async (req, res) => {
   }
 });
 
+// ==================================================================
+// Routes for Create/Edit Listing
+// ==================================================================
 //serve the edit listing page
 app.get("/EditListing", (req, res) => {
   res.render("editListingPage.ejs");
@@ -447,53 +450,55 @@ app.get("/test", (req, res) => {
 });
 
 //Create listing route
-app.post("/CreateListing", async (req, res) => {
-  const { image, title, location, price, contact, description, category } =
-    req.body;
-  try {
-    const newListing = await ListingModel.create({
-      seller: req.session.UserID,
-      image: image,
-      title: title,
-      location: location,
-      price: price,
-      contact: contact,
-      category: category,
-    });
-    res.sendStatus(200);
-  } catch (error) {
+app.post('/CreateListing', async (req, res) => {
+  const {image, title, location, price, contact, description, category, foods} = req.body
+  try{
+      const newListing = await ListingModel.create({
+        seller: req.session.UserID,
+        image: image,
+        title: title,
+        location: location,
+        price: price,
+        contact: contact,
+        description: description,
+        category: category,
+        foods: foods
+      })
+
+      await UserModel.findByIdAndUpdate(
+        req.session.UserID, 
+        {'$push': {listedItems: newListing._id}},
+        {new: true}
+      )
+      res.sendStatus(200)
+  }
+  catch(error){
     console.log(error);
-    res.status(500).send("Edit listing form could not be saved.");
+    res.status(500).send('Create listing form could not be saved.')
   }
 });
 
 //Save Listing route
-app.put("/EditListing/:listingID", async (req, res) => {
-  const listingID = req.params.listingID;
-  console.log("This is the req.body:", req.body);
-  const {
-    updatedImage,
-    updatedTitle,
-    updatedLocation,
-    updatedPrice,
-    updatedContact,
-    updatedDescription,
-    updatedCategory,
-  } = req.body;
-  try {
-    const listingRecord = await ListingModel.findOne({ _id: listingID });
-
-    if (updatedImage) listingRecord.image = updatedImage;
-    if (updatedTitle) listingRecord.title = updatedTitle;
-    if (updatedLocation) listingRecord.location = updatedLocation;
-    if (updatedPrice) listingRecord.price = updatedPrice;
-    if (updatedContact) listingRecord.contact = updatedContact;
-    if (updatedDescription) listingRecord.description = updatedDescription;
-    if (updatedCategory) listingRecord.category = updatedCategory;
-
-    await listingRecord.save();
-    res.sendStatus(200);
-  } catch (error) {
+app.put('/EditListing/:listingID', async (req, res) => {
+  const listingID = req.params.listingID
+  console.log('This is the req.body:', req.body);
+  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory, updatedFoods} = req.body
+  try{
+      const listingRecord = await ListingModel.findOne({_id: listingID})
+      
+      if (updatedImage) listingRecord.image = updatedImage
+      if (updatedTitle) listingRecord.title = updatedTitle
+      if (updatedLocation) listingRecord.location = updatedLocation
+      if (updatedPrice) listingRecord.price = updatedPrice
+      if (updatedContact) listingRecord.contact = updatedContact
+      if (updatedDescription) listingRecord.description = updatedDescription
+      if (updatedCategory) listingRecord.category = updatedCategory
+      if (updatedFoods) listingRecord.foods = updatedFoods
+      
+      await listingRecord.save()
+      res.sendStatus(200)
+  }
+  catch(error){
     console.log(error);
     res.status(500).send("Edit listing form could not be saved.");
   }

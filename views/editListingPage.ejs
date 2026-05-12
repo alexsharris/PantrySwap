@@ -53,19 +53,19 @@
                     <!-- short text inputs S -->
                     <div id="" class="grid min-[915px]:grid-cols-2 gap-6">
                         <div id="" class="flex flex-col gap-1">
-                            <label class="" for="editTitle">Title</label>
+                            <label class="" for="editTitle"><span class="text-red-500">*</span>Title</label>
                             <input class="border-[#9b9b9b]  placeholder-[#d8c3bb]" type="text" id="editTitle" name="editTitle" placeholder="Fresh fruits and vegetables" required>
                         </div>
                         <div id="" class="flex flex-col gap-1">
-                            <label class="font-bold" for="editLocation">Location</label>
+                            <label class="font-bold" for="editLocation"><span class="text-red-500">*</span>Location</label>
                             <input class="border-[#9b9b9b]  placeholder-[#d8c3bb]" type="text" id="editLocation" name="editLocation" placeholder="V1Y 2KX" required>
                         </div>
                         <div id="" class="flex flex-col gap-1">
-                            <label class="" for="editPrice">Price</label>
+                            <label class="" for="editPrice"><span class="text-red-500">*</span>Price $</label>
                             <input class="border-[#9b9b9b]  placeholder-[#d8c3bb]" type="text" id="editPrice" name="editPrice" placeholder="Free" required>
                         </div>
                         <div id="" class="flex flex-col gap-1">
-                            <label class="" for="editContact">Contact Phone Number</label>
+                            <label class="" for="editContact"><span class="text-red-500">*</span>Contact Phone Number</label>
                             <input class="border-[#9b9b9b]  placeholder-[#d8c3bb]" type="text" id="editContact" name="editContact" placeholder="604 123 4567" required>
                         </div>
                     </div>
@@ -98,7 +98,7 @@
                         </div>
 
                         <!-- Add food button -->
-                        <div id="" class="flex justify-between rounded-lg box-color-1">
+                        <div id="addFoodButton" class="flex justify-between rounded-lg box-color-1">
                             <!-- left -->
                             <div id="" class="py-2 px-4">Add food</div>
                             <!-- right -->
@@ -171,10 +171,10 @@
                         <button id="cancelButton" class="px-16 box-color-1 text-[18px]">Cancel</button>
                     </div>
                         
-                </div>
-
-
                 </form>
+
+            </div>
+
 
             </div>
         </div>
@@ -183,6 +183,6 @@
     <!-- page container E -->
 
 <!-- scripts -->
-<script src="editListingPage.js"></script>
+<script type="module" src="editListingPage.js"></script>
 </body>
 </html>
