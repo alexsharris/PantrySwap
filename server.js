@@ -468,7 +468,7 @@ app.put("/updateUser/:id", async (req, res) => {
 });
 
 // get the bookmark or saved page
-app.get("/saved", (req, res) => {
+app.get("/bookmark", (req, res) => {
   res.sendFile(__dirname + "/savedPage.html");
 });
 
