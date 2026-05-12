@@ -4,7 +4,18 @@ document.getElementById("SignUpButton").addEventListener("click", () => {
   document.getElementById("LoginForm").classList.add("hidden");
   document.getElementById("SignUpForm").classList.toggle("hidden");
   document.getElementById("SignUpButton").classList.add("hidden");
+  document.getElementById("LoginButton").classList.remove("hidden");
 });
+
+// if user is on the sign up section and clicks on login
+
+document.getElementById("LoginButton").addEventListener("click", () => {
+  document.getElementById("LoginForm").classList.remove("hidden");
+  document.getElementById("SignUpForm").classList.toggle("hidden");
+  document.getElementById("SignUpButton").classList.remove("hidden");
+  document.getElementById("LoginButton").classList.add("hidden");
+});
+
 
 // submitting the login form
 
@@ -30,6 +41,9 @@ const LoginForm = document
 
     if (Response.redirected) {
       window.location.href = Response.url;
+    }
+    else{
+      document.getElementById("errorMsg").classList.remove("hidden");
     }
   });
 

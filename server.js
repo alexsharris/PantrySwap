@@ -17,8 +17,8 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 
-app.use(express.static("src"))
-app.use(express.static("."))
+app.use(express.static("src"));
+app.use(express.static("."));
 
 // schema for users
 const UserSchema = new mongoose.Schema({
@@ -32,6 +32,7 @@ const UserSchema = new mongoose.Schema({
   notifications: [
     {
       message: String,
+      hasSeen: Boolean,
       listing: String, // _id of the related listing
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
     },
@@ -39,7 +40,8 @@ const UserSchema = new mongoose.Schema({
   tutorials: {
     create: Boolean,
     search: Boolean,
-    bookmark: Boolean}
+    bookmark: Boolean,
+  },
 });
 
 // schema of listings
@@ -52,8 +54,12 @@ const ListingsSchema = new mongoose.Schema({
   contact: String,
   description: String,
   category: {
-    type: [String],
-    enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked goods"],
+    type: [
+      {
+        type: String,
+        enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked Goods"],
+      },
+    ],
     required: true,
   },
   foods: [{ name: String, quantity: Number }],
@@ -89,59 +95,55 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.set("view engine", "ejs");
 
-
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect(db);
-  console.log("Connected to MongoDB!");
-  app.listen(port, () => {
-    console.log("server's up!");
+  mongoose.connect(db)
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(3000, () => {
+      console.log("Server running on port 3000");
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB connection failed:", err);
   });
 }
-
 
 app.get("/sell", (req, res) => {
   res.render("sellListings.ejs");
 });
 
-
 app.get("/buy", (req, res) => {
-  res.render("buyListings.ejs")
-})
-
+  res.render("buyListings.ejs");
+});
 
 app.get("/sellerListings", async (req, res) => {
   try {
-    const listings = await ListingModel.find({seller: req.session.UserID});
+    const listings = await ListingModel.find({ seller: req.session.UserID });
     res.json(listings);
   } catch (error) {
     console.log(error);
-    res.status(500).json({error: "Server error"});
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-
 app.get("/loadListings", async (req, res) => {
-  let filter = {}
-  try{
-    const listings = await ListingModel.find(filter)
-    if (listings.length == 0) return res.status(404).send("No listings found.")
-    res.send(listings)
+  let filter = {};
+  try {
+    const listings = await ListingModel.find(filter);
+    if (listings.length == 0) return res.status(404).send("No listings found.");
+    res.send(listings);
+  } catch (error) {
+    console.log(error);
   }
-  catch (error){
-    console.log(error)
-  }
-})
-
-
+});
 
 // Login routes
 
 app.get("/Login", (req, res) => {
   res.sendFile(__dirname + "/login.html");
 });
-
 
 app.post("/Login", async (req, res) => {
   try {
@@ -170,13 +172,13 @@ app.post("/Login", async (req, res) => {
         req.session.save(() => res.redirect("/buy"));
       }
       // if password doesnt match
-      else res.status(401).json({ error: "Invalid credentials"});
+      else res.status(401).json({ error: "Invalid credentials" });
     }
     // if user email doesnt exist in the DB
-    else res.status(401).json({ error: "Invalid credentials"});
+    else res.status(401).json({ error: "Invalid credentials" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Login failed"});
+    res.status(500).json({ error: "Login failed" });
   }
 });
 
@@ -192,9 +194,12 @@ app.post("/SignUp", async (req, res) => {
 
   // create a new user in DB
   try {
-    const user = await UserModel.create({ name: NewUserName, password: HashedPassword, email: NewUserEmail,
-      tutorials: {create:false, bookmark:false, search:false}
-     });
+    const user = await UserModel.create({
+      name: NewUserName,
+      password: HashedPassword,
+      email: NewUserEmail,
+      tutorials: { create: false, bookmark: false, search: false },
+    });
 
     // setting up the session for the new user
     req.session.email = NewUserEmail;
@@ -205,13 +210,13 @@ app.post("/SignUp", async (req, res) => {
       req.session.cookie.maxAge = 14 * 24 * 3600 * 1000;
     }
     //makes the redirect wait until the session is fully written to session file, because other routes like
-    // user were still loading the previous user who was logged in. 
+    // user were still loading the previous user who was logged in.
     // redirecting would be trigger without setting the session properly without this
 
     req.session.save(() => res.redirect("/buy"));
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "registration failed"});
+    res.status(500).json({ error: "registration failed" });
   }
 });
 
@@ -234,7 +239,7 @@ app.get("/Account", async (req, res) => {
     res.sendFile(__dirname + "/account.html");
   } catch (error) {
     console.log(error);
-    res.status(500).json( {error: "Internal Server Error!"});
+    res.status(500).json({ error: "Internal Server Error!" });
   }
 });
 
@@ -244,7 +249,7 @@ app.get("/AccountData", async (req, res) => {
     res.json(Data);
   } catch (error) {
     console.log(error);
-    res.status(500).json( {error: "Internal Server Error!"});
+    res.status(500).json({ error: "Internal Server Error!" });
   }
 });
 
@@ -268,30 +273,130 @@ app.put("/ChangeData", async (req, res) => {
       { _id: req.session.UserID },
       { $set: UpdatedFields },
     );
-    res.json({ message: "Updated Successfully!"});
+    res.json({ message: "Updated Successfully!" });
   } catch (error) {
     res.status(500).json({ error: "Update failed" });
   }
 });
 
 // add a route to delete an account
-app.delete("/DeleteAccount", async(req,res)=>{
-  try{
-
-    await UserModel.findByIdAndDelete({_id: req.session.UserID});
+app.delete("/DeleteAccount", async (req, res) => {
+  try {
+    await UserModel.findByIdAndDelete({ _id: req.session.UserID });
     req.session.destroy(() => res.redirect("/Login"));
-
-  }
-  catch(error){
-
+  } catch (error) {
     console.log(error);
     res.status(500).send("Delete failed!");
-
   }
-    
-
 });
 
+// ==================================================================
+// Routes for Create/Edit Listing
+// ==================================================================
+//serve the edit listing page
+app.get("/EditListing", (req, res) => {
+  res.render("editListingPage.ejs");
+});
+
+//delete listing route - soft deleting only
+app.put("/DeleteListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+    listingRecord.status = "deleted";
+    await listingRecord.save();
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Listing could not be deleted.");
+  }
+});
+
+//Unlist Listing route
+app.put("/UnlistListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+    listingRecord.status = "unlisted";
+    await listingRecord.save();
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Could not unlist listing");
+  }
+});
+
+//load one listing
+app.get("/LoadListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+    res.status(200).send(listingRecord);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Could not load listing");
+  }
+});
+
+// Serves the create listing page
+app.get("/CreateListing", async (req, res) => {
+  res.render("createListingPage.ejs");
+});
+
+//Create listing route
+app.post('/CreateListing', async (req, res) => {
+  const {image, title, location, price, contact, description, category, foods} = req.body
+  try{
+      const newListing = await ListingModel.create({
+        seller: req.session.UserID,
+        image: image,
+        title: title,
+        location: location,
+        price: price,
+        contact: contact,
+        description: description,
+        category: category,
+        foods: foods
+      })
+
+      await UserModel.findByIdAndUpdate(
+        req.session.UserID, 
+        {'$push': {listedItems: newListing._id}},
+        {new: true}
+      )
+      res.sendStatus(200)
+  }
+  catch(error){
+    console.log(error);
+    res.status(500).send('Create listing form could not be saved.')
+  }
+});
+
+//Save Listing route
+app.put('/EditListing/:listingID', async (req, res) => {
+  const listingID = req.params.listingID
+  console.log('This is the req.body:', req.body);
+  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory, updatedFoods} = req.body
+  try{
+      const listingRecord = await ListingModel.findOne({_id: listingID})
+      
+      if (updatedImage) listingRecord.image = updatedImage
+      if (updatedTitle) listingRecord.title = updatedTitle
+      if (updatedLocation) listingRecord.location = updatedLocation
+      if (updatedPrice) listingRecord.price = updatedPrice
+      if (updatedContact) listingRecord.contact = updatedContact
+      if (updatedDescription) listingRecord.description = updatedDescription
+      if (updatedCategory) listingRecord.category = updatedCategory
+      if (updatedFoods) listingRecord.foods = updatedFoods
+      
+      await listingRecord.save()
+      res.sendStatus(200)
+  }
+  catch(error){
+    console.log(error);
+    res.status(500).send("Edit listing form could not be saved.");
+  }
+});
 
 //get current user info
 app.get("/user", async (req, res) => {
@@ -301,61 +406,112 @@ app.get("/user", async (req, res) => {
   try {
     if (!req.session.UserID) {
       return res.status(401).json({
-        error: "No session"
+        error: "No session",
       });
     }
 
-    const currentUser = await UserModel.findById(
-      req.session.UserID
-    );
+    const currentUser = await UserModel.findById(req.session.UserID);
 
     if (!currentUser) {
       return res.status(404).json({
-        error: "User not found"
+        error: "User not found",
       });
     }
 
     res.json(currentUser);
-
   } catch (error) {
-
     console.log(error);
 
     res.status(500).json({
-      error: error.message
+      error: error.message,
     });
   }
 });
 
-
 //update user
 app.put("/updateUser/:id", async (req, res) => {
   try {
+    console.log(req.body);
+    const updateFields = {};
 
-      console.log(req.body);
+    if (req.body?.["tutorials.search"] !== undefined) {
+      updateFields["tutorials.search"] = req.body["tutorials.search"];
+    }
 
-      const updated = await UserModel.findByIdAndUpdate(
-          req.params.id,
-          {
-            $set: {
-              "tutorials.search": req.body.tutorialSearch
-            }
-          },
-          {
-            new: true,
-            runValidators: true
-          }
-      );
+    if (req.body?.["tutorials.create"] !== undefined) {
+      updateFields["tutorials.create"] = req.body["tutorials.create"];
+    }
 
-      res.json(updated);
+    if (req.body?.["tutorials.bookmark"] !== undefined) {
+      updateFields["tutorials.bookmark"] = req.body["tutorials.bookmark"];
+    }
 
-  } catch (err) {
+    if (req.body?.notifications !== undefined) {
+      updateFields.notifications = req.body.notifications;
+    }
 
-      console.log(err);
-
-      res.status(500).json({
-          error: err.message
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).json({
+        error: "No valid fields provided for update",
       });
+    }
+
+    const updated = await UserModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: updateFields,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    res.json(updated);
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+});
+
+// get the bookmark or saved page
+app.get("/bookmark", (req, res) => {
+  res.sendFile(__dirname + "/savedPage.html");
+});
+
+// save a listing into users savedItems
+// addToSet add an element to array if it doesnt exist in it already, ensures avoiding duplicates
+app.post("/bookmarkListing/:id", async (req, res) => {
+  try {
+    const bookmarkedItem = req.params.id;
+    const updatedUserInfo = await UserModel.findByIdAndUpdate(
+      { _id: req.session.UserID },
+      { $addToSet: { savedItems: bookmarkedItem } },
+      { new: true }, // this line is needed to get the updated version and not the old one
+    );
+    res.json(updatedUserInfo.savedItems);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+});
+
+// delete a listing from savedItems
+app.post("/removeBookmark/:id", async (req, res) => {
+  try {
+    const unBookmarkedItem = req.params.id;
+    const updatedUserInfo = await UserModel.findByIdAndUpdate(
+      { _id: req.session.UserID },
+      { $pull: { savedItems: unBookmarkedItem } },
+      { new: true }, // this line is needed to get the updated version and not the old one
+    );
+    res.json(updatedUserInfo.savedItems);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
   }
 });
 
@@ -365,15 +521,16 @@ app.get("/tutorial", (req, res) => {
 });
 
 // routes for rendering listing details page and loading it dynamically
-app.get("/listingDetails/:id", async(req,res)=>{
-   
-  try{
-    const listing = await ListingModel.findById({_id: req.params.id});
-    const user = await UserModel.findById({_id: listing.seller}, {city: 1, name: 1});
-    res.render("listingDetails", {listing, user});
-  }
-  catch(error){
+app.get("/listingDetails/:id", async (req, res) => {
+  try {
+    const listing = await ListingModel.findById({ _id: req.params.id });
+    const user = await UserModel.findById(
+      { _id: listing.seller },
+      { city: 1, name: 1 },
+    );
+    res.render("listingDetails", { listing, user });
+  } catch (error) {
     console.log(error);
     res.status(500).send("Unexpected server error!");
   }
-})
+});
