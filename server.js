@@ -110,34 +110,7 @@ async function main() {
   });
 }
 
-app.get("/sell", (req, res) => {
-  res.render("sellListings.ejs");
-});
 
-app.get("/buy", (req, res) => {
-  res.render("buyListings.ejs");
-});
-
-app.get("/sellerListings", async (req, res) => {
-  try {
-    const listings = await ListingModel.find({ seller: req.session.UserID });
-    res.json(listings);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-app.get("/loadListings", async (req, res) => {
-  let filter = {};
-  try {
-    const listings = await ListingModel.find(filter);
-    if (listings.length == 0) return res.status(404).send("No listings found.");
-    res.send(listings);
-  } catch (error) {
-    console.log(error);
-  }
-});
 
 // Login routes
 
@@ -291,7 +264,7 @@ app.delete("/DeleteAccount", async (req, res) => {
 });
 
 //serve the edit listing page
-app.get("/EditListing", (req, res) => {
+app.get("/EditListing/:listingID", (req, res) => {
   res.render("editListingPage.ejs");
 });
 
@@ -393,10 +366,43 @@ app.put("/EditListing/:listingID", async (req, res) => {
   }
 });
 
+
+app.get("/sell", (req, res) => {
+  res.render("sellListings.ejs");
+});
+
+app.get("/buy", (req, res) => {
+  res.render("buyListings.ejs");
+});
+
+app.get("/sellerListings", async (req, res) => {
+  try {
+    console.log(req.session.UserID)
+    const listings = await ListingModel.find({ seller: req.session.UserID });
+    res.json(listings);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/loadListings", async (req, res) => {
+  let filter = {};
+  try {
+    const listings = await ListingModel.find(filter);
+    if (listings.length == 0) return res.status(404).send("No listings found.");
+    res.send(listings);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+
 //get current user info
 app.get("/user", async (req, res) => {
-  console.log("USER ROUTE HIT");
-  console.log(req.session);
+  // console.log("USER ROUTE HIT");
+  // console.log(req.session);
 
   try {
     if (!req.session.UserID) {
