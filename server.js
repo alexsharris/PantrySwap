@@ -100,10 +100,15 @@ app.set("view engine", "ejs");
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect(db);
-  console.log("Connected to MongoDB!");
-  app.listen(port, () => {
-    console.log("server's up!");
+  mongoose.connect(db)
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(3000, () => {
+      console.log("Server running on port 3000");
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB connection failed:", err);
   });
 }
 
@@ -575,7 +580,7 @@ app.put("/updateUser/:id", async (req, res) => {
 
 // get the bookmark or saved page
 app.get("/bookmark", (req, res) => {
-  res.sendFile(__dirname + "/bookmark.html");
+  res.sendFile(__dirname + "/savedPage.html");
 });
 
 // save a listing into users savedItems
