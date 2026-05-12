@@ -469,7 +469,7 @@ app.put("/updateUser/:id", async (req, res) => {
 
 // get the bookmark or saved page
 app.get("/bookmark", (req, res) => {
-  res.sendFile(__dirname + "/bookmark.html");
+  res.sendFile(__dirname + "/savedPage.html");
 });
 
 // save a listing into users savedItems
