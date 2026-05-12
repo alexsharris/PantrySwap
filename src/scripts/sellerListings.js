@@ -12,10 +12,17 @@ displaySellerListings = async function () {
       //clone template
       const clone = template.content.cloneNode(true);
 
+      // determine status colour
+      const statusIndicatorColour = data[i].status == "listed"
+        ? "bg-green"
+        : "bg-red";
+
       //fill data
       clone.querySelector(".listingTitle").textContent = data[i].title;
       clone.querySelector(".listingImage").src = data[i].image;
       clone.querySelector(".listingPrice").textContent = `$${data[i].price}`;
+      clone.querySelector(".listingStatus").textContent = `${data[i].status}`;
+      clone.querySelector(".statusIndicator").classList.add(statusIndicatorColour);
       clone.querySelector(".editButton").id = `edit-${data[i]._id}`;
       clone.querySelector(".viewButton").id = `view-${data[i]._id}`;
       container.appendChild(clone);
@@ -30,14 +37,12 @@ displaySellerListings = async function () {
 displaySellerListings();
 
 
-// Listen for edit button
+// Listen for create button
 document.addEventListener("click", async (event) => {
-  const button = event.target.closest(".editButton");
-
+  const button = event.target.closest("#createButton");
   if (!button) return;
-  const listingID = button.id.split("-")[1];
   
-  const res = await fetch(`/editLIsting/?listingID=${listingID}`)
+  window.location.href = "/CreateListing";
 
   if (!res.ok) {
     console.error("Request failed");
@@ -46,17 +51,29 @@ document.addEventListener("click", async (event) => {
 });
 
 
-
-// Listen for view button
+// Listen for edit button
 document.addEventListener("click", async (event) => {
-  const button = event.target.closest(".viewButton");
+  const button = event.target.closest(".editButton");
 
   if (!button) return;
   const listingID = button.id.split("-")[1];
   
-  const res = await fetch(`/buy?eventID=${listingID}`)
- 
+  window.location.href = `/EditListing/${listingID}`;
+
   if (!res.ok) {
     console.error("Request failed");
   }
+
+});
+
+
+// Listen for view button
+document.addEventListener("click", async (event) => {
+  const button = event.target.closest(".viewButton");
+  if (!button) return;
+
+  const listingID = button.id.split("-")[1];
+  window.location.assign(`/listingDetails/${listingID}`)
+  
+ 
 });
