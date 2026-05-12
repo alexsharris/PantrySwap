@@ -340,7 +340,7 @@ app.get('/CreateListing', async (req, res) => {
 
 //Create listing route
 app.post('/CreateListing', async (req, res) => {
-  const {image, title, location, price, contact, description, category} = req.body
+  const {image, title, location, price, contact, description, category, foods} = req.body
   try{
       const newListing = await ListingModel.create({
         seller: req.session.UserID,
@@ -349,7 +349,9 @@ app.post('/CreateListing', async (req, res) => {
         location: location,
         price: price,
         contact: contact,
-        category: category
+        description: description,
+        category: category,
+        foods: foods
       })
 
       await UserModel.findByIdAndUpdate(
