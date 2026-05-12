@@ -7,16 +7,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script type="module" src="/src/components/navbar.js"></script>
     <link rel="stylesheet" href="./public/main.css" />
-    <script src="/src/scripts/bookmark.js"></script>
-    <script src="/src/scripts/tutorialBookmark.js" defer></script>
+    <script src="/src/scripts/savedPage.js" defer></script>
   </head>
   <body class="min-h-screen flex flex-col">
     <!-- navbar -->
     <site-navbar></site-navbar>
     <!-- main content -->
-    <div class="site-margins">
-      <!-- Add main content here! -->
+    <div class="site-margins mx-auto max-w-screen">
+      <!-- container div for holding listings -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mx-auto mb-20"
+        id="listingsHolder"
+      ></div>
     </div>
+
+    <!-- each card, will be used in js file for dynamic population -->
+
 
     <!-- scripts -->
   </body>
