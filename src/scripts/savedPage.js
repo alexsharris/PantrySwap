@@ -4,12 +4,13 @@
 async function displaySavedListings() {
   const Response = await (await fetch("/user")).json();
 
-  // using promise.all to wait for all fetch requests for sending the id of the listings in users array to the server to
-  // get all those info back at once, then load the cards for each when we have all of them
-  const savedData = await Promise.all(
-    Response.savedItems.map((id) =>
-      fetch(`/LoadListing/${id}`).then((resp) => resp.json()),
-    ),
+  //get all the listing from the database
+  const listingResponse = await fetch("/loadListings");
+  const allListings = await listingResponse.json();
+
+  // filter down to only the saved ones for a user
+  const savedData = allListings.filter((listing) =>
+    Response.savedItems.includes(listing._id),
   );
 
   const listingContainer = document.getElementById("listingsHolder");
@@ -51,8 +52,9 @@ async function displaySavedListings() {
       .addEventListener("click", async () => {
         const serverResponse = await fetch(`/listingDetails/${saved._id}`);
 
-        if (serverResponse.ok) { // means the try block gets executed and we didnt get any http errors
-          
+        if (serverResponse.ok) {
+          // means the try block gets executed and we didnt get any http errors
+
           window.location.href = `/listingDetails/${saved._id}`;
         }
       });

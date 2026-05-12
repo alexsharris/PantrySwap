@@ -98,10 +98,15 @@ app.set("view engine", "ejs");
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect(db);
-  console.log("Connected to MongoDB!");
-  app.listen(port, () => {
-    console.log("server's up!");
+  mongoose.connect(db)
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(3000, () => {
+      console.log("Server running on port 3000");
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB connection failed:", err);
   });
 }
 
