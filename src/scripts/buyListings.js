@@ -13,7 +13,12 @@ document.addEventListener("DOMContentLoaded", async() => {
 
             //fill data
             clone.querySelector(".listingTitle").textContent = newListing.title;
-            clone.querySelector(".listingImage").src = newListing.image;
+            if (newListing.image){
+                clone.querySelector(".listingImage").src = newListing.image;
+            }
+            else{
+                clone.querySelector(".listingImage").src = "images/pantry_share_img_10.jpg"
+            }
             clone.querySelector(".listingPrice").textContent = `$${newListing.price}`;
             clone.querySelector(".viewButton").id = `${newListing._id}ViewBtn`;
             
