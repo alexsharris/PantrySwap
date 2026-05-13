@@ -1,7 +1,3 @@
-//GRAB THE ID FROM THE URL 
-// const params = new URLSearchParams(window.location.search)
-// const listingID = params.get('id') // this should be passed in to the url once a user clicks on edit a listing from the my listing page
-const listingID = '69fa70e043a7f4dbfc8616fa' //hard coding the listing ID for now until later
 
 import {
   displaySimpleWindow,
@@ -9,6 +5,13 @@ import {
   displayWindow,
 } from "../scripts/popupWindow.js";
 
+//GRAB THE ID FROM THE URL 
+const params = new URLSearchParams(window.location.search)
+const listingID = window.location.pathname.split('/').pop()
+// const listingID = params.get('id') // this should be passed in to the url once a user clicks on edit a listing from the my listing page
+// const listingID = '69fa70e043a7f4dbfc8616fa' //hard coding the listing ID for now until later
+
+let data = null 
 
 async function loadListingData(){
     //fetch foods
