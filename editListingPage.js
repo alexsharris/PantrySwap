@@ -33,13 +33,15 @@ function prefillForm(listingRecord){
     document.getElementById('editCookedMeals').checked = listingRecord.category.includes('Cooked Meals')? true : false
 }
 
+//PRELOADING FOOD FROM THE EXISITNG LISTING
 function loadFoods(listingRecord){
-    const foodsArray = listingRecord.foods
+    const foodArray = listingRecord.foods
+
 
     const foodsList = document.getElementById('foodsList')
     foodsList.innerHTML = ""
 
-    foodsArray.forEach((food) => {
+    foodArray.forEach((food) => {
         const foodBar = document.createElement('div')
         foodBar.id = "foodBar"
         foodBar.className = "flex justify-between rounded-lg text-light-brown border-[#9b9b9b] border-solid border"
@@ -57,9 +59,15 @@ function loadFoods(listingRecord){
             </div>
         `
         foodBar.querySelector("#minusQuant").addEventListener("click", () => {
-            if (food.quantity > 0) food.quantity = food.quantity - 1
-            console.log("food quantity:", food.quantity);
+            if (food.quantity > 0) food.quantity -= 1
+            console.log("food array: ", foodArray);
+            if (food.quantity == 0){
+                const index = foodArray.indexOf(food)
+                foodArray.splice(index, 1)
+                foodBar.remove()
+            }
             loadFoods(listingRecord) //need to reload whenever we want to display updated data
+        
         })
 
         foodBar.querySelector('#plusQuant').addEventListener("click", () => {
@@ -73,7 +81,7 @@ function loadFoods(listingRecord){
 
 
 async function initializePage(){
-    var data = await loadListingData()
+    data = await loadListingData()
     prefillForm(data)
     loadFoods(data)
 
@@ -111,11 +119,13 @@ async function initializePage(){
 
 }
 
+
+
 initializePage()
 
 
 
-
+//ADD FOOD FUNCTION
 function addFood(listingRecord) {
   let foodArray = listingRecord.foods
   console.log("foodsArray:",foodArray);
@@ -167,7 +177,7 @@ function addFood(listingRecord) {
             loadFoods(listingRecord)
             console.log("foodArray:", foodArray);
             if (foodArray[index].quantity == 0){
-                foodArray.pop()
+                foodArray.splice(index, 1)
                 foodBar.remove()
             }
         }
@@ -225,6 +235,11 @@ document.getElementById('cancelButton').addEventListener('click', () => {
 document.querySelector('form').addEventListener('submit', async(event) => {
     event.preventDefault()
 
+    if (!data){
+        console.log("data not loaded yet");
+        return
+    }
+
     //get back the updated values
     const updatedTitle = document.getElementById('editTitle').value
     const updatedLocation = document.getElementById('editLocation').value
@@ -254,7 +269,7 @@ document.querySelector('form').addEventListener('submit', async(event) => {
             updatedContact: updatedContact,
             updatedDescription: updatedDescription,
             updatedCategory: updatedCategory,
-            updatedFoods: foodsArray
+            updatedFoods: data.foods
         })
 
         })
