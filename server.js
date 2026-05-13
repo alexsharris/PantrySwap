@@ -289,6 +289,44 @@ app.get("/EditListing/:listingID", (req, res) => {
   res.render("editListingPage.ejs");
 });
 
+//load one listing
+app.get("/LoadListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+    res.status(200).send(listingRecord);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Could not load listing");
+  }
+});
+
+//Save Listing route
+app.put('/EditListing/:listingID', async (req, res) => {
+  const listingID = req.params.listingID
+  console.log('This is the req.body:', req.body);
+  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory, updatedFoods} = req.body
+  try{
+      const listingRecord = await ListingModel.findOne({_id: listingID})
+      
+      if (updatedImage) listingRecord.image = updatedImage
+      if (updatedTitle) listingRecord.title = updatedTitle
+      if (updatedLocation) listingRecord.location = updatedLocation
+      if (updatedPrice) listingRecord.price = updatedPrice
+      if (updatedContact) listingRecord.contact = updatedContact
+      if (updatedDescription) listingRecord.description = updatedDescription
+      if (updatedCategory) listingRecord.category = updatedCategory
+      if (updatedFoods) listingRecord.foods = updatedFoods
+      
+      await listingRecord.save()
+      res.sendStatus(200)
+  }
+  catch(error){
+    console.log(error);
+    res.status(500).send("Edit listing form could not be saved.");
+  }
+});
+
 //delete listing route - soft deleting only
 app.put("/DeleteListing/:listingID", async (req, res) => {
   const listingID = req.params.listingID;
@@ -304,39 +342,36 @@ app.put("/DeleteListing/:listingID", async (req, res) => {
 });
 
 //Unlist Listing route
-app.put("/UnlistListing/:listingID", async (req, res) => {
+app.put("/UpdateListingStatus/:listingID", async (req, res) => {
   const listingID = req.params.listingID;
+  const {buttonValue} = req.body
   try {
     const listingRecord = await ListingModel.findOne({ _id: listingID });
-    listingRecord.status = "unlisted";
-    await listingRecord.save();
-    res.sendStatus(200);
+
+    if (buttonValue == 'Unlist'){
+      listingRecord.status = "unlisted";
+      await listingRecord.save();
+      res.sendStatus(200);
+    }
+    else if (buttonValue == 'Re-list'){
+      listingRecord.status = 'listed'
+      await listingRecord.save();
+      res.sendStatus(200);
+    }
+    
   } catch (error) {
     console.log(error);
-    res.status(500).send("Could not unlist listing");
+    res.status(500).send("Could not update listing status");
   }
 });
 
-//load one listing
-app.get("/LoadListing/:listingID", async (req, res) => {
-  const listingID = req.params.listingID;
-  try {
-    const listingRecord = await ListingModel.findOne({ _id: listingID });
-    res.status(200).send(listingRecord);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Could not load listing");
-  }
-});
 
 // Serves the create listing page
 app.get("/CreateListing", async (req, res) => {
   res.render("createListingPage.ejs");
 });
 
-//================================================================================
-//to be deleted!
-//================================================================================
+
 app.get("/test", (req, res) => {
   res.render("test.ejs");
 });
@@ -378,39 +413,6 @@ app.post("/CreateListing", async (req, res) => {
   }
 });
 
-//Save Listing route
-app.put("/EditListing/:listingID", async (req, res) => {
-  const listingID = req.params.listingID;
-  console.log("This is the req.body:", req.body);
-  const {
-    updatedImage,
-    updatedTitle,
-    updatedLocation,
-    updatedPrice,
-    updatedContact,
-    updatedDescription,
-    updatedCategory,
-    updatedFoods,
-  } = req.body;
-  try {
-    const listingRecord = await ListingModel.findOne({ _id: listingID });
-
-    if (updatedImage) listingRecord.image = updatedImage;
-    if (updatedTitle) listingRecord.title = updatedTitle;
-    if (updatedLocation) listingRecord.location = updatedLocation;
-    if (updatedPrice) listingRecord.price = updatedPrice;
-    if (updatedContact) listingRecord.contact = updatedContact;
-    if (updatedDescription) listingRecord.description = updatedDescription;
-    if (updatedCategory) listingRecord.category = updatedCategory;
-    if (updatedFoods) listingRecord.foods = updatedFoods;
-
-    await listingRecord.save();
-    res.sendStatus(200);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Edit listing form could not be saved.");
-  }
-});
 
 app.get("/sell", (req, res) => {
   res.render("sellListings.ejs");

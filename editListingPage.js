@@ -1,7 +1,3 @@
-//GRAB THE ID FROM THE URL 
-// const params = new URLSearchParams(window.location.search)
-// const listingID = params.get('id') // this should be passed in to the url once a user clicks on edit a listing from the my listing page
-const listingID = '69fa70e043a7f4dbfc8616fa' //hard coding the listing ID for now until later
 
 import {
   displaySimpleWindow,
@@ -9,6 +5,13 @@ import {
   displayWindow,
 } from "../scripts/popupWindow.js";
 
+//GRAB THE ID FROM THE URL 
+const params = new URLSearchParams(window.location.search)
+const listingID = window.location.pathname.split('/').pop()
+// const listingID = params.get('id') // this should be passed in to the url once a user clicks on edit a listing from the my listing page
+// const listingID = '69fa70e043a7f4dbfc8616fa' //hard coding the listing ID for now until later
+
+let data = null 
 
 async function loadListingData(){
     //fetch foods
@@ -33,13 +36,15 @@ function prefillForm(listingRecord){
     document.getElementById('editCookedMeals').checked = listingRecord.category.includes('Cooked Meals')? true : false
 }
 
+//PRELOADING FOOD FROM THE EXISITNG LISTING
 function loadFoods(listingRecord){
-    const foodsArray = listingRecord.foods
+    const foodArray = listingRecord.foods
+
 
     const foodsList = document.getElementById('foodsList')
     foodsList.innerHTML = ""
 
-    foodsArray.forEach((food) => {
+    foodArray.forEach((food) => {
         const foodBar = document.createElement('div')
         foodBar.id = "foodBar"
         foodBar.className = "flex justify-between rounded-lg text-light-brown border-[#9b9b9b] border-solid border"
@@ -57,9 +62,15 @@ function loadFoods(listingRecord){
             </div>
         `
         foodBar.querySelector("#minusQuant").addEventListener("click", () => {
-            if (food.quantity > 0) food.quantity = food.quantity - 1
-            console.log("food quantity:", food.quantity);
+            if (food.quantity > 0) food.quantity -= 1
+            console.log("food array: ", foodArray);
+            if (food.quantity == 0){
+                const index = foodArray.indexOf(food)
+                foodArray.splice(index, 1)
+                foodBar.remove()
+            }
             loadFoods(listingRecord) //need to reload whenever we want to display updated data
+        
         })
 
         foodBar.querySelector('#plusQuant').addEventListener("click", () => {
@@ -71,51 +82,7 @@ function loadFoods(listingRecord){
 }
 
 
-
-async function initializePage(){
-    var data = await loadListingData()
-    prefillForm(data)
-    loadFoods(data)
-
-    const form = `
-    <form id="food-form" class="flex flex-col gap-4 mt-4 text-start">
-    <div class="flex flex-col gap-1">
-        <label>Name</label>
-        <input type="text" name="name" placeholder="Gala apples" />
-    </div>
-    <div class="flex flex-col gap-1">
-        <label>Quantity</label>
-        <input type="text" name="quantity" placeholder="2" />
-    </div>
-    </form>`;
-
-    const buttons = [
-    {
-        label: "Add food",
-        color: "box-color-0",
-        hover: "hover-outline",
-        onClick: () => addFood(data), // turn into anonymous function because we need to pass data into addFood, but not call it right away
-    },
-    {
-        label: "cancel",
-        color: "box-color-1",
-        hover: "hover-outline",
-        onClick: closePopupWindow,
-    },
-    ];
-
-    //add food button - add inside initialize function because we need the data object
-    document.getElementById('addFoodButton').addEventListener('click', () => {
-        displaySimpleWindow("Add food" + form, buttons, false)
-    })
-
-}
-
-initializePage()
-
-
-
-
+//ADD FOOD FUNCTION
 function addFood(listingRecord) {
   let foodArray = listingRecord.foods
   console.log("foodsArray:",foodArray);
@@ -167,7 +134,7 @@ function addFood(listingRecord) {
             loadFoods(listingRecord)
             console.log("foodArray:", foodArray);
             if (foodArray[index].quantity == 0){
-                foodArray.pop()
+                foodArray.splice(index, 1)
                 foodBar.remove()
             }
         }
@@ -196,6 +163,71 @@ function addFood(listingRecord) {
   }
 }
 
+// Function for changing the listing status and listing buttons shown on the page
+function listingStatus(listingRecord){
+    let statusCircle = document.getElementById('statusCircle')
+    let statusLabel = document.getElementById('statusLabel')
+    let listingStatusButton = document.getElementById('listingStatusButton')
+    
+    if (listingRecord.status == "unlisted"){
+        statusCircle.classList.remove('bg-green-500')
+        statusCircle.classList.add('bg-gray-500')
+        statusLabel.innerText = 'Unlisted'
+        listingStatusButton.innerText = 'Re-list'
+    }
+    else if(listingRecord.status == 'listed') {
+        statusCircle.classList.remove('bg-gray-500')
+        statusCircle.classList.add('bg-green-500')
+        statusLabel.innerText = 'Listed'
+        listingStatusButton.innerText = 'Unlist'
+    }
+}
+
+
+async function initializePage(){
+    data = await loadListingData()
+    listingStatus(data)
+    prefillForm(data)
+    loadFoods(data)
+
+    const form = `
+    <form id="food-form" class="flex flex-col gap-4 mt-4 text-start">
+    <div class="flex flex-col gap-1">
+        <label>Name</label>
+        <input type="text" name="name" placeholder="Gala apples" />
+    </div>
+    <div class="flex flex-col gap-1">
+        <label>Quantity</label>
+        <input type="text" name="quantity" placeholder="2" />
+    </div>
+    </form>`;
+
+    const buttons = [
+    {
+        label: "Add food",
+        color: "box-color-0",
+        hover: "hover-outline",
+        onClick: () => addFood(data), // turn into anonymous function because we need to pass data into addFood, but not call it right away
+    },
+    {
+        label: "cancel",
+        color: "box-color-1",
+        hover: "hover-outline",
+        onClick: closePopupWindow,
+    },
+    ];
+
+    //add food button - add inside initialize function because we need the data object
+    document.getElementById('addFoodButton').addEventListener('click', () => {
+        displaySimpleWindow("Add food" + form, buttons, false)
+    })
+
+}
+
+
+
+initializePage()
+
 
 
 
@@ -208,11 +240,20 @@ document.getElementById('deleteButton').addEventListener('click', async () => {
 
 })
 
-//Unlist button
-document.getElementById('unlistButton').addEventListener('click', async () => {
-    const response = await fetch(`/UnlistListing/${listingID}`, {method: "PUT"})
+//Unlist or Re-list button
+document.getElementById('listingStatusButton').addEventListener('click', async () => {
+    const listingStatusButton = document.getElementById('listingStatusButton')
+    const buttonValue = listingStatusButton.innerText
+    console.log(buttonValue);
+    const response = await fetch(`/UpdateListingStatus/${listingID}`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({buttonValue})
+        })
+
     if (response.ok){
-        alert('Listing unlisted!')
+        alert('Listing status updated')
+        initializePage()
     }
 })
 
@@ -224,6 +265,11 @@ document.getElementById('cancelButton').addEventListener('click', () => {
 //save button
 document.querySelector('form').addEventListener('submit', async(event) => {
     event.preventDefault()
+
+    if (!data){
+        console.log("data not loaded yet");
+        return
+    }
 
     //get back the updated values
     const updatedTitle = document.getElementById('editTitle').value
@@ -254,7 +300,7 @@ document.querySelector('form').addEventListener('submit', async(event) => {
             updatedContact: updatedContact,
             updatedDescription: updatedDescription,
             updatedCategory: updatedCategory,
-            updatedFoods: foodsArray
+            updatedFoods: data.foods
         })
 
         })
