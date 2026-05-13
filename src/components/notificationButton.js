@@ -52,54 +52,6 @@ const seedNotifications = [
     listing: "680fa1d23c4b2a001f9d1002",
     createdAt: new Date(),
   },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
 ];
 
 const formatWindow = (notificationItems) => {
@@ -164,30 +116,28 @@ class NotificationButton extends HTMLElement {
   // LOGIC
   // ======================
   async getUser() {
-    const response = await fetch("/user");
-    const data = await response.json();
+    try {
+      const response = await fetch("/user");
+      if (!response.ok) {
+        console.log("No user found for this session");
+        return;
+      }
+      const data = await response.json();
 
-    if (
-      data.notifications.length === 0 ||
-      data.notifications.length !== seedNotifications.length
-    ) {
-      await fetch(`/updateUser/${data._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ notifications: seedNotifications }),
-      });
+      if (
+        data.notifications.length === 0 ||
+        data.notifications.length !== seedNotifications.length
+      ) {
+        await seedNotifications(false);
+      } else {
+        this.user = data;
+        this.notifications = data.notifications;
+      }
 
-      const refreshed = await fetch("/user");
-      const refreshedData = await refreshed.json();
-
-      this.user = refreshedData;
-      this.notifications = refreshedData.notifications;
-    } else {
-      this.user = data;
-      this.notifications = data.notifications;
+      this.userId = this.user._id;
+    } catch (error) {
+      console.log(error);
     }
-
-    this.userId = this.user._id;
   }
 
   async clickEvent() {
@@ -211,8 +161,23 @@ class NotificationButton extends HTMLElement {
 
     // update user info
     await this.getUser();
-
     this.renderBtn();
+  }
+
+  async seedNotifications(seed = true) {
+    if (!seed) return;
+
+    await fetch(`/updateUser/${data._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notifications: seedNotifications }),
+    });
+
+    const refreshed = await fetch("/user");
+    const refreshedData = await refreshed.json();
+
+    this.user = refreshedData;
+    this.notifications = refreshedData.notifications;
   }
   // ======================
   // RENDER LOGIC
@@ -220,13 +185,16 @@ class NotificationButton extends HTMLElement {
 
   async renderBtn() {
     await this.getUser();
-
-    const hasUnreadNotifications = this.notifications
-      ? this.notifications.some((notif) => notif.hasSeen == false)
-      : false;
-    const buttonClass = hasUnreadNotifications
-      ? `text-orange hover:text-black`
-      : `text-medium-grey hover:text-black`;
+    let hasUnreadNotifications = false;
+    let buttonClass = `text-medium-grey hover:text-black`;
+    if (this.user) {
+      hasUnreadNotifications = this.notifications
+        ? this.notifications.some((notif) => notif.hasSeen == false)
+        : false;
+      buttonClass = hasUnreadNotifications
+        ? `text-orange hover:text-black`
+        : `text-medium-grey hover:text-black`;
+    }
 
     this.innerHTML = `
       <button class="${buttonClass} p-0">
