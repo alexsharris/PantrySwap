@@ -29,18 +29,20 @@ class ListingCard extends HTMLElement {
           <p class="listingPrice text-xs font-medium text-[#FF6700]">$${this.price}</p>
         </div>
 
-        <div class="mt-auto flex flex-1 gap-2 items-end mx-4">
-          <button class="viewButton flex-1 text-xs rounded-lg bg-[#FF6700] font-bold px-3 py-2 mb-4 text-white">
-            View
-          </button>
+        <div class="button-container mt-auto flex flex-1 gap-2 items-end mx-4">
         </div>
       </div>
     </div>
   `;
 
-    this.querySelector(".viewButton").addEventListener("click", (e) => {
+    const button = document.createElement("button");
+    button.className =
+      "view-button flex-1 text-xs rounded-lg box-color-0 hover-bright font-bold px-3 py-2 mb-4";
+    button.innerHTML = "View";
+    button.addEventListener("click", () => {
       this.clickEvent();
     });
+    this.querySelector(".button-container").append(button);
   }
 }
 

@@ -10,6 +10,7 @@ import {
   getDayWithSuffix,
   getMonthName,
 } from "../scripts/dateTime.js";
+import "../components/listingSummaryCard.js";
 
 //consts
 const bellSVG = [
@@ -40,19 +41,13 @@ const seedNotifications = [
   {
     notifType: "DELETED",
     hasSeen: false,
-    listing: "680fa1d23c4b2a001f9d1003",
+    listing: "69fa70e043a7f4dbfc8616fa",
     createdAt: new Date(),
   },
   {
     notifType: "DELETED",
     hasSeen: false,
     listing: "680fa1d23c4b2a001f9d1001",
-    createdAt: new Date(),
-  },
-  {
-    notifType: "UNLISTED",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
     createdAt: new Date(),
   },
   {
@@ -80,27 +75,65 @@ const formatWindow = (notificationItems) => {
     </div>
   `;
 };
-const formatNotificationItem = (notification) => {
+
+const formatNotificationItem = (notification, listing) => {
   const date = new Date(notification.createdAt);
   const month = getMonthName(date);
   const dayStr = getDayWithSuffix(date);
   const hasSeen = notification.hasSeen;
   const type = NotifTypes[notification.notifType];
-  return `<div class="card-item px-10 ">
+  let newCard = null;
+  if (listing) {
+    newCard = document.createElement("listing-card");
+
+    newCard.setListingInfo(
+      listing.title,
+      listing.image,
+      listing.price,
+      notification.listing,
+    );
+  }
+
+  return `<div id="${notification.listing}" class="card-item px-10">
           <p class="text-light-brown">${month} ${dayStr}</p>
-          <h2 class="${hasSeen ? `text-black` : `text-orange`}">${type ? type.message : "Unknown notification"}</h2>
+          <h2 class="${hasSeen ? "text-black" : "text-orange"}">
+            ${type ? type.message : "Unknown notification"}
+          </h2>
+          ${listing ? newCard.outerHTML : ""}
         </div>`;
 };
-function notificationItems(notifications) {
-  let output = "";
-  notifications.forEach((notif) => {
-    output += formatNotificationItem(notif);
-  });
-  return output;
+
+async function notificationItems(notifications) {
+  const items = await Promise.all(
+    notifications.map(async (notif) => {
+      let listing = null;
+
+      if (notif.listing) {
+        try {
+          const res = await fetch(`/LoadListing/${notif.listing}`);
+
+          if (res.ok) {
+            listing = await res.json();
+          } else {
+            console.log("Failed to load listing:", notif.listing, res.status);
+          }
+        } catch (err) {
+          console.log("Network error loading listing:", notif.listing);
+        }
+      }
+
+      return formatNotificationItem(notif, listing);
+    }),
+  );
+
+  return items.join("");
 }
-function showWindow(notifications) {
+
+async function showWindow(notifications) {
+  const itemsHTML = await notificationItems(notifications);
+
   displayWindow(
-    formatWindow(notificationItems(notifications)),
+    formatWindow(itemsHTML),
     [
       {
         label: "Close",
