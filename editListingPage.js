@@ -82,52 +82,6 @@ function loadFoods(listingRecord){
 }
 
 
-
-async function initializePage(){
-    data = await loadListingData()
-    prefillForm(data)
-    loadFoods(data)
-
-    const form = `
-    <form id="food-form" class="flex flex-col gap-4 mt-4 text-start">
-    <div class="flex flex-col gap-1">
-        <label>Name</label>
-        <input type="text" name="name" placeholder="Gala apples" />
-    </div>
-    <div class="flex flex-col gap-1">
-        <label>Quantity</label>
-        <input type="text" name="quantity" placeholder="2" />
-    </div>
-    </form>`;
-
-    const buttons = [
-    {
-        label: "Add food",
-        color: "box-color-0",
-        hover: "hover-outline",
-        onClick: () => addFood(data), // turn into anonymous function because we need to pass data into addFood, but not call it right away
-    },
-    {
-        label: "cancel",
-        color: "box-color-1",
-        hover: "hover-outline",
-        onClick: closePopupWindow,
-    },
-    ];
-
-    //add food button - add inside initialize function because we need the data object
-    document.getElementById('addFoodButton').addEventListener('click', () => {
-        displaySimpleWindow("Add food" + form, buttons, false)
-    })
-
-}
-
-
-
-initializePage()
-
-
-
 //ADD FOOD FUNCTION
 function addFood(listingRecord) {
   let foodArray = listingRecord.foods
@@ -209,6 +163,71 @@ function addFood(listingRecord) {
   }
 }
 
+// Function for changing the listing status and listing buttons shown on the page
+function listingStatus(listingRecord){
+    let statusCircle = document.getElementById('statusCircle')
+    let statusLabel = document.getElementById('statusLabel')
+    let listingStatusButton = document.getElementById('listingStatusButton')
+    
+    if (listingRecord.status == "unlisted"){
+        statusCircle.classList.remove('bg-green-500')
+        statusCircle.classList.add('bg-gray-500')
+        statusLabel.innerText = 'Unlisted'
+        listingStatusButton.innerText = 'Re-list'
+    }
+    else if(listingRecord.status == 'listed') {
+        statusCircle.classList.remove('bg-gray-500')
+        statusCircle.classList.add('bg-green-500')
+        statusLabel.innerText = 'Listed'
+        listingStatusButton.innerText = 'Unlist'
+    }
+}
+
+
+async function initializePage(){
+    data = await loadListingData()
+    listingStatus(data)
+    prefillForm(data)
+    loadFoods(data)
+
+    const form = `
+    <form id="food-form" class="flex flex-col gap-4 mt-4 text-start">
+    <div class="flex flex-col gap-1">
+        <label>Name</label>
+        <input type="text" name="name" placeholder="Gala apples" />
+    </div>
+    <div class="flex flex-col gap-1">
+        <label>Quantity</label>
+        <input type="text" name="quantity" placeholder="2" />
+    </div>
+    </form>`;
+
+    const buttons = [
+    {
+        label: "Add food",
+        color: "box-color-0",
+        hover: "hover-outline",
+        onClick: () => addFood(data), // turn into anonymous function because we need to pass data into addFood, but not call it right away
+    },
+    {
+        label: "cancel",
+        color: "box-color-1",
+        hover: "hover-outline",
+        onClick: closePopupWindow,
+    },
+    ];
+
+    //add food button - add inside initialize function because we need the data object
+    document.getElementById('addFoodButton').addEventListener('click', () => {
+        displaySimpleWindow("Add food" + form, buttons, false)
+    })
+
+}
+
+
+
+initializePage()
+
 
 
 
@@ -221,11 +240,20 @@ document.getElementById('deleteButton').addEventListener('click', async () => {
 
 })
 
-//Unlist button
-document.getElementById('unlistButton').addEventListener('click', async () => {
-    const response = await fetch(`/UnlistListing/${listingID}`, {method: "PUT"})
+//Unlist or Re-list button
+document.getElementById('listingStatusButton').addEventListener('click', async () => {
+    const listingStatusButton = document.getElementById('listingStatusButton')
+    const buttonValue = listingStatusButton.innerText
+    console.log(buttonValue);
+    const response = await fetch(`/UpdateListingStatus/${listingID}`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({buttonValue})
+        })
+
     if (response.ok){
-        alert('Listing unlisted!')
+        alert('Listing status updated')
+        initializePage()
     }
 })
 

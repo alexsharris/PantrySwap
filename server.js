@@ -323,16 +323,26 @@ app.put("/DeleteListing/:listingID", async (req, res) => {
 });
 
 //Unlist Listing route
-app.put("/UnlistListing/:listingID", async (req, res) => {
+app.put("/UpdateListingStatus/:listingID", async (req, res) => {
   const listingID = req.params.listingID;
+  const {buttonValue} = req.body
   try {
     const listingRecord = await ListingModel.findOne({ _id: listingID });
-    listingRecord.status = "unlisted";
-    await listingRecord.save();
-    res.sendStatus(200);
+
+    if (buttonValue == 'Unlist'){
+      listingRecord.status = "unlisted";
+      await listingRecord.save();
+      res.sendStatus(200);
+    }
+    else if (buttonValue == 'Re-list'){
+      listingRecord.status = 'listed'
+      await listingRecord.save();
+      res.sendStatus(200);
+    }
+    
   } catch (error) {
     console.log(error);
-    res.status(500).send("Could not unlist listing");
+    res.status(500).send("Could not update listing status");
   }
 });
 
@@ -342,9 +352,7 @@ app.get("/CreateListing", async (req, res) => {
   res.render("createListingPage.ejs");
 });
 
-//================================================================================
-//to be deleted!
-//================================================================================
+
 app.get("/test", (req, res) => {
   res.render("test.ejs");
 });
