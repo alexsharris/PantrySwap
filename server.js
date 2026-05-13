@@ -84,6 +84,18 @@ const ListingsSchema = new mongoose.Schema({
   },
 });
 
+//schema of review collection
+const reviewsSchema = new mongoose.Schema({
+  reviewer: String, // user ID of the writer
+  reviewerName: String, // display name of the writer
+  seller: String, // user ID of the seller
+  title: String,
+  rating: Number,
+  description: String,
+  listing: String, // listing ID
+  createdAt: { type: Date, default: Date.now },
+});
+
 const ImageModel = mongoose.model("Images", ImageSchema)
 
 const UserModel = mongoose.model("Users", UserSchema);
