@@ -317,6 +317,7 @@ app.put('/EditListing/:listingID', async (req, res) => {
       if (updatedDescription) listingRecord.description = updatedDescription
       if (updatedCategory) listingRecord.category = updatedCategory
       if (updatedFoods) listingRecord.foods = updatedFoods
+      if (updatedImage) listingRecord.image = updatedImage
       
       await listingRecord.save()
       res.sendStatus(200)
