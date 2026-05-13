@@ -2,7 +2,7 @@
 const searchTutorial = async function () {
   const response = await fetch("/user");
   const currentUser = await response.json();
-  console.log(currentUser);
+  // console.log(currentUser);
   if (!currentUser.tutorials.search) {
     //Display tutorial
     let tutorialContainer = document.createElement("div");
@@ -66,7 +66,7 @@ const searchTutorial = async function () {
         </div>
       `;
 
-      let stepFour = `
+    let stepFour = `
           <div id="stepTwo" class="relative flex flex-col bg-white rounded-lg pb-5 px-10 pt-10 max-w-70 justify-center shadow-xl hidden">
               <button class="closeButton absolute top-2 right-2 rounded-full w-7 h-7 bg-[#D9D9D9]"><img src="images/closeIcon.png" class="p-2"></button>
               <img src="images/tutorialBookmarkStep2.png" class="mb-5 p-2">

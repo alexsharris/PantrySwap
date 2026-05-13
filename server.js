@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({
   listedItems: [String], // the idea is to store _id of documents in listedItems here
   notifications: [
     {
-      message: String,
+      notifType: String, // type of the lsiting found in notificationSystem.js
       hasSeen: Boolean,
       listing: String, // _id of the related listing
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
@@ -110,8 +110,6 @@ async function main() {
       console.error("MongoDB connection failed:", err);
     });
 }
-
-
 
 // Login routes
 
@@ -389,7 +387,6 @@ app.post("/CreateListing", async (req, res) => {
 });
 
 
-
 app.get("/sell", (req, res) => {
   res.render("sellListings.ejs");
 });
@@ -400,7 +397,7 @@ app.get("/buy", (req, res) => {
 
 app.get("/sellerListings", async (req, res) => {
   try {
-    console.log(req.session.UserID)
+    console.log(req.session.UserID);
     const listings = await ListingModel.find({ seller: req.session.UserID });
     res.json(listings);
   } catch (error) {
@@ -419,8 +416,6 @@ app.get("/loadListings", async (req, res) => {
     console.log(error);
   }
 });
-
-
 
 //get current user info
 app.get("/user", async (req, res) => {
@@ -557,7 +552,6 @@ app.get("/listingDetails/:id", async (req, res) => {
     res.status(500).send("Unexpected server error!");
   }
 });
-
 
 //===================================================================================================
 //This route handles connection to gemini to fill out the create listing form for the user
