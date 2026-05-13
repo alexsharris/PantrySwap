@@ -1,36 +1,23 @@
+import "../components/listingSummaryCard.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
-  const response = await fetch(`http://localhost:3000/loadListings`);
+  const response = await fetch(`/loadListings`);
   const data = await response.json();
-  // console.log(data)
-  listingHolder = document.getElementById("listingsHolder");
+
+  const listingHolder = document.getElementById("listingsHolder");
+
   data.forEach((newListing) => {
-    if (newListing.status == "listed") {
-      // console.log(newListing)
+    if (!newListing || newListing.status !== "listed") return;
 
-      //clone template
-      const template = document.getElementById("listingTemplate");
-      const clone = template.content.cloneNode(true);
+    const newCard = document.createElement("listing-card");
 
-      //fill data
-      clone.querySelector(".listingTitle").textContent = newListing.title;
-      if (newListing.image) {
-        clone.querySelector(".listingImage").src = newListing.image;
-      } else {
-        clone.querySelector(".listingImage").src =
-          "images/pantry_share_img_10.jpg";
-      }
-      clone.querySelector(".listingPrice").textContent = `$${newListing.price}`;
-      clone.querySelector(".viewButton").id = `${newListing._id}ViewBtn`;
+    newCard.setListingInfo(
+      newListing.title,
+      newListing.image,
+      newListing.price,
+      newListing._id,
+    );
 
-      listingHolder.appendChild(clone);
-      document
-        .getElementById(`${newListing._id}ViewBtn`)
-        .addEventListener("click", () => {
-          console.log(newListing._id);
-          window.location.assign(
-            `http://localhost:3000/listingDetails/${newListing._id}`,
-          );
-        });
-    }
+    listingHolder.appendChild(newCard);
   });
 });
