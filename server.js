@@ -17,8 +17,20 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 
+// multer
+const multer = require('multer')
+const upload = multer({storage: multer.memoryStorage()})
+
+app.use(express.json({limit: '50mb'}))
 app.use(express.static("src"));
 app.use(express.static("."));
+
+// schema for images
+const ImageSchema = new mongoose.Schema({
+  name: String,
+  image: Buffer
+})
+
 
 // schema for users
 const UserSchema = new mongoose.Schema({
@@ -27,6 +39,7 @@ const UserSchema = new mongoose.Schema({
   phone: String,
   password: String,
   city: String,
+  profilePicture: String,
   savedItems: [String], // the idea is to store _id of documents in listedItems here
   listedItems: [String], // the idea is to store _id of documents in listedItems here
   notifications: [
@@ -71,16 +84,8 @@ const ListingsSchema = new mongoose.Schema({
   },
 });
 
-const reviewsSchema = new mongoose.Schema({
-  reviewer: String, // user ID as the writer  goes here - for query purposes later if needed
-  seller: String, // user ID as the seller goes here
-  title: String,
-  reviewerName: String,
-  rating: Number,
-  description: String,
-  listing: String, //listing ID goes here
-  createdAt: { type: Date, default: Date.now },
-});
+const ImageModel = mongoose.model("Images", ImageSchema)
+
 const UserModel = mongoose.model("Users", UserSchema);
 
 const ListingModel = mongoose.model("Listings", ListingsSchema);
@@ -237,6 +242,7 @@ app.get("/AccountData", async (req, res) => {
   }
 });
 
+
 // put route to update the user document in the DB from the Account page
 app.put("/ChangeData", async (req, res) => {
   try {
@@ -244,6 +250,8 @@ app.put("/ChangeData", async (req, res) => {
     const UserNewEmail = req.body.UserNewEmail;
     const UserNewphone = req.body.UserNewphone;
     const UserNewCity = req.body.UserNewCity;
+    const UserNewPFP = req.body.UserNewPFP
+    console.log(UserNewPFP)
 
     // check if the value exists, if so, update the DB
     const UpdatedFields = {};
@@ -252,6 +260,7 @@ app.put("/ChangeData", async (req, res) => {
     if (UserNewEmail) UpdatedFields.email = UserNewEmail;
     if (UserNewphone) UpdatedFields.phone = UserNewphone;
     if (UserNewCity) UpdatedFields.city = UserNewCity;
+    if (UserNewPFP) UpdatedFields.profilePicture = UserNewPFP
 
     const user = await UserModel.findByIdAndUpdate(
       { _id: req.session.UserID },
@@ -310,6 +319,7 @@ app.put('/EditListing/:listingID', async (req, res) => {
       if (updatedDescription) listingRecord.description = updatedDescription
       if (updatedCategory) listingRecord.category = updatedCategory
       if (updatedFoods) listingRecord.foods = updatedFoods
+      if (updatedImage) listingRecord.image = updatedImage
       
       await listingRecord.save()
       res.sendStatus(200)

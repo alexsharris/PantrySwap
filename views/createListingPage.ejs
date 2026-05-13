@@ -19,7 +19,7 @@
     </style>
   </head>
   <body class="min-h-screen flex flex-col">
-    <site-navbar></site-navbar>
+    <!-- <site-navbar></site-navbar> -->
     <div id="" class=""></div>
     <!-- page container S-->
     <div class="site-margins max-w-6xl mx-auto">
@@ -145,16 +145,17 @@
         <!-- left -->
         <div id="" class="flex flex-col min-[915px]:w-1/3 gap-2">
           <h2 id="" class="text-light-brown tracking-wide">Image</h2>
-          <div id="" class="relative">
+          <div id="" class="relative flex flex-col gap-2">
             <img
               class="rounded-xl"
               src="images\pantry_share_img_13.jpg"
-              alt=""
+              alt="" id="listingImg"
             />
+            <input type="file" id="listingImageUpload" />
             <button
-              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 bg-gray-100 text-gray-500"
-            >
-              Change Photo
+            type="button"
+            class="button box-color-5 border border-medium-grey w-fit hover-outline hover-accent-text" id="uploadImgBtn">
+            Upload Photo
             </button>
           </div>
         </div>

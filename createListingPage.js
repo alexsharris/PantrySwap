@@ -369,6 +369,37 @@ document.getElementById("cancelButton").addEventListener("click", () => {
   window.location.href = "/sell";
 });
 
+// translate image file into string
+function readImageAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      resolve(e.target.result); // full Base64 string
+    };
+    reader.onerror = function () {
+      reject(new Error("Error reading image"));
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+
+let currentImg
+// upload image button
+const uploadImgBtn = document.getElementById("uploadImgBtn")
+uploadImgBtn.addEventListener("click", async ()=>{
+  console.log("pressed btn")
+  const listingImg = document.getElementById("listingImageUpload").files[0]
+  console.log(listingImg)
+  const encodedImg = await readImageAsBase64(listingImg)
+  console.log(encodedImg)
+  currentImg = encodedImg
+  document.getElementById("listingImg").src = currentImg
+})
+
 //create button
 document.querySelector("form").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -383,6 +414,7 @@ document.querySelector("form").addEventListener("submit", async (event) => {
   const updatedDairy = document.getElementById("editDairy").checked;
   const updatedBakedGoods = document.getElementById("editBakedGoods").checked;
   const updatedCookedMeals = document.getElementById("editCookedMeals").checked;
+  const updatedImage = currentImg
 
   // //validate required fields not left blank
   if (foodArray.length == 0) {
@@ -409,6 +441,7 @@ document.querySelector("form").addEventListener("submit", async (event) => {
       description: updatedDescription,
       category: updatedCategory,
       foods: foodArray,
+      image: updatedImage,
     }),
   });
   if (response.ok) {
