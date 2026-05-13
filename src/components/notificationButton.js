@@ -1,13 +1,17 @@
+// imports
 import {
   displaySimpleWindow,
   closePopupWindow,
   displayWindow,
 } from "../scripts/popupWindow.js";
+import { NotifTypes } from "../scripts/notificationSystem.js";
 import {
   getDayName,
   getDayWithSuffix,
   getMonthName,
 } from "../scripts/dateTime.js";
+
+//consts
 const bellSVG = [
   `<svg
         xmlns="http://www.w3.org/2000/svg"
@@ -32,37 +36,45 @@ const bellSVG = [
         <path d="M12 2c1.358 0 2.506 .903 2.875 2.141l.046 .171l.008 .043a8.013 8.013 0 0 1 4.024 6.069l.028 .287l.019 .289v2.931l.021 .136a3 3 0 0 0 1.143 1.847l.167 .117l.162 .099c.86 .487 .56 1.766 -.377 1.864l-.116 .006h-16c-1.028 0 -1.387 -1.364 -.493 -1.87a3 3 0 0 0 1.472 -2.063l.021 -.143l.001 -2.97a8 8 0 0 1 3.821 -6.454l.248 -.146l.01 -.043a3.003 3.003 0 0 1 2.562 -2.29l.182 -.017l.176 -.004z" />
         </svg>`,
 ];
-
 const seedNotifications = [
   {
-    message: "Someone commented on your listing.",
+    notifType: "DELETED",
     hasSeen: false,
     listing: "680fa1d23c4b2a001f9d1003",
     createdAt: new Date(),
   },
   {
-    message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    hasSeen: true,
+    notifType: "DELETED",
+    hasSeen: false,
     listing: "680fa1d23c4b2a001f9d1001",
     createdAt: new Date(),
   },
   {
-    message: "Your item was successfully sold.",
+    notifType: "UNLISTED",
+    hasSeen: true,
+    listing: "680fa1d23c4b2a001f9d1002",
+    createdAt: new Date(),
+  },
+  {
+    notifType: "UNLISTED",
     hasSeen: true,
     listing: "680fa1d23c4b2a001f9d1002",
     createdAt: new Date(),
   },
 ];
 
+// =============================
+// WINDOW LOGIC
+// =============================
 const formatWindow = (notificationItems) => {
   return `
-    <div class="flex flex-col max-h-[75vh]">
-      <div class="flex justify-between px-10 py-5 shrink-0">
-        <h1>Notifications</h1>
-        <div class="text-medium-grey">${bellSVG[0]}</div>
-      </div>
-      <div class="flex-1 overflow-y-auto overflow-x-hidden">
-        ${notificationItems || `<div class="card-item px-10 text-light-brown">No notifications yet!</div>`}
+  <div class="flex flex-col max-h-[75vh]">
+  <div class="flex justify-between px-10 py-5 shrink-0">
+  <h1>Notifications</h1>
+  <div class="text-medium-grey">${bellSVG[0]}</div>
+  </div>
+  <div class="flex-1 overflow-y-auto overflow-x-hidden">
+  ${notificationItems || `<div class="card-item px-10 text-light-brown">No notifications yet!</div>`}
       </div>
       <div class="border-b border-peach px-4 -mx-4 shrink-0"></div>
     </div>
@@ -73,12 +85,12 @@ const formatNotificationItem = (notification) => {
   const month = getMonthName(date);
   const dayStr = getDayWithSuffix(date);
   const hasSeen = notification.hasSeen;
+  const type = NotifTypes[notification.notifType];
   return `<div class="card-item px-10 ">
           <p class="text-light-brown">${month} ${dayStr}</p>
-          <h2 class="${hasSeen ? `text-black` : `text-orange`}">${notification.message}</h2>
+          <h2 class="${hasSeen ? `text-black` : `text-orange`}">${type ? type.message : "Unknown notification"}</h2>
         </div>`;
 };
-
 function notificationItems(notifications) {
   let output = "";
   notifications.forEach((notif) => {
@@ -86,7 +98,6 @@ function notificationItems(notifications) {
   });
   return output;
 }
-
 function showWindow(notifications) {
   displayWindow(
     formatWindow(notificationItems(notifications)),
@@ -103,6 +114,9 @@ function showWindow(notifications) {
   );
 }
 
+// =============================
+// COMPONENT
+// =============================
 class NotificationButton extends HTMLElement {
   constructor() {
     super();
@@ -124,15 +138,13 @@ class NotificationButton extends HTMLElement {
       }
       const data = await response.json();
       this.user = data;
-
+      this.userId = this.user._id;
       if (
         data.notifications.length === 0 ||
         data.notifications.length !== seedNotifications.length
       )
-        await this.seedNewNotifications(false);
+        await this.seedNewNotifications();
       else this.notifications = data.notifications;
-
-      this.userId = this.user._id;
     } catch (error) {
       console.log(error);
     }
@@ -162,10 +174,11 @@ class NotificationButton extends HTMLElement {
     this.renderBtn();
   }
 
-  async seedNewNotifications(seed = true) {
-    if (!seed) return;
+  async seedNewNotifications() {
+    if (!this.user) return;
 
-    await fetch(`/updateUser/${data._id}`, {
+    console.log(seedNotifications);
+    await fetch(`/updateUser/${this.userId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ notifications: seedNotifications }),
@@ -176,6 +189,7 @@ class NotificationButton extends HTMLElement {
 
     this.user = refreshedData;
     this.notifications = refreshedData.notifications;
+    console.log(this.user);
   }
   // ======================
   // RENDER LOGIC

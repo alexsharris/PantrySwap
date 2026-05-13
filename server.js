@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({
   listedItems: [String], // the idea is to store _id of documents in listedItems here
   notifications: [
     {
-      message: String,
+      notifType: String, // type of the lsiting found in notificationSystem.js
       hasSeen: Boolean,
       listing: String, // _id of the related listing
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
@@ -98,19 +98,18 @@ app.set("view engine", "ejs");
 main().catch((err) => console.log(err));
 
 async function main() {
-  mongoose.connect(db)
-  .then(() => {
-    console.log("Connected to MongoDB");
-    app.listen(3000, () => {
-      console.log("Server running on port 3000");
+  mongoose
+    .connect(db)
+    .then(() => {
+      console.log("Connected to MongoDB");
+      app.listen(3000, () => {
+        console.log("Server running on port 3000");
+      });
+    })
+    .catch((err) => {
+      console.error("MongoDB connection failed:", err);
     });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection failed:", err);
-  });
 }
-
-
 
 // Login routes
 
@@ -317,60 +316,75 @@ app.get("/CreateListing", async (req, res) => {
 });
 
 //Create listing route
-app.post('/CreateListing', async (req, res) => {
-  const {image, title, location, price, contact, description, category, foods} = req.body
-  try{
-      const newListing = await ListingModel.create({
-        seller: req.session.UserID,
-        image: image,
-        title: title,
-        location: location,
-        price: price,
-        contact: contact,
-        description: description,
-        category: category,
-        foods: foods
-      })
+app.post("/CreateListing", async (req, res) => {
+  const {
+    image,
+    title,
+    location,
+    price,
+    contact,
+    description,
+    category,
+    foods,
+  } = req.body;
+  try {
+    const newListing = await ListingModel.create({
+      seller: req.session.UserID,
+      image: image,
+      title: title,
+      location: location,
+      price: price,
+      contact: contact,
+      description: description,
+      category: category,
+      foods: foods,
+    });
 
-      await UserModel.findByIdAndUpdate(
-        req.session.UserID, 
-        {'$push': {listedItems: newListing._id}},
-        {new: true}
-      )
-      res.sendStatus(200)
-  }
-  catch(error){
+    await UserModel.findByIdAndUpdate(
+      req.session.UserID,
+      { $push: { listedItems: newListing._id } },
+      { new: true },
+    );
+    res.sendStatus(200);
+  } catch (error) {
     console.log(error);
-    res.status(500).send('Create listing form could not be saved.')
+    res.status(500).send("Create listing form could not be saved.");
   }
 });
 
 //Save Listing route
-app.put('/EditListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
-  console.log('This is the req.body:', req.body);
-  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory, updatedFoods} = req.body
-  try{
-      const listingRecord = await ListingModel.findOne({_id: listingID})
-      
-      if (updatedImage) listingRecord.image = updatedImage
-      if (updatedTitle) listingRecord.title = updatedTitle
-      if (updatedLocation) listingRecord.location = updatedLocation
-      if (updatedPrice) listingRecord.price = updatedPrice
-      if (updatedContact) listingRecord.contact = updatedContact
-      if (updatedDescription) listingRecord.description = updatedDescription
-      if (updatedCategory) listingRecord.category = updatedCategory
-      if (updatedFoods) listingRecord.foods = updatedFoods
-      
-      await listingRecord.save()
-      res.sendStatus(200)
-  }
-  catch(error){
+app.put("/EditListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  console.log("This is the req.body:", req.body);
+  const {
+    updatedImage,
+    updatedTitle,
+    updatedLocation,
+    updatedPrice,
+    updatedContact,
+    updatedDescription,
+    updatedCategory,
+    updatedFoods,
+  } = req.body;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+
+    if (updatedImage) listingRecord.image = updatedImage;
+    if (updatedTitle) listingRecord.title = updatedTitle;
+    if (updatedLocation) listingRecord.location = updatedLocation;
+    if (updatedPrice) listingRecord.price = updatedPrice;
+    if (updatedContact) listingRecord.contact = updatedContact;
+    if (updatedDescription) listingRecord.description = updatedDescription;
+    if (updatedCategory) listingRecord.category = updatedCategory;
+    if (updatedFoods) listingRecord.foods = updatedFoods;
+
+    await listingRecord.save();
+    res.sendStatus(200);
+  } catch (error) {
     console.log(error);
     res.status(500).send("Edit listing form could not be saved.");
   }
 });
-
 
 app.get("/sell", (req, res) => {
   res.render("sellListings.ejs");
@@ -382,7 +396,7 @@ app.get("/buy", (req, res) => {
 
 app.get("/sellerListings", async (req, res) => {
   try {
-    console.log(req.session.UserID)
+    console.log(req.session.UserID);
     const listings = await ListingModel.find({ seller: req.session.UserID });
     res.json(listings);
   } catch (error) {
@@ -401,8 +415,6 @@ app.get("/loadListings", async (req, res) => {
     console.log(error);
   }
 });
-
-
 
 //get current user info
 app.get("/user", async (req, res) => {
@@ -520,7 +532,6 @@ app.post("/removeBookmark/:id", async (req, res) => {
     res.status(500).send("Unexpected server error!");
   }
 });
-
 
 app.get("/tutorial", (req, res) => {
   res.render("tutorial.ejs");
