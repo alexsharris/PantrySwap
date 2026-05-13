@@ -86,12 +86,7 @@ const formatNotificationItem = (notification, listing) => {
   if (listing) {
     newCard = document.createElement("listing-card");
 
-    newCard.setListingInfo(
-      listing.title,
-      listing.image,
-      listing.price,
-      notification.listing,
-    );
+    newCard.setListingInfo(listing.title, listing.image, listing.price);
   }
 
   return `<div id="${notification.listing}" class="card-item px-10">

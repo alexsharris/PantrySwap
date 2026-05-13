@@ -35,14 +35,16 @@ class ListingCard extends HTMLElement {
     </div>
   `;
 
-    const button = document.createElement("button");
-    button.className =
-      "view-button flex-1 text-xs rounded-lg box-color-0 hover-bright font-bold px-3 py-2 mb-4";
-    button.innerHTML = "View";
-    button.addEventListener("click", () => {
-      this.clickEvent();
-    });
-    this.querySelector(".button-container").append(button);
+    if (this.listingID) {
+      const button = document.createElement("button");
+      button.className =
+        "view-button flex-1 text-xs rounded-lg box-color-0 hover-bright font-bold px-3 py-2 mb-4";
+      button.innerHTML = "View";
+      button.addEventListener("click", () => {
+        this.clickEvent();
+      });
+      this.querySelector(".button-container").append(button);
+    }
   }
 }
 
