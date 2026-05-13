@@ -34,7 +34,39 @@ function prefillForm(listingRecord){
     document.getElementById('editDairy').checked = listingRecord.category.includes('Dairy')? true : false
     document.getElementById('editBakedGoods').checked = listingRecord.category.includes('Baked Goods')? true : false
     document.getElementById('editCookedMeals').checked = listingRecord.category.includes('Cooked Meals')? true : false
+    document.getElementById('listingImg').src = listingRecord.image
 }
+
+// translate image file into string
+function readImageAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      resolve(e.target.result); // full Base64 string
+    };
+    reader.onerror = function () {
+      reject(new Error("Error reading image"));
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+
+let currentImg
+// upload image button
+const uploadImgBtn = document.getElementById("uploadImgBtn")
+uploadImgBtn.addEventListener("click", async ()=>{
+  console.log("pressed btn")
+  const listingImg = document.getElementById("listingImageUpload").files[0]
+  console.log(listingImg)
+  const encodedImg = await readImageAsBase64(listingImg)
+  console.log(encodedImg)
+  currentImg = encodedImg
+  document.getElementById("listingImg").src = currentImg
+})
 
 //PRELOADING FOOD FROM THE EXISITNG LISTING
 function loadFoods(listingRecord){
@@ -282,6 +314,7 @@ document.querySelector('form').addEventListener('submit', async(event) => {
     const updatedDairy = document.getElementById('editDairy').checked
     const updatedBakedGoods = document.getElementById('editBakedGoods').checked
     const updatedCookedMeals = document.getElementById('editCookedMeals').checked
+    const updatedImage = currentImg
 
     let updatedCategory = []
     updatedProduce == true? updatedCategory.push("Produce") : undefined
@@ -300,7 +333,8 @@ document.querySelector('form').addEventListener('submit', async(event) => {
             updatedContact: updatedContact,
             updatedDescription: updatedDescription,
             updatedCategory: updatedCategory,
-            updatedFoods: data.foods
+            updatedFoods: data.foods,
+            updatedImage: updatedImage,
         })
 
         })
