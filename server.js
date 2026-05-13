@@ -72,15 +72,13 @@ const ListingsSchema = new mongoose.Schema({
 });
 
 const reviewsSchema = new mongoose.Schema({
-    
-      reviewer: String, // user ID as the writer  goes here
-      seller: String, // user ID as the seller goes here
-      title: String,
-      rating: Number,
-      description: String,
-      listing: String, //listing ID goes here
-      createdAt: { type: Date, default: Date.now },
-    
+  reviewer: String, // user ID as the writer  goes here
+  seller: String, // user ID as the seller goes here
+  title: String,
+  rating: Number,
+  description: String,
+  listing: String, //listing ID goes here
+  createdAt: { type: Date, default: Date.now },
 });
 const UserModel = mongoose.model("Users", UserSchema);
 
@@ -572,6 +570,7 @@ app.get("/listingDetails/:id", async (req, res) => {
   }
 });
 
+// route to post reviews
 app.post("/reviews/:id", async (req, res) => {
   try {
     const listingID = req.params.id;
@@ -591,7 +590,19 @@ app.post("/reviews/:id", async (req, res) => {
     console.log(error);
     res.status(500).json({ error: "Could not save review" });
   }
-})
+});
+
+//route to get all reviews for the seller
+app.get("/sellerReviews/:id", async (req, res) => {
+  try {
+    const listing = await ListingModel.findById(req.params.id);
+    const sellerReviews = await ReviewModel.find({ seller: listing.seller });
+    res.json(sellerReviews);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Could not get reviews" });
+  }
+});
 
 //===================================================================================================
 //This route handles connection to gemini to fill out the create listing form for the user
