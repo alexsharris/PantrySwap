@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Listing</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script type="module" src="src\components\navbar.js"></script>
+    <!-- <script type="module" src="src\components\navbar.js"></script> -->
     <link rel="stylesheet" href="./public/main.css" />
     <style>
         * {
@@ -23,13 +24,13 @@
             <div id="" class="flex gap-8 max-[915px]:justify-between ">
                 <h1 id="" class="">Edit Listing</h1>
                 <div id="" class="flex gap-4 items-center font-bold">
-                    <div id="" class="border-solid border-2 border-green bg-green rounded-full w-4 h-4 "></div>
-                    Listed
+                    <div id="statusCircle" class=" bg-green-500 rounded-full w-4 h-4 "></div>
+                    <div id="statusLabel">Listed</div>
                     </div>
             </div>
 
             <div id="" class="flex gap-4 max-[915px]:justify-between max-[915px]:py-8 max-[915px]:border-y border-[#a0756436]">
-                <button id="unlistButton" class="px-16 box-color-3 text-[18px]">Unlist</button>
+                <button id="listingStatusButton" class="px-16 box-color-3 text-[18px]">Unlist</button>
                 <button id="deleteButton" class="px-16 box-color-4 text-[18px]">Delete</button>
             </div>
         </div>
@@ -183,6 +184,6 @@
     <!-- page container E -->
 
 <!-- scripts -->
-<script type="module" src="editListingPage.js"></script>
+<script type="module" src="/editListingPage.js"></script>
 </body>
 </html>
