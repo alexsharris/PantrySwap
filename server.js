@@ -42,6 +42,16 @@ const UserSchema = new mongoose.Schema({
     search: Boolean,
     bookmark: Boolean,
   },
+  reviews: [
+    {
+      reviewer: String, // user ID goes here
+      title: String,
+      rating: Number,
+      description: String,
+      listing: String,
+      createdAt: { type: Date, default: Date.now },
+    },
+  ]
 });
 
 // schema of listings
