@@ -42,16 +42,6 @@ const UserSchema = new mongoose.Schema({
     search: Boolean,
     bookmark: Boolean,
   },
-  reviews: [
-    {
-      reviewer: String, // user ID goes here
-      title: String,
-      rating: Number,
-      description: String,
-      listing: String,
-      createdAt: { type: Date, default: Date.now },
-    },
-  ]
 });
 
 // schema of listings
@@ -81,9 +71,22 @@ const ListingsSchema = new mongoose.Schema({
   },
 });
 
+const reviewsSchema = new mongoose.Schema({
+    
+      reviewer: String, // user ID as the writer  goes here
+      seller: String, // user ID as the seller goes here
+      title: String,
+      rating: Number,
+      description: String,
+      listing: String, //listing ID goes here
+      createdAt: { type: Date, default: Date.now },
+    
+});
 const UserModel = mongoose.model("Users", UserSchema);
 
 const ListingModel = mongoose.model("Listings", ListingsSchema);
+
+const ReviewModel = mongoose.model("Reviews", reviewsSchema);
 
 // setting up session
 app.use(
@@ -568,6 +571,27 @@ app.get("/listingDetails/:id", async (req, res) => {
     res.status(500).send("Unexpected server error!");
   }
 });
+
+app.post("/reviews/:id", async (req, res) => {
+  try {
+    const listingID = req.params.id;
+    const listing = await ListingModel.findById(listingID, { seller: 1 });
+    const reviewer = req.session.UserID;
+    const { title, description, rating } = req.body;
+    await ReviewModel.create({
+      listing: listingID,
+      seller: listing.seller, // extract the seller ID string from the document
+      reviewer: reviewer,
+      title: title,
+      description: description,
+      rating: rating,
+    });
+    res.send("Review added successfully!");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Could not save review" });
+  }
+})
 
 //===================================================================================================
 //This route handles connection to gemini to fill out the create listing form for the user
