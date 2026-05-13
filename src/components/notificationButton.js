@@ -123,16 +123,14 @@ class NotificationButton extends HTMLElement {
         return;
       }
       const data = await response.json();
+      this.user = data;
 
       if (
         data.notifications.length === 0 ||
         data.notifications.length !== seedNotifications.length
-      ) {
-        await seedNotifications(false);
-      } else {
-        this.user = data;
-        this.notifications = data.notifications;
-      }
+      )
+        await this.seedNewNotifications(false);
+      else this.notifications = data.notifications;
 
       this.userId = this.user._id;
     } catch (error) {
@@ -164,7 +162,7 @@ class NotificationButton extends HTMLElement {
     this.renderBtn();
   }
 
-  async seedNotifications(seed = true) {
+  async seedNewNotifications(seed = true) {
     if (!seed) return;
 
     await fetch(`/updateUser/${data._id}`, {
