@@ -10,8 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <!--CSS-->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="/scripts/sellerListings.js" ></script>
-    <script src="/src/scripts/tutorialCreate.js" defer></script>
+    <script src="/scripts/sellerListings.js" defer></script>
 
     <!--Tailwind-->
     <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet"/>
@@ -23,14 +22,23 @@
     <site-navbar></site-navbar>
 
     <div class="site-margins">
-
-        <h1 class="mb-10">Your listings</h1>
+        
+        <!--Heading and create button-->
+        <div class="flex flex-col sm:flex-row justify-between mb-3">
+            <h1 class="mb-4">Your listings</h1>
+            <button type="button" id="createButton" class="flex-1 text-xs rounded-lg bg-orange font-bold max-w-30 max-h-10 text-white py-2 px-3">Create new</button>
+        </div>
+        
         <div id="sellerListings" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"></div>
 
         <template id="sellerListingTemplate">
             <div class="listingCard flex flex-col relative bg-white rounded-lg shadow-lg shadow-[#D9D9D9]">
                 <!--image-->
-                <div class="bg-white/50 rounded-t-lg mb-4">
+                <div class="relative bg-white/50 rounded-t-lg mb-4">
+                    <div class="absolute flex items-center justify-center rounded-full h-6 bg-white px-2 py-1 top-3 right-3">
+                        <div class="statusIndicator rounded-full h-2 w-2 mr-2"></div>
+                        <p class="listingStatus text-xs"></p>
+                    </div>
                     <img src="" class="listingImage mx-auto rounded-t-lg">
                 </div>
                 <!--bottom-->
@@ -43,7 +51,7 @@
                     <!--Buttons-->
                     <div class="mt-auto flex flex-1 gap-2 items-end mx-4">
                         <button id="" class="viewButton flex-1 text-xs rounded-lg bg-[#FF6700] font-bold px-3 py-2 mb-4 text-white">View</button>
-                        <button id="" class="editButton flex-1 text-xs rounded-lg bg-[#D9D9D9] font-bold px-3 py-2 mb-4">Edit</button>
+                        <button id="" type="button" class="editButton flex-1 text-xs rounded-lg bg-[#D9D9D9] font-bold px-3 py-2 mb-4">Edit</button>
                     </div>
                 </div>
             </div>
