@@ -72,9 +72,10 @@ const ListingsSchema = new mongoose.Schema({
 });
 
 const reviewsSchema = new mongoose.Schema({
-  reviewer: String, // user ID as the writer  goes here
+  reviewer: String, // user ID as the writer  goes here - for query purposes later if needed
   seller: String, // user ID as the seller goes here
   title: String,
+  reviewerName: String,
   rating: Number,
   description: String,
   listing: String, //listing ID goes here
@@ -578,7 +579,7 @@ app.post("/reviews/:id", async (req, res) => {
     const listingID = req.params.id;
     const listing = await ListingModel.findById(listingID, { seller: 1 });
     const reviewer = req.session.UserID;
-    const { title, description, rating } = req.body;
+    const { title, description, rating, name } = req.body;
     await ReviewModel.create({
       listing: listingID,
       seller: listing.seller, // extract the seller ID string from the document
@@ -586,6 +587,7 @@ app.post("/reviews/:id", async (req, res) => {
       title: title,
       description: description,
       rating: rating,
+      reviewerName: name,
     });
     res.send("Review added successfully!");
   } catch (error) {

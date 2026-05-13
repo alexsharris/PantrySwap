@@ -68,7 +68,115 @@ async function bookmarkListing() {
 }
 
 bookmarkButton.addEventListener("click", bookmarkListing);
+//=======================================================================================
+//This function gets all the reviews submitted for a seller and displays them dynamically
+//=======================================================================================
+async function displayReviews(id) {
+  const reviewsResponse = await (await fetch(`/sellerReviews/${id}`)).json(); // this would be an array
+  const reviewContainer = document.getElementById("reviewsContainer");
+  reviewContainer.innerHTML = "";
+  let ratings = 0;
+  reviewsResponse.forEach((review) => {
+    ratings++;
+    const element = document.createElement("div");
+    element.innerHTML = `<div class="flex flex-col gap-3">
+            <h2 id="reviewTitle">${review.title}</h2>
+            <!-- container of stars -->
+            <div id="starContainer" class="flex flex-row gap-1 items-center">
+              <svg data-value="1"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6 text-light-grey"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+                />
+              </svg>
+              <svg data-value="2"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6 text-light-grey"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+                />
+              </svg>
+              <svg data-value="3"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6 text-light-grey"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+                />
+              </svg>
+              <svg data-value="4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6 text-light-grey"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+                />
+              </svg>
+              <svg data-value="5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6 text-light-grey"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+                />
+              </svg>
+            </div>
+            <p  class="py-5">${review.description}</p>
+            <p  class="font-bold pb-4">${review.reviewerName}</p>
+            <hr class="border-light-grey">
+          </div>`;
+    reviewContainer.appendChild(element);
+    //handle the stars in each review
+    const starValueDB = review.rating;
+    document.querySelectorAll("#starContainer svg").forEach((star) => {
+      if (star.dataset.value <= starValueDB) {
+        star.classList.add("text-orange");
+        star.classList.remove("text-light-grey");
+      }
+      else {
+        star.classList.remove("text-orange");
+        star.classList.add("text-light-grey");
+      }
+    });
+  });
 
+  // display total number of reviews seller has
+  document.getElementById("numberReviews").innerHTML = ratings;
+}
+displayReviews(id);
 //======================================================================================
 //This function collects a user review and send it to the server.
 //This function is adopted from popupWindow file and refactored to be used for review.
@@ -95,6 +203,7 @@ async function submitReview() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         // use get method to get the submitted values by the name of inputs
+        name:formData.get("name"),
         title: formData.get("title"),
         description: formData.get("description"),
         rating: Number(formData.get("rating")),
@@ -102,6 +211,7 @@ async function submitReview() {
     });
     if (Response.ok) {
       closePopupWindow();
+      displayReviews(id);
     }
   } else {
     if (reviewForm.querySelector(".form-error")) return;
@@ -129,6 +239,10 @@ const form = `
       <input type="hidden" id="ratingValue" name="rating" value="0" />
     </div>
     <div class="flex flex-col gap-1">
+      <label>Name</label>
+      <input type="text" name="name" placeholder="Displayed Name" />
+    </div>
+    <div class="flex flex-col gap-1">
       <label>Title</label>
       <input type="text" name="title" placeholder="Review title" />
     </div>
@@ -152,7 +266,6 @@ const buttons = [
     onClick: closePopupWindow,
   },
 ];
-
 
 let starValue = undefined;
 
