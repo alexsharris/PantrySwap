@@ -86,39 +86,52 @@ const formatNotificationItem = (notification, listing) => {
   if (listing) {
     newCard = document.createElement("listing-card");
 
-    newCard.setListingInfo(listing.title, listing.image, listing.price);
+    newCard.setListingInfo(
+      listing.title,
+      listing.image,
+      listing.price,
+      null,
+      "small",
+    );
   }
 
-  return `<div id="${notification.listing}" class="card-item px-10">
-          <p class="text-light-brown">${month} ${dayStr}</p>
-          <h2 class="${hasSeen ? "text-black" : "text-orange"}">
-            ${type ? type.message : "Unknown notification"}
-          </h2>
-          ${listing ? newCard.outerHTML : ""}
+  return `
+        <div id="${notification.listing}" class="card-item px-10">
+            <p class="text-light-brown">${month} ${dayStr}</p>
+            <h2 class="${hasSeen ? "text-black" : "text-orange"}">
+              ${type ? type.message : "Unknown notification"}
+            </h2>
+            <div class="w-1/2">
+            ${listing ? newCard.outerHTML : ""}
+            </div>
         </div>`;
 };
 
 async function notificationItems(notifications) {
   const items = await Promise.all(
-    notifications.map(async (notif) => {
-      let listing = null;
+    notifications
+      .sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      })
+      .map(async (notif) => {
+        let listing = null;
 
-      if (notif.listing) {
-        try {
-          const res = await fetch(`/LoadListing/${notif.listing}`);
+        if (notif.listing) {
+          try {
+            const res = await fetch(`/LoadListing/${notif.listing}`);
 
-          if (res.ok) {
-            listing = await res.json();
-          } else {
-            console.log("Failed to load listing:", notif.listing, res.status);
+            if (res.ok) {
+              listing = await res.json();
+            } else {
+              console.log("Failed to load listing:", notif.listing, res.status);
+            }
+          } catch (err) {
+            console.log("Network error loading listing:", notif.listing);
           }
-        } catch (err) {
-          console.log("Network error loading listing:", notif.listing);
         }
-      }
 
-      return formatNotificationItem(notif, listing);
-    }),
+        return formatNotificationItem(notif, listing);
+      }),
   );
 
   return items.join("");
@@ -167,12 +180,7 @@ class NotificationButton extends HTMLElement {
       const data = await response.json();
       this.user = data;
       this.userId = this.user._id;
-      if (
-        data.notifications.length === 0 ||
-        data.notifications.length !== seedNotifications.length
-      )
-        await this.seedNewNotifications();
-      else this.notifications = data.notifications;
+      this.notifications = data.notifications;
     } catch (error) {
       console.log(error);
     }
@@ -203,7 +211,7 @@ class NotificationButton extends HTMLElement {
   }
 
   async seedNewNotifications() {
-    if (!this.user) return;
+    if (!this.userId) return;
 
     console.log(seedNotifications);
     await fetch(`/updateUser/${this.userId}`, {
@@ -226,14 +234,14 @@ class NotificationButton extends HTMLElement {
   async renderBtn() {
     await this.getUser();
     let hasUnreadNotifications = false;
-    let buttonClass = `text-medium-grey hover:text-black`;
+    let buttonClass = `text-medium-grey hover:text-red`;
     if (this.user) {
       hasUnreadNotifications = this.notifications
         ? this.notifications.some((notif) => notif.hasSeen == false)
         : false;
       buttonClass = hasUnreadNotifications
-        ? `text-orange hover:text-black`
-        : `text-medium-grey hover:text-black`;
+        ? `text-orange hover:text-red`
+        : `text-medium-grey hover:text-red`;
     }
 
     this.innerHTML = `

@@ -3,6 +3,10 @@ import {
   displayWindow,
   closePopupWindow,
 } from "./popupWindow.js";
+import {
+  NotifTypes,
+  newNotificationWithGetReciever,
+} from "./notificationSystem.js";
 
 let bookmarkedItems = [];
 
@@ -53,6 +57,7 @@ async function bookmarkListing() {
       })
     ).json();
     bookmarkedItems = Response;
+    newNotificationWithGetReciever(id, NotifTypes.BOOKMARKED);
   } else {
     const Response = await (
       await fetch(`/removeBookmark/${id}`, {
@@ -165,8 +170,7 @@ async function displayReviews(id) {
       if (star.dataset.value <= starValueDB) {
         star.classList.add("text-orange");
         star.classList.remove("text-light-grey");
-      }
-      else {
+      } else {
         star.classList.remove("text-orange");
         star.classList.add("text-light-grey");
       }
@@ -203,7 +207,7 @@ async function submitReview() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         // use get method to get the submitted values by the name of inputs
-        name:formData.get("name"),
+        name: formData.get("name"),
         title: formData.get("title"),
         description: formData.get("description"),
         rating: Number(formData.get("rating")),
