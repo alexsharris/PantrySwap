@@ -22,7 +22,7 @@ class ListingCard extends HTMLElement {
     <div class="card p-0">
       <img src="${this.image}"class="w-full h-${this.imageSize} object-cover">
       <div class="p-4">
-        <${this.headerSize} class="font-bold">${this.title}</${this.headerSize}>
+        <${this.headerSize} class="font-bold truncate">${this.title}</${this.headerSize}>
         <p class="text-xs font-medium text-orange">$${this.price}</p>
         <div class="button-container flex gap-2 mt-2"></div>
       </div>
