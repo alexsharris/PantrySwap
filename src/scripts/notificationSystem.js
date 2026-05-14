@@ -25,7 +25,28 @@ export const NotifTypes = Object.freeze({
 // NOTIF LOGIC
 // =============================
 
-// Get the reciever from the listing ID
+export async function newNotifForConnectedUsers(listingID, type) {
+  try {
+    const res = await fetch("/allUsers");
+    if (!res.ok) {
+      console.log("Failed to load users:", res.status);
+      return;
+    }
+    const userData = await res.json();
+    for (const user of userData) {
+      const hasListing = user.savedItems.some(
+        (item) => item.toString() === listingID.toString(),
+      );
+      if (hasListing) {
+        await newNotification(user._id, listingID, type);
+      }
+    }
+  } catch (err) {
+    console.log("Network error loading users:", err);
+  }
+}
+
+// Get the reciever from the listing ID thenn send the notif
 export async function newNotificationWithGetReciever(listingID, type) {
   let listing = null;
   try {
@@ -41,6 +62,7 @@ export async function newNotificationWithGetReciever(listingID, type) {
   }
 }
 
+// Generic new notif function. Sends a notification of the type and listing to the reciever
 export async function newNotification(receiverID, listingID, type) {
   if (!listingID || !receiverID) {
     console.log("No listing or reciever provided");

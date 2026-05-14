@@ -10,7 +10,6 @@ class ListingCard extends HTMLElement {
     this.listingID = listingID || null;
     this.imageSize = imageSize == "small" ? 20 : 50;
     this.headerSize = imageSize == "small" ? `h4` : `h2`;
-    console.log(this.headerSize);
     this.render();
   }
 
