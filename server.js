@@ -84,11 +84,25 @@ const ListingsSchema = new mongoose.Schema({
   },
 });
 
+//schema of review collection
+const reviewsSchema = new mongoose.Schema({
+  reviewer: String, // user ID of the writer
+  reviewerName: String, // display name of the writer
+  seller: String, // user ID of the seller
+  title: String,
+  rating: Number,
+  description: String,
+  listing: String, // listing ID
+  createdAt: { type: Date, default: Date.now },
+});
+
 const ImageModel = mongoose.model("Images", ImageSchema)
 
 const UserModel = mongoose.model("Users", UserSchema);
 
 const ListingModel = mongoose.model("Listings", ListingsSchema);
+
+const ReviewModel = mongoose.model("Reviews", reviewsSchema);
 
 // setting up session
 app.use(
@@ -578,6 +592,41 @@ app.get("/listingDetails/:id", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send("Unexpected server error!");
+  }
+});
+
+// route to post reviews
+app.post("/reviews/:id", async (req, res) => {
+  try {
+    const listingID = req.params.id;
+    const listing = await ListingModel.findById(listingID, { seller: 1 });
+    const reviewer = req.session.UserID;
+    const { title, description, rating, name } = req.body;
+    await ReviewModel.create({
+      listing: listingID,
+      seller: listing.seller, // extract the seller ID string from the document
+      reviewer: reviewer,
+      title: title,
+      description: description,
+      rating: rating,
+      reviewerName: name,
+    });
+    res.send("Review added successfully!");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Could not save review" });
+  }
+});
+
+//route to get all reviews for the seller
+app.get("/sellerReviews/:id", async (req, res) => {
+  try {
+    const listing = await ListingModel.findById(req.params.id);
+    const sellerReviews = await ReviewModel.find({ seller: listing.seller });
+    res.json(sellerReviews);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Could not get reviews" });
   }
 });
 
