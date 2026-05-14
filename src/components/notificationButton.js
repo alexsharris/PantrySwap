@@ -100,25 +100,29 @@ const formatNotificationItem = (notification, listing) => {
 
 async function notificationItems(notifications) {
   const items = await Promise.all(
-    notifications.map(async (notif) => {
-      let listing = null;
+    notifications
+      .sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      })
+      .map(async (notif) => {
+        let listing = null;
 
-      if (notif.listing) {
-        try {
-          const res = await fetch(`/LoadListing/${notif.listing}`);
+        if (notif.listing) {
+          try {
+            const res = await fetch(`/LoadListing/${notif.listing}`);
 
-          if (res.ok) {
-            listing = await res.json();
-          } else {
-            console.log("Failed to load listing:", notif.listing, res.status);
+            if (res.ok) {
+              listing = await res.json();
+            } else {
+              console.log("Failed to load listing:", notif.listing, res.status);
+            }
+          } catch (err) {
+            console.log("Network error loading listing:", notif.listing);
           }
-        } catch (err) {
-          console.log("Network error loading listing:", notif.listing);
         }
-      }
 
-      return formatNotificationItem(notif, listing);
-    }),
+        return formatNotificationItem(notif, listing);
+      }),
   );
 
   return items.join("");
@@ -167,12 +171,13 @@ class NotificationButton extends HTMLElement {
       const data = await response.json();
       this.user = data;
       this.userId = this.user._id;
-      if (
-        data.notifications.length === 0 ||
-        data.notifications.length !== seedNotifications.length
-      )
-        await this.seedNewNotifications();
-      else this.notifications = data.notifications;
+      // if (
+      //   data.notifications.length === 0 ||
+      //   data.notifications.length !== seedNotifications.length
+      // )
+      //   await this.seedNewNotifications();
+      // else this.notifications = data.notifications;
+      this.notifications = data.notifications;
     } catch (error) {
       console.log(error);
     }
