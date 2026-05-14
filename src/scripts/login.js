@@ -71,5 +71,10 @@ const SignUpForm = document
     // redirecting them to home when signed up successfully
     if (Response.redirected) {
       window.location.href = Response.url;
+    } else if (!Response.ok) {
+      const data = await Response.json();
+      const errorMsg = document.getElementById("signupErrorMsg");
+      document.getElementById("signupErrorText").textContent = data.error;
+      errorMsg.classList.remove("hidden");
     }
   });

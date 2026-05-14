@@ -18,19 +18,18 @@ const app = express();
 const mongoose = require("mongoose");
 
 // multer
-const multer = require('multer')
-const upload = multer({storage: multer.memoryStorage()})
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
 
-app.use(express.json({limit: '50mb'}))
+app.use(express.json({ limit: "50mb" }));
 app.use(express.static("src"));
 app.use(express.static("."));
 
 // schema for images
 const ImageSchema = new mongoose.Schema({
   name: String,
-  image: Buffer
-})
-
+  image: Buffer,
+});
 
 // schema for users
 const UserSchema = new mongoose.Schema({
@@ -96,7 +95,7 @@ const reviewsSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-const ImageModel = mongoose.model("Images", ImageSchema)
+const ImageModel = mongoose.model("Images", ImageSchema);
 
 const UserModel = mongoose.model("Users", UserSchema);
 
@@ -189,12 +188,16 @@ app.post("/SignUp", async (req, res) => {
   const NewUserEmail = req.body.emailSignup;
   const NewUserName = req.body.name;
   const NewUserPassword = req.body.passwordSignup;
+  if (!NewUserPassword || !NewUserPassword.trim() || !NewUserEmail || !NewUserEmail.trim() || !NewUserName || !NewUserName.trim()) {
+    return res.status(400).json({ error: "Please fill out all the fields!" });
+  }
 
-  // hash password to store it in DB
-  const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
+  const emailExists = await UserModel.findOne({ email: NewUserEmail });
+  if (emailExists) return res.status(400).json({ error: "There's an account associated with this email!" });
 
   // create a new user in DB
   try {
+    const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
     const user = await UserModel.create({
       name: NewUserName,
       password: HashedPassword,
@@ -254,7 +257,6 @@ app.get("/AccountData", async (req, res) => {
   }
 });
 
-
 // put route to update the user document in the DB from the Account page
 app.put("/ChangeData", async (req, res) => {
   try {
@@ -262,8 +264,8 @@ app.put("/ChangeData", async (req, res) => {
     const UserNewEmail = req.body.UserNewEmail;
     const UserNewphone = req.body.UserNewphone;
     const UserNewCity = req.body.UserNewCity;
-    const UserNewPFP = req.body.UserNewPFP
-    console.log(UserNewPFP)
+    const UserNewPFP = req.body.UserNewPFP;
+    console.log(UserNewPFP);
 
     // check if the value exists, if so, update the DB
     const UpdatedFields = {};
@@ -272,7 +274,7 @@ app.put("/ChangeData", async (req, res) => {
     if (UserNewEmail) UpdatedFields.email = UserNewEmail;
     if (UserNewphone) UpdatedFields.phone = UserNewphone;
     if (UserNewCity) UpdatedFields.city = UserNewCity;
-    if (UserNewPFP) UpdatedFields.profilePicture = UserNewPFP
+    if (UserNewPFP) UpdatedFields.profilePicture = UserNewPFP;
 
     const user = await UserModel.findByIdAndUpdate(
       { _id: req.session.UserID },
@@ -316,27 +318,35 @@ app.get("/LoadListing/:listingID", async (req, res) => {
 });
 
 //Save Listing route
-app.put('/EditListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
-  console.log('This is the req.body:', req.body);
-  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory, updatedFoods} = req.body
-  try{
-      const listingRecord = await ListingModel.findOne({_id: listingID})
-      
-      if (updatedImage) listingRecord.image = updatedImage
-      if (updatedTitle) listingRecord.title = updatedTitle
-      if (updatedLocation) listingRecord.location = updatedLocation
-      if (updatedPrice) listingRecord.price = updatedPrice
-      if (updatedContact) listingRecord.contact = updatedContact
-      if (updatedDescription) listingRecord.description = updatedDescription
-      if (updatedCategory) listingRecord.category = updatedCategory
-      if (updatedFoods) listingRecord.foods = updatedFoods
-      if (updatedImage) listingRecord.image = updatedImage
-      
-      await listingRecord.save()
-      res.sendStatus(200)
-  }
-  catch(error){
+app.put("/EditListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  console.log("This is the req.body:", req.body);
+  const {
+    updatedImage,
+    updatedTitle,
+    updatedLocation,
+    updatedPrice,
+    updatedContact,
+    updatedDescription,
+    updatedCategory,
+    updatedFoods,
+  } = req.body;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+
+    if (updatedImage) listingRecord.image = updatedImage;
+    if (updatedTitle) listingRecord.title = updatedTitle;
+    if (updatedLocation) listingRecord.location = updatedLocation;
+    if (updatedPrice) listingRecord.price = updatedPrice;
+    if (updatedContact) listingRecord.contact = updatedContact;
+    if (updatedDescription) listingRecord.description = updatedDescription;
+    if (updatedCategory) listingRecord.category = updatedCategory;
+    if (updatedFoods) listingRecord.foods = updatedFoods;
+    if (updatedImage) listingRecord.image = updatedImage;
+
+    await listingRecord.save();
+    res.sendStatus(200);
+  } catch (error) {
     console.log(error);
     res.status(500).send("Edit listing form could not be saved.");
   }
@@ -359,33 +369,29 @@ app.put("/DeleteListing/:listingID", async (req, res) => {
 //Unlist Listing route
 app.put("/UpdateListingStatus/:listingID", async (req, res) => {
   const listingID = req.params.listingID;
-  const {buttonValue} = req.body
+  const { buttonValue } = req.body;
   try {
     const listingRecord = await ListingModel.findOne({ _id: listingID });
 
-    if (buttonValue == 'Unlist'){
+    if (buttonValue == "Unlist") {
       listingRecord.status = "unlisted";
       await listingRecord.save();
       res.sendStatus(200);
-    }
-    else if (buttonValue == 'Re-list'){
-      listingRecord.status = 'listed'
+    } else if (buttonValue == "Re-list") {
+      listingRecord.status = "listed";
       await listingRecord.save();
       res.sendStatus(200);
     }
-    
   } catch (error) {
     console.log(error);
     res.status(500).send("Could not update listing status");
   }
 });
 
-
 // Serves the create listing page
 app.get("/CreateListing", async (req, res) => {
   res.render("createListingPage.ejs");
 });
-
 
 app.get("/test", (req, res) => {
   res.render("test.ejs");
@@ -427,7 +433,6 @@ app.post("/CreateListing", async (req, res) => {
     res.status(500).send("Create listing form could not be saved.");
   }
 });
-
 
 app.get("/sell", (req, res) => {
   res.render("sellListings.ejs");
