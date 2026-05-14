@@ -203,7 +203,7 @@ class NotificationButton extends HTMLElement {
   }
 
   async seedNewNotifications() {
-    if (!this.user) return;
+    if (!this.userId) return;
 
     console.log(seedNotifications);
     await fetch(`/updateUser/${this.userId}`, {
