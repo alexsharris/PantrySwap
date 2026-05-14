@@ -620,7 +620,7 @@ app.get("/listingDetails/:id", async (req, res) => {
     const listing = await ListingModel.findById({ _id: req.params.id });
     const user = await UserModel.findById(
       { _id: listing.seller },
-      { city: 1, name: 1 },
+      { city: 1, name: 1, profilePicture: 1, phone: 1 },
     );
     res.render("listingDetails", { listing, user });
   } catch (error) {

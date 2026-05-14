@@ -19,18 +19,24 @@
       <div class="card flex flex-col gap-5 h-113 p-0 mb-7 ">
         <img
           id="listingImage"
-          src= "/<%= listing.image %>"
+          src= "<%= listing.image %>"
           alt=""
           class="object-cover w-full h-3/4 mx-auto md:mx-0"
         />
         <!-- container of seller img, name and city -->
         <div class="flex flex-row gap-4 justify-start items-center px-5">
-          <img
-            id="sellerImage"
-            src="/images/businessShark.jpg"
-            alt=""
-            class="object-cover rounded-full size-15"
-          />
+          <% if (user.profilePicture) { %>
+            <img
+              id="sellerImage"
+              src="<%= user.profilePicture %>"
+              alt=""
+              class="object-cover rounded-full size-15"
+            />
+          <% } else { %>
+            <div class="rounded-full size-15 bg-orange-400 flex items-center justify-center text-white font-bold text-xl shrink-0">
+              <%= user.name.charAt(0).toUpperCase() %>
+            </div>
+          <% } %>
 
           <!-- name and city container -->
           <div class="flex flex-col gap-1">
