@@ -286,7 +286,7 @@ app.put("/ChangeData", async (req, res) => {
 app.delete("/DeleteAccount", async (req, res) => {
   try {
     await UserModel.findByIdAndDelete({ _id: req.session.UserID });
-    req.session.destroy(() => res.redirect("/Login"));
+    req.session.destroy(() => res.send("Account deleted!"));
   } catch (error) {
     console.log(error);
     res.status(500).send("Delete failed!");
