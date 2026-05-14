@@ -1,61 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pantry Swap</title>
     <!--Google fonts-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
     <!--CSS-->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="/scripts/sellerListings.js" defer></script>
 
     <!--Tailwind-->
-    <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet"/>
+    <link
+      href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css"
+      rel="stylesheet"
+    />
     <!-- <script src="https://cdn.tailwindcss.com" ></script> -->
     <script type="module" src="/src/components/navbar.js"></script>
-    <link rel="stylesheet" href="/public/main.css"/>
-</head>
-<body class="min-h-screen flex flex-col">
+    <link rel="stylesheet" href="/public/main.css" />
+  </head>
+  <body class="min-h-screen flex flex-col">
     <site-navbar></site-navbar>
 
     <div class="site-margins">
-        
-        <!--Heading and create button-->
-        <div class="flex flex-col sm:flex-row justify-between mb-3">
-            <h1 class="mb-4">Your listings</h1>
-            <button type="button" id="createButton" class="flex-1 text-xs rounded-lg bg-orange font-bold max-w-30 max-h-10 text-white py-2 px-3">Create new</button>
-        </div>
-        
-        <div id="sellerListings" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"></div>
+      <!--Heading and create button-->
+      <div class="flex flex-col sm:flex-row justify-between mb-3">
+        <h1 class="mb-4">Your listings</h1>
+        <button
+          type="button"
+          id="createButton"
+          class="flex-1 text-xs rounded-lg bg-orange font-bold max-w-30 max-h-10 text-white py-2 px-3"
+        >
+          Create new
+        </button>
+      </div>
 
-        <template id="sellerListingTemplate">
-            <div class="listingCard flex flex-col relative bg-white rounded-lg shadow-lg shadow-[#D9D9D9]">
-                <!--image-->
-                <div class="relative bg-white/50 rounded-t-lg mb-4">
-                    <div class="absolute flex items-center justify-center rounded-full h-6 bg-white px-2 py-1 top-3 right-3">
-                        <div class="statusIndicator rounded-full h-2 w-2 mr-2"></div>
-                        <p class="listingStatus text-xs"></p>
-                    </div>
-                    <img src="" class="listingImage mx-auto rounded-t-lg">
-                </div>
-                <!--bottom-->
-                <div class="flex flex-col flex-1">
-                    <!--Text-->
-                    <div class="flex-1 mx-4 mb-4">
-                        <h2 class="listingTitle font-bold"></h2>
-                        <p class="listingPrice text-xs font-medium text-[#FF6700]"></p>
-                    </div>
-                    <!--Buttons-->
-                    <div class="mt-auto flex flex-1 gap-2 items-end mx-4">
-                        <button id="" class="viewButton flex-1 text-xs rounded-lg bg-[#FF6700] font-bold px-3 py-2 mb-4 text-white">View</button>
-                        <button id="" type="button" class="editButton flex-1 text-xs rounded-lg bg-[#D9D9D9] font-bold px-3 py-2 mb-4">Edit</button>
-                    </div>
-                </div>
+      <div class="card-grid" id="sellerListings"></div>
+
+      <template id="sellerListingTemplate">
+        <div
+          class="listingCard flex flex-col relative bg-white rounded-lg shadow-lg shadow-[#D9D9D9]"
+        >
+          <!--image-->
+          <div class="relative bg-white/50 rounded-t-lg mb-4">
+            <div
+              class="absolute flex items-center justify-center rounded-full h-6 bg-white px-2 py-1 top-3 right-3"
+            >
+              <div class="statusIndicator rounded-full h-2 w-2 mr-2"></div>
+              <p class="listingStatus text-xs"></p>
             </div>
-        </template>
+            <img src="" class="listingImage mx-auto rounded-t-lg" />
+          </div>
+          <!--bottom-->
+          <div class="flex flex-col flex-1">
+            <!--Text-->
+            <div class="flex-1 mx-4 mb-4">
+              <h2 class="listingTitle font-bold"></h2>
+              <p class="listingPrice text-xs font-medium text-[#FF6700]"></p>
+            </div>
+            <!--Buttons-->
+            <div class="mt-auto flex flex-1 gap-2 items-end mx-4">
+              <button
+                id=""
+                class="viewButton flex-1 text-xs rounded-lg bg-[#FF6700] font-bold px-3 py-2 mb-4 text-white"
+              >
+                View
+              </button>
+              <button
+                id=""
+                type="button"
+                class="editButton flex-1 text-xs rounded-lg bg-[#D9D9D9] font-bold px-3 py-2 mb-4"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
-</body>
+  </body>
 </html>
