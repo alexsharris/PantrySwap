@@ -23,13 +23,13 @@ class Navbar extends HTMLElement {
     this.innerHTML = `
     <nav class="bg-white text-[#FF6700] font-extrabold z-20 relative p-6 md:drop-shadow-xl">
         <div class="flex min-w-full md:relative md:w-auto justify-between">
-            <div class="flex gap-2 text-2xl self-center">
+            <button id="homeButton" class="flex gap-2 text-2xl self-center p-0">
                 <img src="/images/Pantry_Swap_Icon.png" class="size-9">
                 <h1>
                 Pantry Swap
                 </h1>
-            </div>
-            <div class="flex justify-end gap-3">
+            </button>
+            <div class="flex justify-end gap-3 items-center">
                 <div class="flex gap-12 self-center">
                     <div class="flex gap-6 md:visible md:w-auto w-0 invisible">
                         <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.buy[0]}">
@@ -89,6 +89,10 @@ class Navbar extends HTMLElement {
           navigateIfNeeded(routes[key]);
         });
       });
+    });
+
+    this.querySelector(`#homeButton`)?.addEventListener("click", () => {
+      navigateIfNeeded("/buy");
     });
   }
 

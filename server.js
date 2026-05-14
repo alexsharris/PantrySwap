@@ -494,6 +494,35 @@ app.get("/user", async (req, res) => {
   }
 });
 
+app.get("/allUsers", async (req, res) => {
+  try {
+    const allUsers = await UserModel.find({});
+    res.json(allUsers);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
+app.put("/addUserNotification/:id", async (req, res) => {
+  try {
+    const reciever = req.params.id;
+    console.log(reciever);
+    const updatedUserInfo = await UserModel.findByIdAndUpdate(
+      { _id: reciever },
+      { $addToSet: { notifications: req.body.newNotif } },
+      { new: true }, // this line is needed to get the updated version and not the old one
+    );
+    res.json(updatedUserInfo.notifications);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+});
+
 //update user
 app.put("/updateUser/:id", async (req, res) => {
   try {

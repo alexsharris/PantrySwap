@@ -24,24 +24,69 @@ export const NotifTypes = Object.freeze({
 // =============================
 // NOTIF LOGIC
 // =============================
-export async function newNotification(receiver, type, listing) {
-  if (!listing || !reciever) {
+
+export async function newNotifForConnectedUsers(listingID, type) {
+  try {
+    const res = await fetch("/allUsers");
+    if (!res.ok) {
+      console.log("Failed to load users:", res.status);
+      return;
+    }
+    const userData = await res.json();
+    for (const user of userData) {
+      const hasListing = user.savedItems.some(
+        (item) => item.toString() === listingID.toString(),
+      );
+      if (hasListing) {
+        await newNotification(user._id, listingID, type);
+      }
+    }
+  } catch (err) {
+    console.log("Network error loading users:", err);
+  }
+}
+
+// Get the reciever from the listing ID thenn send the notif
+export async function newNotificationWithGetReciever(listingID, type) {
+  let listing = null;
+  try {
+    const res = await fetch(`/LoadListing/${listingID}`);
+    if (res.ok) {
+      listing = await res.json();
+      newNotification(listing.seller, listingID, type);
+    } else {
+      console.log("Failed to load listing:", listingID, res.status);
+    }
+  } catch (err) {
+    console.log("Network error loading listing:", listingID);
+  }
+}
+
+// Generic new notif function. Sends a notification of the type and listing to the reciever
+export async function newNotification(receiverID, listingID, type) {
+  if (!listingID || !receiverID) {
     console.log("No listing or reciever provided");
     return;
   }
 
-  await fetch(`/updateUser/${receiver._id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      newNotif: {
-        hasSeen: false,
-        listing,
-        notifType: type.name,
-        createdAt: new Date(),
+  try {
+    const res = await fetch(`/addUserNotification/${receiverID}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
       },
-    }),
-  });
+      body: JSON.stringify({
+        newNotif: {
+          hasSeen: false,
+          listing: listingID,
+          notifType: type.name,
+          createdAt: new Date(),
+        },
+      }),
+    });
+    const data = await res.json();
+    console.log(data);
+  } catch (err) {
+    console.log(err);
+  }
 }

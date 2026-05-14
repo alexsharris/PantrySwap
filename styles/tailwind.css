@@ -60,16 +60,16 @@
     @apply text-[22px] font-bold;
   }
   h3 {
-    @apply text-[22px];
+    @apply text-[20px];
   }
   h4 {
-    @apply text-[22px];
+    @apply text-[18px];
   }
   h5 {
-    @apply text-[22px];
+    @apply text-[16px];
   }
   h6 {
-    @apply text-[22px];
+    @apply text-[14px];
   }
   p {
     @apply text-[13px];
