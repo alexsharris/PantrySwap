@@ -3,12 +3,14 @@ class ListingCard extends HTMLElement {
     super();
   }
 
-  setListingInfo(title, image, price, listingID) {
+  setListingInfo(title, image, price, listingID, imageSize = "default") {
     this.title = title;
     this.image = image || "images/pantry_share_img_10.jpg";
     this.price = price;
-    this.listingID = listingID;
-
+    this.listingID = listingID || null;
+    this.imageSize = imageSize == "small" ? 20 : 50;
+    this.headerSize = imageSize == "small" ? `h4` : `h2`;
+    console.log(this.headerSize);
     this.render();
   }
 
@@ -18,19 +20,12 @@ class ListingCard extends HTMLElement {
 
   render() {
     this.innerHTML = `
-    <div class="listingCard flex flex-col relative bg-white rounded-lg shadow-lg shadow-[#D9D9D9]">
-      <div class="bg-white/50 rounded-t-lg mb-4">
-        <img src="${this.image}" class="listingImage mx-auto rounded-t-lg">
-      </div>
-
-      <div class="flex flex-col flex-1">
-        <div class="flex-1 mx-4 mb-4">
-          <h2 class="listingTitle font-bold">${this.title}</h2>
-          <p class="listingPrice text-xs font-medium text-[#FF6700]">$${this.price}</p>
-        </div>
-
-        <div class="button-container mt-auto flex flex-1 gap-2 items-end mx-4">
-        </div>
+    <div class="card p-0">
+      <img src="${this.image}"class="w-full h-${this.imageSize} object-cover">
+      <div class="p-4">
+        <${this.headerSize} class="font-bold">${this.title}</${this.headerSize}>
+        <p class="text-xs font-medium text-orange">$${this.price}</p>
+        <div class="button-container flex gap-2 mt-2"></div>
       </div>
     </div>
   `;
