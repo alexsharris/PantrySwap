@@ -269,7 +269,8 @@ app.put("/ChangeData", async (req, res) => {
     const UserNewphone = req.body.UserNewphone;
     const UserNewCity = req.body.UserNewCity;
     const UserNewPFP = req.body.UserNewPFP;
-    console.log(UserNewPFP);
+    const UserNewAddress = req.body.UserNewAddress;
+    const UserNewPostalCode = req.body.UserNewPostalCode;
 
     // check if the value exists, if so, update the DB
     const UpdatedFields = {};
@@ -279,6 +280,8 @@ app.put("/ChangeData", async (req, res) => {
     if (UserNewphone) UpdatedFields.phone = UserNewphone;
     if (UserNewCity) UpdatedFields.city = UserNewCity;
     if (UserNewPFP) UpdatedFields.profilePicture = UserNewPFP;
+    if (UserNewAddress) UpdatedFields.address = UserNewAddress;
+    if (UserNewPostalCode) UpdatedFields.postalCode = UserNewPostalCode;
 
     const user = await UserModel.findByIdAndUpdate(
       { _id: req.session.UserID },
