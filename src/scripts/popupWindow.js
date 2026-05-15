@@ -2,6 +2,10 @@
 // BUTTONS
 // ============================================
 let locked = false;
+let manualLock = false;
+
+export const setManualLock = (val) => (manualLock = val);
+export const isLocked = () => manualLock;
 
 function createButtons(functions, autoClose) {
   let buttons = [];
@@ -91,6 +95,7 @@ export function closePopupWindow() {
   popupWindow.remove();
   document.body.style.overflow = "auto";
   locked = false;
+  manualLock = false;
 }
 
 // ============================================
