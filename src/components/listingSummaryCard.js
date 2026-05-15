@@ -34,10 +34,6 @@ class ListingCard extends HTMLElement {
     this.render();
   }
 
-  clickEvent() {
-    window.location.assign(`/listingDetails/${this.listingID}`);
-  }
-
   render() {
     this.innerHTML = `
     <div class="card p-0 relative">
@@ -69,7 +65,7 @@ class ListingCard extends HTMLElement {
         "view-button box-color-0 hover-bright font-bold w-full";
       viewButton.innerHTML = "View Listing";
       viewButton.addEventListener("click", () => {
-        this.clickEvent();
+        window.location.assign(`/listingDetails/${this.listingID}`);
       });
       this.querySelector(".button-container").append(viewButton);
 
@@ -79,7 +75,7 @@ class ListingCard extends HTMLElement {
         editButton.className = `editButton box-color-3 hover-bright font-bold w-full`;
         editButton.innerHTML = "Edit";
         editButton.addEventListener("click", () => {
-          this.clickEvent();
+          window.location.href = `/EditListing/${this.listingID}`;
         });
         this.querySelector(".button-container").append(editButton);
       }

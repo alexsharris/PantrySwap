@@ -8,7 +8,7 @@ displaySellerListings = async function () {
 
     console.log(data);
     data.reverse().forEach((newListing) => {
-      if (!newListing || newListing.status !== "listed") return;
+      if (!newListing || newListing.status === "deleted") return;
 
       const newCard = document.createElement("listing-card");
 
