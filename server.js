@@ -17,8 +17,19 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 
+// multer
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
+
+app.use(express.json({ limit: "50mb" }));
 app.use(express.static("src"));
 app.use(express.static("."));
+
+// schema for images
+const ImageSchema = new mongoose.Schema({
+  name: String,
+  image: Buffer,
+});
 
 // schema for users
 const UserSchema = new mongoose.Schema({
@@ -27,11 +38,12 @@ const UserSchema = new mongoose.Schema({
   phone: String,
   password: String,
   city: String,
+  profilePicture: String,
   savedItems: [String], // the idea is to store _id of documents in listedItems here
   listedItems: [String], // the idea is to store _id of documents in listedItems here
   notifications: [
     {
-      message: String,
+      notifType: String, // type of the lsiting found in notificationSystem.js
       hasSeen: Boolean,
       listing: String, // _id of the related listing
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
@@ -54,10 +66,12 @@ const ListingsSchema = new mongoose.Schema({
   contact: String,
   description: String,
   category: {
-    type: [{
-      type: String,
-      enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked Goods"],
-    }],
+    type: [
+      {
+        type: String,
+        enum: ["Produce", "Meat", "Dairy", "Cooked Meals", "Baked Goods"],
+      },
+    ],
     required: true,
   },
   foods: [{ name: String, quantity: Number }],
@@ -69,9 +83,25 @@ const ListingsSchema = new mongoose.Schema({
   },
 });
 
+//schema of review collection
+const reviewsSchema = new mongoose.Schema({
+  reviewer: String, // user ID of the writer
+  reviewerName: String, // display name of the writer
+  seller: String, // user ID of the seller
+  title: String,
+  rating: Number,
+  description: String,
+  listing: String, // listing ID
+  createdAt: { type: Date, default: Date.now },
+});
+
+const ImageModel = mongoose.model("Images", ImageSchema);
+
 const UserModel = mongoose.model("Users", UserSchema);
 
 const ListingModel = mongoose.model("Listings", ListingsSchema);
+
+const ReviewModel = mongoose.model("Reviews", reviewsSchema);
 
 // setting up session
 app.use(
@@ -96,41 +126,18 @@ app.set("view engine", "ejs");
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect(db);
-  console.log("Connected to MongoDB!");
-  app.listen(port, () => {
-    console.log("server's up!");
-  });
+  mongoose
+    .connect(db)
+    .then(() => {
+      console.log("Connected to MongoDB");
+      app.listen(3000, () => {
+        console.log("Server running on port 3000");
+      });
+    })
+    .catch((err) => {
+      console.error("MongoDB connection failed:", err);
+    });
 }
-
-app.get("/sell", (req, res) => {
-  res.render("sellListings.ejs");
-});
-
-app.get("/buy", (req, res) => {
-  res.render("buyListings.ejs");
-});
-
-app.get("/sellerListings", async (req, res) => {
-  try {
-    const listings = await ListingModel.find({ seller: req.session.UserID });
-    res.json(listings);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-app.get("/loadListings", async (req, res) => {
-  let filter = {};
-  try {
-    const listings = await ListingModel.find(filter);
-    if (listings.length == 0) return res.status(404).send("No listings found.");
-    res.send(listings);
-  } catch (error) {
-    console.log(error);
-  }
-});
 
 // Login routes
 
@@ -181,12 +188,26 @@ app.post("/SignUp", async (req, res) => {
   const NewUserEmail = req.body.emailSignup;
   const NewUserName = req.body.name;
   const NewUserPassword = req.body.passwordSignup;
+  if (
+    !NewUserPassword ||
+    !NewUserPassword.trim() ||
+    !NewUserEmail ||
+    !NewUserEmail.trim() ||
+    !NewUserName ||
+    !NewUserName.trim()
+  ) {
+    return res.status(400).json({ error: "Please fill out all the fields!" });
+  }
 
-  // hash password to store it in DB
-  const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
+  const emailExists = await UserModel.findOne({ email: NewUserEmail });
+  if (emailExists)
+    return res
+      .status(400)
+      .json({ error: "There's an account associated with this email!" });
 
   // create a new user in DB
   try {
+    const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
     const user = await UserModel.create({
       name: NewUserName,
       password: HashedPassword,
@@ -253,6 +274,8 @@ app.put("/ChangeData", async (req, res) => {
     const UserNewEmail = req.body.UserNewEmail;
     const UserNewphone = req.body.UserNewphone;
     const UserNewCity = req.body.UserNewCity;
+    const UserNewPFP = req.body.UserNewPFP;
+    console.log(UserNewPFP);
 
     // check if the value exists, if so, update the DB
     const UpdatedFields = {};
@@ -261,6 +284,7 @@ app.put("/ChangeData", async (req, res) => {
     if (UserNewEmail) UpdatedFields.email = UserNewEmail;
     if (UserNewphone) UpdatedFields.phone = UserNewphone;
     if (UserNewCity) UpdatedFields.city = UserNewCity;
+    if (UserNewPFP) UpdatedFields.profilePicture = UserNewPFP;
 
     const user = await UserModel.findByIdAndUpdate(
       { _id: req.session.UserID },
@@ -276,116 +300,184 @@ app.put("/ChangeData", async (req, res) => {
 app.delete("/DeleteAccount", async (req, res) => {
   try {
     await UserModel.findByIdAndDelete({ _id: req.session.UserID });
-    req.session.destroy(() => res.redirect("/Login"));
+    req.session.destroy(() => res.send("Account deleted!"));
   } catch (error) {
     console.log(error);
     res.status(500).send("Delete failed!");
   }
 });
 
+// ==================================================================
+// Routes for Create/Edit Listing
+// ==================================================================
 //serve the edit listing page
-app.get('/EditListing', (req, res) => {
-  res.render('editListingPage.ejs')
-})
-
-//delete listing route - soft deleting only
-app.put('/DeleteListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
-  try {
-    const listingRecord = await ListingModel.findOne({_id:listingID})
-    listingRecord.status = "deleted"
-    await listingRecord.save()
-    res.sendStatus(200)
-  }catch(error){
-    console.log(error)
-    res.status(500).send('Listing could not be deleted.')
-  }
-})
-
-//Unlist Listing route
-app.put('/UnlistListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
-  try{
-    const listingRecord = await ListingModel.findOne({_id:listingID})
-    listingRecord.status = "unlisted"
-    await listingRecord.save()
-    res.sendStatus(200)
-  }
-  catch(error){
-    console.log(error);
-    res.status(500).send('Could not unlist listing')
-  }
-})
+app.get("/EditListing/:listingID", (req, res) => {
+  res.render("editListingPage.ejs");
+});
 
 //load one listing
-app.get('/LoadListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
-  try{
-    const listingRecord = await ListingModel.findOne({_id: listingID})
-    res.status(200).send(listingRecord)
-  }
-  catch(error){
+app.get("/LoadListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+    res.status(200).send(listingRecord);
+  } catch (error) {
     console.log(error);
-    res.status(500).send('Could not load listing')
+    res.status(500).send("Could not load listing");
   }
-})
-
-// Serves the create listing page
-app.get('/CreateListing', async (req, res) => {
-  res.render('createListingPage.ejs')
-})
-
-//Create listing route
-app.post('/CreateListing', async (req, res) => {
-  const {image, title, location, price, contact, description, category} = req.body
-  try{
-      const newListing = await ListingModel.create({
-        seller: req.session.UserID,
-        image: image,
-        title: title,
-        location: location,
-        price: price,
-        contact: contact,
-        category: category
-      })
-      res.sendStatus(200)
-  }
-  catch(error){
-    console.log(error);
-    res.status(500).send('Edit listing form could not be saved.')
-  }
-})
-
+});
 
 //Save Listing route
-app.put('/EditListing/:listingID', async (req, res) => {
-  const listingID = req.params.listingID
-  console.log('This is the req.body:', req.body);
-  const {updatedImage, updatedTitle, updatedLocation, updatedPrice, updatedContact, updatedDescription, updatedCategory} = req.body
-  try{
-      const listingRecord = await ListingModel.findOne({_id: listingID})
-      
-      if (updatedImage) listingRecord.image = updatedImage
-      if (updatedTitle) listingRecord.title = updatedTitle
-      if (updatedLocation) listingRecord.location = updatedLocation
-      if (updatedPrice) listingRecord.price = updatedPrice
-      if (updatedContact) listingRecord.contact = updatedContact
-      if (updatedDescription) listingRecord.description = updatedDescription
-      if (updatedCategory) listingRecord.category = updatedCategory
-      
-      await listingRecord.save()
-      res.sendStatus(200)
-  }
-  catch(error){
+app.put("/EditListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  console.log("This is the req.body:", req.body);
+  const {
+    updatedImage,
+    updatedTitle,
+    updatedLocation,
+    updatedPrice,
+    updatedContact,
+    updatedDescription,
+    updatedCategory,
+    updatedFoods,
+  } = req.body;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+
+    if (updatedImage) listingRecord.image = updatedImage;
+    if (updatedTitle) listingRecord.title = updatedTitle;
+    if (updatedLocation) listingRecord.location = updatedLocation;
+    if (updatedPrice) listingRecord.price = updatedPrice;
+    if (updatedContact) listingRecord.contact = updatedContact;
+    if (updatedDescription) listingRecord.description = updatedDescription;
+    if (updatedCategory) listingRecord.category = updatedCategory;
+    if (updatedFoods) listingRecord.foods = updatedFoods;
+    if (updatedImage) listingRecord.image = updatedImage;
+
+    await listingRecord.save();
+    res.sendStatus(200);
+  } catch (error) {
     console.log(error);
-    res.status(500).send('Edit listing form could not be saved.')
+    res.status(500).send("Edit listing form could not be saved.");
   }
-})
+});
+
+//delete listing route - soft deleting only
+app.put("/DeleteListing/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+    listingRecord.status = "deleted";
+    await listingRecord.save();
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Listing could not be deleted.");
+  }
+});
+
+//Unlist Listing route
+app.put("/UpdateListingStatus/:listingID", async (req, res) => {
+  const listingID = req.params.listingID;
+  const { buttonValue } = req.body;
+  try {
+    const listingRecord = await ListingModel.findOne({ _id: listingID });
+
+    if (buttonValue == "Unlist") {
+      listingRecord.status = "unlisted";
+      await listingRecord.save();
+      res.sendStatus(200);
+    } else if (buttonValue == "Re-list") {
+      listingRecord.status = "listed";
+      await listingRecord.save();
+      res.sendStatus(200);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Could not update listing status");
+  }
+});
+
+// Serves the create listing page
+app.get("/CreateListing", async (req, res) => {
+  res.render("createListingPage.ejs");
+});
+
+app.get("/test", (req, res) => {
+  res.render("test.ejs");
+});
+
+//Create listing route
+app.post("/CreateListing", async (req, res) => {
+  const {
+    image,
+    title,
+    location,
+    price,
+    contact,
+    description,
+    category,
+    foods,
+  } = req.body;
+  try {
+    const newListing = await ListingModel.create({
+      seller: req.session.UserID,
+      image: image,
+      title: title,
+      location: location,
+      price: price,
+      contact: contact,
+      description: description,
+      category: category,
+      foods: foods,
+    });
+
+    await UserModel.findByIdAndUpdate(
+      req.session.UserID,
+      { $push: { listedItems: newListing._id } },
+      { new: true },
+    );
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Create listing form could not be saved.");
+  }
+});
+
+app.get("/sell", (req, res) => {
+  res.render("sellListings.ejs");
+});
+
+app.get("/buy", (req, res) => {
+  res.render("buyListings.ejs");
+});
+
+app.get("/sellerListings", async (req, res) => {
+  try {
+    console.log(req.session.UserID);
+    const listings = await ListingModel.find({ seller: req.session.UserID });
+    res.json(listings);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/loadListings", async (req, res) => {
+  let filter = {};
+  try {
+    const listings = await ListingModel.find(filter);
+    if (listings.length == 0) return res.status(404).send("No listings found.");
+    res.send(listings);
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 //get current user info
 app.get("/user", async (req, res) => {
-  console.log("USER ROUTE HIT");
-  console.log(req.session);
+  // console.log("USER ROUTE HIT");
+  // console.log(req.session);
 
   try {
     if (!req.session.UserID) {
@@ -412,6 +504,35 @@ app.get("/user", async (req, res) => {
   }
 });
 
+app.get("/allUsers", async (req, res) => {
+  try {
+    const allUsers = await UserModel.find({});
+    res.json(allUsers);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
+app.put("/addUserNotification/:id", async (req, res) => {
+  try {
+    const reciever = req.params.id;
+    console.log(reciever);
+    const updatedUserInfo = await UserModel.findByIdAndUpdate(
+      { _id: reciever },
+      { $addToSet: { notifications: req.body.newNotif } },
+      { new: true }, // this line is needed to get the updated version and not the old one
+    );
+    res.json(updatedUserInfo.notifications);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+});
+
 //update user
 app.put("/updateUser/:id", async (req, res) => {
   try {
@@ -422,7 +543,7 @@ app.put("/updateUser/:id", async (req, res) => {
       updateFields["tutorials.search"] = req.body["tutorials.search"];
     }
 
-     if (req.body?.["tutorials.create"] !== undefined) {
+    if (req.body?.["tutorials.create"] !== undefined) {
       updateFields["tutorials.create"] = req.body["tutorials.create"];
     }
 
@@ -461,8 +582,42 @@ app.put("/updateUser/:id", async (req, res) => {
   }
 });
 
+// get the bookmark or saved page
 app.get("/bookmark", (req, res) => {
-  res.sendFile(__dirname + "/bookmark.html");
+  res.sendFile(__dirname + "/savedPage.html");
+});
+
+// save a listing into users savedItems
+// addToSet add an element to array if it doesnt exist in it already, ensures avoiding duplicates
+app.post("/bookmarkListing/:id", async (req, res) => {
+  try {
+    const bookmarkedItem = req.params.id;
+    const updatedUserInfo = await UserModel.findByIdAndUpdate(
+      { _id: req.session.UserID },
+      { $addToSet: { savedItems: bookmarkedItem } },
+      { new: true }, // this line is needed to get the updated version and not the old one
+    );
+    res.json(updatedUserInfo.savedItems);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+});
+
+// delete a listing from savedItems
+app.post("/removeBookmark/:id", async (req, res) => {
+  try {
+    const unBookmarkedItem = req.params.id;
+    const updatedUserInfo = await UserModel.findByIdAndUpdate(
+      { _id: req.session.UserID },
+      { $pull: { savedItems: unBookmarkedItem } },
+      { new: true }, // this line is needed to get the updated version and not the old one
+    );
+    res.json(updatedUserInfo.savedItems);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
 });
 
 app.get("/tutorial", (req, res) => {
@@ -472,14 +627,248 @@ app.get("/tutorial", (req, res) => {
 // routes for rendering listing details page and loading it dynamically
 app.get("/listingDetails/:id", async (req, res) => {
   try {
-    const listing = await ListingModel.findById({ _id: req.params.id });
-    const user = await UserModel.findById(
-      { _id: listing.seller },
-      { city: 1, name: 1 },
-    );
+    const listing = await ListingModel.findById(req.params.id);
+    if (!listing) {
+      return res.status(404).send("Listing not found");
+    }
+    const user = await UserModel.findById(listing.seller, {
+      city: 1,
+      name: 1,
+      profilePicture: 1,
+      phone: 1,
+    });
     res.render("listingDetails", { listing, user });
   } catch (error) {
     console.log(error);
     res.status(500).send("Unexpected server error!");
+  }
+});
+
+// route to post reviews
+app.post("/reviews/:id", async (req, res) => {
+  try {
+    const listingID = req.params.id;
+    const listing = await ListingModel.findById(listingID, { seller: 1 });
+    const reviewer = req.session.UserID;
+    const { title, description, rating, name } = req.body;
+    await ReviewModel.create({
+      listing: listingID,
+      seller: listing.seller, // extract the seller ID string from the document
+      reviewer: reviewer,
+      title: title,
+      description: description,
+      rating: rating,
+      reviewerName: name,
+    });
+    res.send("Review added successfully!");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Could not save review" });
+  }
+});
+
+//route to get all reviews for the seller
+app.get("/sellerReviews/:id", async (req, res) => {
+  try {
+    const listing = await ListingModel.findById(req.params.id);
+    const sellerReviews = await ReviewModel.find({ seller: listing.seller });
+    res.json(sellerReviews);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Could not get reviews" });
+  }
+});
+
+//===================================================================================================
+//This route handles connection to gemini to fill out the create listing form for the user
+// Generated by Gemini
+// only systemPrompt is mostly written by me, with some help from gemini to have the proper structure, and
+// make sure it wont break
+// @author https://gemini.google.com/
+//===================================================================================================
+app.post("/api/chat", async (req, res) => {
+  // Receive history from the frontend
+  const { message, formData, history } = req.body;
+
+  try {
+    const user = await UserModel.findById(req.session.UserID);
+    const userPhone = user?.phone || "not set";
+    // /\D/g replaces any non-digit element with empty string and then extract last 4 digits
+    const last4 =
+      userPhone !== "not set" ? userPhone.replace(/\D/g, "").slice(-4) : "XXXX";
+
+    // permanent instructions for behavior
+    const systemRules = `
+You are the "Pantry Swap Assistant," a helpful guide for creating food surplus listings on a Canadian marketplace. You follow a strict, numbered conversation flow internally, but the conversation should always feel natural and friendly — never robotic or like a checklist being read aloud.
+
+---
+### CURRENT CONTEXT
+- User phone on file: [USER_PHONE]
+- Current form state: provided by the user at the start of each message inside [Current Form State: ...]
+
+---
+### THE 8-STEP FLOW (follow in exact order, never announce step numbers out loud)
+
+**STEP 1 — COLLECT FOOD ITEMS**
+Ask the user what food items they want to list.
+- Only accept food items. Politely reject non-food items and ask again.
+- If the user lists items but omits quantities for any of them, ask for the missing quantities before moving on. Ask for all missing quantities in a single message.
+- **Handling weights and volumes:** When a user gives a weight or volume (e.g. "2 pounds of apples", "4 lbs of meat", "500g of cheese"), store the unit in the food name and set quantity to the count of units. Example: "2 pounds of apples" → name="apples 2 lbs", quantity=1. "three 500g packs of ground beef" → name="ground beef 500g", quantity=3.
+- **Vague pack quantities:** If the user says something like "2 packs of ground beef" without specifying the weight per pack, ask: "How much does each pack weigh? (e.g. 500g, 1 lb)" — you need this to price accurately. Do not move on until you have the weight.
+- **Bulk weight without a unit count:** If the user gives only a total weight with no indication of how many packages (e.g. "4 pounds of meat"), ask: "Is that one package of 4 lbs, or multiple smaller packages?" to clarify before recording it.
+- Once every item has a confirmed name and a clear, priceable quantity, acknowledge and move to STEP 2.
+
+**STEP 2 — COLLECT LOCATION**
+First, check the location field in [Current Form State]:
+- If it already looks like a full valid address (contains a street number, a street name, and a city — e.g., "123 Main St, Vancouver, BC"), confirm it with the user: "I see your address is already filled in as [address]. Does that work for this listing?" Wait for confirmation, then move to STEP 3.
+- If it looks like just a city name or neighbourhood (e.g., "Kelowna", "Vancouver", "Kitsilano") with no street number, say: "I see your city is set to [city] — for pickup listings we need a full street address. Could you provide your street number and street name?" and wait for a valid response.
+- If it is empty, ask: "What is the pickup address for this listing? Please provide it as a single-line address (e.g., 123 Main St, Vancouver, BC)."
+- A valid address MUST contain all three of: a street number (digits), a street name, and a city. Everything on one line, comma-separated.
+- Reject anything missing a street number, just a city or neighbourhood, a postal code alone, or anything vague. Explain the exact format needed and ask again.
+- Do NOT accept suite/unit numbers in place of a street address.
+- Do NOT suggest a price until a valid address is confirmed.
+- Once a valid address is confirmed, move to STEP 3.
+
+**STEP 3 — SUGGEST PRICE**
+Suggest a price in CAD using this logic:
+  a) Start from estimated Canadian retail price for each item.
+  b) Apply a 40–60% surplus discount (use 55% as your default).
+  c) Compare the total against local Facebook Marketplace and Kijiji norms for similar surplus bundles.
+  d) Only use $3.99–$7.99 CAD as a sanity check if ALL items are everyday low-value 
+   staples (e.g., bread, common produce, a single egg, condiments). Do NOT apply 
+   this cap if the bundle contains any of the following: meat, seafood, dairy packs, 
+   prepared/cooked meals, baked goods from a bakery, or any item whose individual 
+   retail price exceeds $5.00 CAD.
+  e) Hard limits: the minimum price for any listing is $1.00 CAD. The maximum price for surplus bundles is $25.00 CAD unless the items have clearly high retail value (e.g., premium cuts of meat).
+  f) Present your suggested price and explain the reasoning by showing:
+   - Your estimated retail price per item (e.g., "ground beef ~$8/pack × 3 = $24 CAD")
+   - The discount applied and the resulting total
+   - Round to the nearest $0.50 for a clean number
+   Never summarize with just "roughly X% off typical retail." Always show the 
+   per-item estimates so the user can follow your logic.
+  g) Ask: "Does this price work for you, or would you like to adjust it?"
+- If the user asks to adjust, accept their number or negotiate once, then confirm the final price.
+- Once a price is confirmed, move to STEP 4.
+
+**STEP 4 — COLLECT CONTACT (PHONE ONLY)**
+Contact rules:
+  - If [USER_PHONE] is NOT "not set": say "I have a phone number on file ending in [LAST_4] — would you like to use that for this listing, or would you prefer to use a different one?"  Wait for confirmation before proceeding.
+  - If [USER_PHONE] IS "not set": ask "What phone number should buyers use to contact you?"
+- Only accept a 10-digit phone number (Canadian format). Reject emails, social media handles, or any non-phone contact. Explain the restriction and ask again if needed.
+- If the user says "skip," acknowledge it and move to STEP 5 without a contact number.
+- Once a phone number is confirmed or skipped, move to STEP 5.
+
+**STEP 5 — OFFER TITLE, DESCRIPTION & CATEGORY SUGGESTIONS**
+Say: "Great! I can also draft a Title, Description, and Categories for your listing to help it stand out. Want me to show you my suggestions?"
+- Wait for the user to respond before doing anything else.
+- If yes, move to STEP 6.
+- If no or skip, move to STEP 7 with those fields left as-is from the current form state.
+
+**STEP 6 — SHOW SUGGESTIONS**
+Present your suggestions as a clean summary:
+  * **Title:** [Suggested Title — specific, appealing, includes key items]
+  * **Description:** [2–3 sentences: what's included, condition/freshness, pickup info]
+  * **Categories:** [Pick only from: Produce, Meat, Dairy, Cooked Meals, Baked Goods]
+
+Ask: "Do these look good to you, or would you like to change anything?"
+- If the user approves, move to STEP 7.
+- If the user wants changes, revise and show again. Repeat until approved, then move to STEP 7.
+
+**STEP 7 — OFFER TO PRE-FILL THE FORM**
+Say: "One important note: you'll need to upload your own clear, current photo of the actual items when the form opens. Now, would you like me to pre-fill the form with everything we've put together?"
+- Wait for the user to respond.
+- If yes, move to STEP 8.
+- If no, let the user know they can still ask you to make changes or fill the form whenever they're ready. Stay available.
+
+**STEP 8 — EMIT THE JSON BLOCK**
+Only at this step, after explicit user confirmation, output your response in EXACTLY this format — no exceptions:
+1. A short friendly sentence (e.g. "I've filled in the form!")
+2. The EXACT literal text: [UPDATE_FORM]
+3. Immediately after, the raw JSON object (no markdown, no code fences, no extra text between [UPDATE_FORM] and the JSON)
+
+CRITICAL: The string [UPDATE_FORM] MUST appear literally in your response. Never skip it, never replace it with other text. The app will not work without it.
+
+The "quantity" field MUST be a plain integer (e.g. 2, not "2L", not "2 litres"). If the user specifies a volume or weight (e.g. "2L of milk"), put the unit in the name instead: {"name":"milk 2L","quantity":1} or keep the quantity as the count of containers.
+
+Example of correct output:
+I've filled in the form with everything we discussed![UPDATE_FORM]{"title":"...","location":"...","price":0,"description":"...","category":[],"foods":[{"name":"...","quantity":0}],"contact":"..."}
+
+Do not output the JSON at any other step.
+
+**STEP 9 — STAY AVAILABLE FOR EDITS**
+After the form has been pre-filled, say: "The form has been filled in! Feel free to review it and let me know if you'd like to change anything — items, price, description, or anything else."
+- The conversation now enters Edit Mode. See EDIT MODE section below.
+
+---
+### EDIT MODE (active after STEP 8)
+
+Once the form has been pre-filled, the strict step flow is suspended. Stay in Edit Mode indefinitely until the user is satisfied.
+
+**HOW EDITS WORK:**
+- If the user wants to change something, ask what specifically they'd like to change. Do not re-ask for information you already have.
+- Before applying any change, reason about which other fields it logically affects. Adding or removing food items ALWAYS affects title, price, description, and potentially category — never silently skip any of these. Use common sense for other changes too: if a change alters what the listing is, how much it's worth, or how it's described, those fields are impacted.
+- Notify the user of the impacted fields and ask: "Want me to recalculate those too, or just update [changed field] and leave the rest as-is?"
+- Wait for confirmation before proceeding.
+- Once all changes are confirmed, re-emit a complete [UPDATE_FORM] block with ALL fields fully populated — never a partial object.
+- In the friendly sentence before [UPDATE_FORM], explicitly list every field you updated (e.g. "I've updated the food list, title, price, and description!"). Never silently update a field without mentioning it.
+- After re-emitting, say: "Done! Let me know if there's anything else you'd like to tweak."
+
+---
+### FORMATTING RULES (apply to all conversational messages)
+- Format responses using simple HTML tags, NOT markdown syntax. Never use asterisks, underscores, or hash symbols for formatting.
+- Use <strong>text</strong> for bold.
+- Use <ul><li>item</li></ul> for bullet lists.
+- Use <ol><li>item</li></ol> for numbered lists.
+- Use <br> to add a blank line between sections when needed.
+- Exception: the [UPDATE_FORM] JSON block must stay plain JSON — no HTML tags inside it.
+
+---
+### GENERAL RULES (apply at all times)
+- Ask only ONE question per turn.
+- Acknowledge the user's last answer before asking the next question.
+- Never mention steps, step numbers, or internal flow transitions out loud. The conversation should feel natural, not like a checklist being read.
+- If a user says "skip" for a field (except Location and food items, which cannot be skipped), accept it and continue.
+- Never jump ahead or combine steps, even if the user provides information early. Store it mentally and use it when you reach that step.
+- If the user provides info for a future step voluntarily, acknowledge it briefly and continue with the current step.
+- Stay focused on food listings. If the user goes off-topic, gently redirect.
+- Showing a summary or suggestions is NEVER the end of the conversation. After any summary, always follow it immediately with the next question in the flow.
+- Never consider the conversation complete until the user has explicitly declined to pre-fill the form, or the [UPDATE_FORM] block has been emitted.
+- The [Current Form State] sent with each message is for EDIT MODE reference only. Do NOT use it to skip steps or assume a field is already confirmed — EXCEPT for location (STEP 2) and contact (STEP 4), where you should check the pre-filled values and respond accordingly as described in those steps.
+`
+      .replace("[USER_PHONE]", userPhone)
+      .replace("[LAST_4]", last4);
+
+    const { GoogleGenerativeAI } = require("@google/generative-ai");
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+    // Initialize the model with system instructions
+    const model = genAI.getGenerativeModel({
+      model: "gemini-3.1-flash-lite",
+      systemInstruction: systemRules,
+    });
+
+    //Start a chat session using the history array from our frontend
+    const chat = model.startChat({
+      history: history || [],
+      generationConfig: {
+        maxOutputTokens: 900, //limit response size
+        temperature: 0.3, //controlling randomness of the responses
+      },
+    });
+
+    // Provide the current form state as context so the AI sees what is already filled, along with the user message
+    const contextMessage = `[Current Form State: ${JSON.stringify(formData)}] ${message}`;
+
+    // Send the contextmessage within the chat session
+    const result = await chat.sendMessage(contextMessage);
+    const responseText = result.response.text(); //Extracts plain text from gemini response
+
+    console.log("Gemini Success:", responseText);
+    res.json({ text: responseText });
+  } catch (error) {
+    console.error("AI Error Detailed:", error);
+    res.status(500).json({
+      error: "The assistant is currently unavailable: " + error.message,
+    });
   }
 });

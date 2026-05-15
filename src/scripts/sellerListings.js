@@ -1,61 +1,43 @@
 //Display seller's listings
 displaySellerListings = async function () {
   try {
-    const res = await fetch("/sellerListings")
+    const res = await fetch("/sellerListings");
     const data = await res.json();
 
-    for (let i = 0; i < data.length; i++) {
+    const listingHolder = document.getElementById("listingsHolder");
 
-      const template = document.getElementById("sellerListingTemplate");
-      const container = document.getElementById("sellerListings");
+    console.log(data);
+    data.reverse().forEach((newListing) => {
+      if (!newListing || newListing.status === "deleted") return;
 
-      //clone template
-      const clone = template.content.cloneNode(true);
+      const newCard = document.createElement("listing-card");
 
-      //fill data
-      clone.querySelector(".listingTitle").textContent = data[i].title;
-      clone.querySelector(".listingImage").src = data[i].image;
-      clone.querySelector(".listingPrice").textContent = `$${data[i].price}`;
-      clone.querySelector(".editButton").id = `edit-${data[i]._id}`;
-      clone.querySelector(".viewButton").id = `view-${data[i]._id}`;
-      container.appendChild(clone);
-    }
-
-  }
-  catch (error) {
+      newCard.setListingInfo(
+        newListing._id,
+        newListing.title,
+        newListing.image,
+        newListing.price,
+        "default",
+        [false, true, true],
+        [],
+        newListing.status,
+      );
+      listingHolder.appendChild(newCard);
+    });
+  } catch (error) {
     console.error(error);
   }
 };
 
 displaySellerListings();
 
-
-// Listen for edit button
+// Listen for create button
 document.addEventListener("click", async (event) => {
-  const button = event.target.closest(".editButton");
-
+  const button = event.target.closest("#createButton");
   if (!button) return;
-  const listingID = button.id.split("-")[1];
-  
-  const res = await fetch(`/editLIsting/?listingID=${listingID}`)
 
-  if (!res.ok) {
-    console.error("Request failed");
-  }
+  window.location.href = "/CreateListing";
 
-});
-
-
-
-// Listen for view button
-document.addEventListener("click", async (event) => {
-  const button = event.target.closest(".viewButton");
-
-  if (!button) return;
-  const listingID = button.id.split("-")[1];
-  
-  const res = await fetch(`/buy?eventID=${listingID}`)
- 
   if (!res.ok) {
     console.error("Request failed");
   }

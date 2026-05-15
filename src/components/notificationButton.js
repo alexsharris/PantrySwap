@@ -1,13 +1,20 @@
+// imports
 import {
   displaySimpleWindow,
   closePopupWindow,
   displayWindow,
+  isLocked,
+  setManualLock,
 } from "../scripts/popupWindow.js";
+import { NotifTypes } from "../scripts/notificationSystem.js";
 import {
   getDayName,
   getDayWithSuffix,
   getMonthName,
 } from "../scripts/dateTime.js";
+import "../components/listingSummaryCard.js";
+
+//consts
 const bellSVG = [
   `<svg
         xmlns="http://www.w3.org/2000/svg"
@@ -32,112 +39,112 @@ const bellSVG = [
         <path d="M12 2c1.358 0 2.506 .903 2.875 2.141l.046 .171l.008 .043a8.013 8.013 0 0 1 4.024 6.069l.028 .287l.019 .289v2.931l.021 .136a3 3 0 0 0 1.143 1.847l.167 .117l.162 .099c.86 .487 .56 1.766 -.377 1.864l-.116 .006h-16c-1.028 0 -1.387 -1.364 -.493 -1.87a3 3 0 0 0 1.472 -2.063l.021 -.143l.001 -2.97a8 8 0 0 1 3.821 -6.454l.248 -.146l.01 -.043a3.003 3.003 0 0 1 2.562 -2.29l.182 -.017l.176 -.004z" />
         </svg>`,
 ];
-
 const seedNotifications = [
   {
-    message: "Someone commented on your listing.",
+    notifType: "DELETED",
     hasSeen: false,
-    listing: "680fa1d23c4b2a001f9d1003",
+    listing: "69fa70e043a7f4dbfc8616fa",
     createdAt: new Date(),
   },
   {
-    message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    hasSeen: true,
+    notifType: "DELETED",
+    hasSeen: false,
     listing: "680fa1d23c4b2a001f9d1001",
     createdAt: new Date(),
   },
   {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
-    hasSeen: true,
-    listing: "680fa1d23c4b2a001f9d1002",
-    createdAt: new Date(),
-  },
-  {
-    message: "Your item was successfully sold.",
+    notifType: "UNLISTED",
     hasSeen: true,
     listing: "680fa1d23c4b2a001f9d1002",
     createdAt: new Date(),
   },
 ];
-
+// =============================
+// WINDOW LOGIC
+// =============================
 const formatWindow = (notificationItems) => {
   return `
-    <div class="flex flex-col max-h-[75vh]">
-      <div class="flex justify-between px-10 py-5 shrink-0">
-        <h1>Notifications</h1>
-        <div class="text-medium-grey">${bellSVG[0]}</div>
-      </div>
-      <div class="flex-1 overflow-y-auto overflow-x-hidden">
-        ${notificationItems || `<div class="card-item px-10 text-light-brown">No notifications yet!</div>`}
+  <div class="flex flex-col max-h-[75vh]">
+  <div class="flex justify-between px-10 py-5 shrink-0">
+  <h1>Notifications</h1>
+  <div class="text-medium-grey">${bellSVG[0]}</div>
+  </div>
+  <div class="flex-1 overflow-y-auto overflow-x-hidden">
+  ${notificationItems || `<div class="card-item px-10 text-light-brown">No notifications yet!</div>`}
       </div>
       <div class="border-b border-peach px-4 -mx-4 shrink-0"></div>
     </div>
   `;
 };
-const formatNotificationItem = (notification) => {
+
+const formatNotificationItem = (notification, listing) => {
   const date = new Date(notification.createdAt);
   const month = getMonthName(date);
   const dayStr = getDayWithSuffix(date);
   const hasSeen = notification.hasSeen;
-  return `<div class="card-item px-10 ">
-          <p class="text-light-brown">${month} ${dayStr}</p>
-          <h2 class="${hasSeen ? `text-black` : `text-orange`}">${notification.message}</h2>
+  const type = NotifTypes[notification.notifType];
+  let newCard = null;
+  if (listing) {
+    newCard = document.createElement("listing-card");
+
+    newCard.setListingInfo(
+      null,
+      listing.title,
+      listing.image,
+      listing.price,
+      "small",
+      [false, false, false],
+      [],
+    );
+  }
+
+  return `
+        <div id="${notification.listing}" class="card-item px-10">
+            <p class="text-light-brown">${month} ${dayStr}</p>
+            <h2 class="${hasSeen ? "text-black" : "text-orange"}">
+              ${type ? type.message : "Unknown notification"}
+            </h2>
+            <div class="w-1/2">
+            ${listing ? newCard.outerHTML : ""}
+            </div>
         </div>`;
 };
 
-function notificationItems(notifications) {
-  let output = "";
-  notifications.forEach((notif) => {
-    output += formatNotificationItem(notif);
-  });
-  return output;
+async function notificationItems(notifications) {
+  const items = await Promise.all(
+    notifications
+      .sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      })
+      .map(async (notif) => {
+        let listing = null;
+
+        if (notif.listing) {
+          try {
+            const res = await fetch(`/LoadListing/${notif.listing}`);
+
+            if (res.ok) {
+              listing = await res.json();
+            } else {
+              console.log("Failed to load listing:", notif.listing, res.status);
+            }
+          } catch (err) {
+            console.log("Network error loading listing:", notif.listing);
+          }
+        }
+
+        return formatNotificationItem(notif, listing);
+      }),
+  );
+
+  return items.join("");
 }
 
-function showWindow(notifications) {
+async function showWindow(notifications) {
+  const itemsHTML = await notificationItems(notifications);
+
   displayWindow(
-    formatWindow(notificationItems(notifications)),
+    formatWindow(itemsHTML),
     [
       {
         label: "Close",
@@ -151,6 +158,9 @@ function showWindow(notifications) {
   );
 }
 
+// =============================
+// COMPONENT
+// =============================
 class NotificationButton extends HTMLElement {
   constructor() {
     super();
@@ -164,33 +174,24 @@ class NotificationButton extends HTMLElement {
   // LOGIC
   // ======================
   async getUser() {
-    const response = await fetch("/user");
-    const data = await response.json();
-
-    if (
-      data.notifications.length === 0 ||
-      data.notifications.length !== seedNotifications.length
-    ) {
-      await fetch(`/updateUser/${data._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ notifications: seedNotifications }),
-      });
-
-      const refreshed = await fetch("/user");
-      const refreshedData = await refreshed.json();
-
-      this.user = refreshedData;
-      this.notifications = refreshedData.notifications;
-    } else {
+    try {
+      const response = await fetch("/user");
+      if (!response.ok) {
+        console.log("No user found for this session");
+        return;
+      }
+      const data = await response.json();
       this.user = data;
+      this.userId = this.user._id;
       this.notifications = data.notifications;
+    } catch (error) {
+      console.log(error);
     }
-
-    this.userId = this.user._id;
   }
 
   async clickEvent() {
+    if (isLocked()) return;
+    setManualLock(true);
     showWindow(this.notifications);
 
     if (!this.user) return;
@@ -211,8 +212,25 @@ class NotificationButton extends HTMLElement {
 
     // update user info
     await this.getUser();
-
     this.renderBtn();
+  }
+
+  async seedNewNotifications() {
+    if (!this.userId) return;
+
+    console.log(seedNotifications);
+    await fetch(`/updateUser/${this.userId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notifications: seedNotifications }),
+    });
+
+    const refreshed = await fetch("/user");
+    const refreshedData = await refreshed.json();
+
+    this.user = refreshedData;
+    this.notifications = refreshedData.notifications;
+    console.log(this.user);
   }
   // ======================
   // RENDER LOGIC
@@ -220,13 +238,16 @@ class NotificationButton extends HTMLElement {
 
   async renderBtn() {
     await this.getUser();
-
-    const hasUnreadNotifications = this.notifications
-      ? this.notifications.some((notif) => notif.hasSeen == false)
-      : false;
-    const buttonClass = hasUnreadNotifications
-      ? `text-orange hover:text-black`
-      : `text-medium-grey hover:text-black`;
+    let hasUnreadNotifications = false;
+    let buttonClass = `text-medium-grey hover:text-red`;
+    if (this.user) {
+      hasUnreadNotifications = this.notifications
+        ? this.notifications.some((notif) => notif.hasSeen == false)
+        : false;
+      buttonClass = hasUnreadNotifications
+        ? `text-orange hover:text-red`
+        : `text-medium-grey hover:text-red`;
+    }
 
     this.innerHTML = `
       <button class="${buttonClass} p-0">

@@ -19,18 +19,24 @@
       <div class="card flex flex-col gap-5 h-113 p-0 mb-7 ">
         <img
           id="listingImage"
-          src= "/<%= listing.image %>"
+          src="/<%= listing.image ? listing.image : 'images/pantry_share_img_10.jpg' %>"
           alt=""
           class="object-cover w-full h-3/4 mx-auto md:mx-0"
         />
         <!-- container of seller img, name and city -->
         <div class="flex flex-row gap-4 justify-start items-center px-5">
-          <img
-            id="sellerImage"
-            src="/images/businessShark.jpg"
-            alt=""
-            class="object-cover rounded-full size-15"
-          />
+          <% if (user.profilePicture) { %>
+            <img
+              id="sellerImage"
+              src="<%= user.profilePicture %>"
+              alt=""
+              class="object-cover rounded-full size-15"
+            />
+          <% } else { %>
+            <div class="rounded-full size-15 bg-orange-400 flex items-center justify-center text-white font-bold text-xl shrink-0">
+              <%= user.name.charAt(0).toUpperCase() %>
+            </div>
+          <% } %>
 
           <!-- name and city container -->
           <div class="flex flex-col gap-1">
@@ -42,7 +48,7 @@
 
       <!-- listing details contains 2 containers -->
       <section
-        class="grid md:grid-cols-2 items-start gap-5 md:gap-24 md:pb-0 pb-25"
+        class="grid md:grid-cols-2 items-start gap-5 md:gap-24 md:pb-0 mb-8 "
       >
         <!-- title description and bookmarking -->
         <div class="flex flex-col justify-start gap-5">
@@ -58,14 +64,15 @@
           </div>
 
           <!-- button for bookmarking -->
-          <button
+           <div id="save-button-div"></div>
+          <!-- <button
             type="button"
             id="bookmark"
             class="button box-color-0 w-50 whitespace-nowrap flex flex-row gap-1 justify-center items-center hover-bright"
           >
-            <svg
+            <svg 
               xmlns="http://www.w3.org/2000/svg"
-              fill="white"
+              fill="currentColor"
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
@@ -77,8 +84,8 @@
                 d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
               />
             </svg>
-            Save For Later
-          </button>
+            <span id="bookmark-label"></span>
+          </button> -->
 
           <!-- description -->
           <div class="flex flex-col gap-1">
@@ -95,17 +102,13 @@
           <div class="flex flex-col gap-3">
             <h3 class="font-bold">Contents</h3>
 
-            <% listing.foods.forEach(food =>{
-              %><div
-              class="card bg-peach box-color-1 flex flex-row justify-between"
-            >
-              <div><%= food.name %></div>
-              <div>X<span><%= food.quantity %></span></div>
-            </div> 
-               <%
-            })
-            %>
-            
+            <% for (const food of listing.foods) { %>
+              <div class="card bg-peach box-color-1 flex flex-row justify-between shadow-none">
+                <div><%= food.name %></div>
+                <div>X<span><%= food.quantity %></span></div>
+              </div>
+            <% } %>
+
           </div>
 
           <!-- container of pickup info -->
@@ -138,9 +141,47 @@
           </div>
         </div>
       </section>
+
+      <!-- outer container for review section -->
+      <div class="flex flex-col gap-5 md:pt-10  pt-8 pb-25">
+        <!-- container for seller reviews and leave a feedback -->
+        <div class="flex md:flex-row flex-col md:items-center items-start md:justify-between justify-start">
+          <div class="font-bold">
+            Seller reviews
+            <span class="text-medium-grey">(<span id="numberReviews"></span>)</span>
+          </div>
+          <button
+            type="button" id="leaveReviewBtn"
+            class="flex flex-row gap-1 hover-bright text-orange px-0 md:py-0 py-5"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              class="size-6"
+            >
+              <path
+                fill="currentColor"
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              />
+              <circle cx="8" cy="10" r="1.5" fill="white" />
+              <circle cx="12" cy="10" r="1.5" fill="white" />
+              <circle cx="16" cy="10" r="1.5" fill="white" />
+            </svg>
+            Leave a Review
+          </button>
+        </div>
+        <!-- each review card -->
+        <div id="reviewsContainer" class="flex flex-col justify-start gap-10">
+          <!-- container of title and stars -->
+          
+
+
+          
+        </div>
+      </div>
     </div>
 
     <!-- scripts -->
-    <script src="/src/scripts/listingDetails.js"></script>
+    <script type="module" src="/src/scripts/listingDetails.js"></script>
   </body>
 </html>

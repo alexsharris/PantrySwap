@@ -60,16 +60,16 @@
     @apply text-[22px] font-bold;
   }
   h3 {
-    @apply text-[22px];
+    @apply text-[20px];
   }
   h4 {
-    @apply text-[22px];
+    @apply text-[18px];
   }
   h5 {
-    @apply text-[22px];
+    @apply text-[16px];
   }
   h6 {
-    @apply text-[22px];
+    @apply text-[14px];
   }
   p {
     @apply text-[13px];
@@ -106,6 +106,23 @@
   label {
     @apply font-bold text-black text-xl;
   }
+
+  /* For custom dropdown */
+  .small-label {
+    @apply font-bold text-black text-sm;
+  }
+  .circle-checkbox {
+    @apply size-4 rounded-full bg-light-grey flex items-center justify-center shrink-0;
+  }
+  .circle-checkbox-dot {
+    @apply size-4 rounded-full bg-orange hidden;
+  }
+  .checkbox-item input:checked + .circle-checkbox {
+    @apply bg-orange;
+  }
+  .checkbox-item input:checked + .circle-checkbox .circle-checkbox-dot {
+    @apply block;
+  }
 }
 
 /* ===================================================================== */
@@ -114,7 +131,7 @@
 @layer components {
   /* For x margins on each page */
   .site-margins {
-    @apply py-5 md:py-10 md:px-20 flex-1;
+    @apply py-5 md:py-10 md:px-20 px-5 min-w-screen;
   }
 
   /* Cards and windows */
@@ -123,6 +140,9 @@
   }
   .card-item {
     @apply border-t border-peach px-4 py-4 -mx-4;
+  }
+  .card-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mx-auto mb-20 w-full;
   }
 
   /* Buttons */

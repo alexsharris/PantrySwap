@@ -10,13 +10,13 @@
   <!-- replace the bg-color -->
   <body class="bg-orange font-sans">
     <!-- outer container -->
-    <div class="flex flex-row justify-center items-start">
+    <div class="flex flex-row justify-center items-stretch">
       <!-- placeholder for the image in big screen -->
-      <div class="md:block md:w-1/2 hidden">
+      <div class="md:block md:w-1/2 hidden h-full">
         <img
-          src="./images/Rectangle 9.jpg"
+          src="./images/Rectangle_9.jpg"
           alt=""
-          class="h-screen object-cover w-full"
+          class="min-h-screen h-full object-cover w-full"
         />
       </div>
 
@@ -27,15 +27,22 @@
         <!-- logo and header container -->
         <div class="flex flex-row justify-center items-center gap-1">
           <!-- brightness-0 turns all the pixels black and invert makes them white -->
-          <img src="./images/Pantry_Swap_Icon.png" class="w-5 h-5 brightness-0 invert" alt="" />
-          <h1 class=" text-white">Pantry Swap</h1>
+          <img
+            src="./images/Pantry_Swap_Icon.png"
+            class="w-5 h-5 brightness-0 invert"
+            alt=""
+          />
+          <h1 class="text-white">Pantry Swap</h1>
         </div>
 
-        <h2 class="text-center pb-10 text-white">Help Your Community Prevent Food Waste.</h2>
+        <h2 class="text-center pb-10 text-white">
+          Help Your Community Prevent Food Waste.
+        </h2>
 
         <!-- form for log in -->
         <form
-          action="submit" id="LoginForm"
+          action="submit"
+          id="LoginForm"
           class="card shadow-sm flex flex-col p-4 space-y-6 md:w-1/2 w-full min-h-50"
         >
           <div class="flex flex-col space-y-1">
@@ -44,7 +51,7 @@
               type="text"
               id="emailLogin"
               placeholder="Email"
-              class="text-sm border  border-gray-300 rounded-lg p-2"
+              class="text-sm border border-gray-300 rounded-lg p-2"
             />
           </div>
 
@@ -57,10 +64,32 @@
               class="text-sm border border-gray-300 rounded-lg p-2"
             />
           </div>
-          <div class="flex items-center gap-2 ">
-            <input class="size-5" type="checkbox" id="RememberLogin" name="Remember Me"><span>Remember Me</span>
-        </div>
-
+          <div class="flex items-center gap-2">
+            <input
+              class="size-5"
+              type="checkbox"
+              id="RememberLogin"
+              name="Remember Me"
+            /><span>Remember Me</span>
+          </div>
+          <!-- invalid credentials placeholder -->
+          <div id="errorMsg" class="flex items-center gap-2 text-sm text-red hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="red"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="white"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
+            </svg>
+            <span>Invalid credentials, Please try again!</span>
+          </div>
           <button
             type="submit"
             id="LoginBtn"
@@ -72,7 +101,8 @@
 
         <!-- form for sign up, we remain on the same page -->
         <form
-          action="submit" id="SignUpForm"
+          action="submit"
+          id="SignUpForm"
           class="hidden card shadow-sm flex flex-col p-4 space-y-6 md:w-1/2 w-full min-h-50"
         >
           <div class="flex flex-col space-y-1">
@@ -106,9 +136,31 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <input class="size-5" type="checkbox" id="RememberSignup" name="Remember Me"><span>Remember Me</span>
-        </div>
+            <input
+              class="size-5"
+              type="checkbox"
+              id="RememberSignup"
+              name="Remember Me"
+            /><span>Remember Me</span>
+          </div>
 
+          <div id="signupErrorMsg" class="flex items-center gap-2 text-sm text-red hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="red"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="white"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
+            </svg>
+            <span id="signupErrorText"></span>
+          </div>
           <button
             type="submit"
             id="signupBtn"
@@ -118,8 +170,19 @@
           </button>
         </form>
 
-        <button type="button" id="SignUpButton" class="text-white text-sm cursor-pointer">
+        <button
+          type="button"
+          id="SignUpButton"
+          class="text-white text-sm cursor-pointer"
+        >
           Not registered? <span class="underline">Create an account</span>
+        </button>
+        <button
+          type="button"
+          id="LoginButton"
+          class="text-white text-sm cursor-pointer hidden"
+        >
+          Have an account? <span class="underline">Back to Login</span>
         </button>
       </div>
     </div>
