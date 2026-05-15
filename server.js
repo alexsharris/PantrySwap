@@ -415,6 +415,8 @@ app.post("/CreateListing", async (req, res) => {
     description,
     category,
     foods,
+    lat,
+    lng,
   } = req.body;
   try {
     const newListing = await ListingModel.create({
@@ -427,6 +429,8 @@ app.post("/CreateListing", async (req, res) => {
       description: description,
       category: category,
       foods: foods,
+      lat: lat,
+      lng: lng,
     });
 
     await UserModel.findByIdAndUpdate(
