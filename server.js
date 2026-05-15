@@ -337,6 +337,8 @@ app.put("/EditListing/:listingID", async (req, res) => {
     updatedDescription,
     updatedCategory,
     updatedFoods,
+    updatedLat,
+    updatedLng,
   } = req.body;
   try {
     const listingRecord = await ListingModel.findOne({ _id: listingID });
@@ -350,6 +352,8 @@ app.put("/EditListing/:listingID", async (req, res) => {
     if (updatedCategory) listingRecord.category = updatedCategory;
     if (updatedFoods) listingRecord.foods = updatedFoods;
     if (updatedImage) listingRecord.image = updatedImage;
+    if (updatedLat) listingRecord.lat = updatedLat;
+    if (updatedLng) listingRecord.lng = updateLng;
 
     await listingRecord.save();
     res.sendStatus(200);
