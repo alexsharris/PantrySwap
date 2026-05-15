@@ -1,6 +1,8 @@
 // ============================================
 // BUTTONS
 // ============================================
+let locked = false;
+
 function createButtons(functions, autoClose) {
   let buttons = [];
 
@@ -46,6 +48,8 @@ export function displayWindow(
   autoClose = true,
   customCardStle = "",
 ) {
+  if (locked) return;
+  locked = true;
   document.body.style.overflow = "hidden";
 
   const window = document.createElement("div");
@@ -86,6 +90,7 @@ export function closePopupWindow() {
   const popupWindow = document.getElementById("popup-window");
   popupWindow.remove();
   document.body.style.overflow = "auto";
+  locked = false;
 }
 
 // ============================================
