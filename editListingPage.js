@@ -2,11 +2,11 @@ import {
   displaySimpleWindow,
   closePopupWindow,
   displayWindow,
-} from "../scripts/popupWindow.js";
+} from "/src/scripts/popupWindow.js";
 import {
   NotifTypes,
   newNotifForConnectedUsers,
-} from "./src/scripts/notificationSystem.js";
+} from "/src/scripts/notificationSystem.js";
 
 //GRAB THE ID FROM THE URL
 const params = new URLSearchParams(window.location.search);

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Listing</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script type="module" src="src\components\navbar.js"></script>
+    <script type="module" src="/src/components/navbar.js"></script>
     <link rel="stylesheet" href="./public/main.css" />
     <style>
         * {
@@ -44,7 +44,7 @@
             <div id="" class="flex flex-col min-[915px]:w-1/3 gap-2">
                 <h2 id="" class="text-light-brown tracking-wide">Image</h2>
                 <div id="" class="relative flex flex-col gap-2">
-                    <img class="rounded-xl" src="images/pantry_share_img_10.jpg" alt="" id="listingImg">
+                    <img class="rounded-xl max-h-50 object-cover" src="images/pantry_share_img_10.jpg" alt="" id="listingImg">
                     <input type="file" id="listingImageUpload" />
                     <button
                     type="button"
@@ -123,7 +123,7 @@
                                     <input id="editProduce" class="w-6 h-6 accent-white" type="checkbox">
                                 </div>
                                 <div id="" class="flex justify-center">
-                                    <img src="images/vegetables.svg" alt="">
+                                    <img src="/images/vegetables.svg" alt="">
                                 </div>
                                 <div id="" class="flex justify-center">Produce</div>
                             </div>
@@ -133,7 +133,7 @@
                                     <input id="editMeat" class="w-6 h-6 accent-white" type="checkbox">
                                 </div>
                                 <div id="" class="flex justify-center">
-                                    <img src="images/meat.svg" alt="">
+                                    <img src="/images/meat.svg" alt="">
                                 </div>
                                 <div id="" class="flex justify-center text">Meat</div>
                             </div>
@@ -143,7 +143,7 @@
                                     <input id="editDairy" class="w-6 h-6 accent-white" type="checkbox">
                                 </div>
                                 <div id="" class="flex justify-center">
-                                    <img src="images/dairy.svg" alt="">
+                                    <img src="/images/dairy.svg" alt="">
                                 </div>
                                 <div id="" class="flex justify-center text">Dairy</div>
                             </div>
@@ -153,7 +153,7 @@
                                     <input id="editBakedGoods" class="w-6 h-6 accent-white" type="checkbox">
                                 </div>
                                 <div id="" class="flex justify-center">
-                                    <img src="images/baked-goods.svg" alt="">
+                                    <img src="/images/baked-goods.svg" alt="">
                                 </div>
                                 <div id="" class="flex justify-center text">Baked Goods</div>
                             </div>
@@ -163,7 +163,7 @@
                                     <input id="editCookedMeals" class="w-6 h-6 accent-white" type="checkbox">
                                 </div>
                                 <div id="" class="flex justify-center">
-                                    <img src="images/cooked-meals.svg" alt="">
+                                    <img src="/images/cooked-meals.svg" alt="">
                                 </div>
                                 <div id="" class="flex justify-center text">Cooked Meals</div>
                             </div>
