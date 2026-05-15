@@ -38,6 +38,8 @@ const UserSchema = new mongoose.Schema({
   phone: String,
   password: String,
   city: String,
+  address: String,
+  postalCode: String,
   profilePicture: String,
   savedItems: [String], // the idea is to store _id of documents in listedItems here
   listedItems: [String], // the idea is to store _id of documents in listedItems here
@@ -63,6 +65,8 @@ const ListingsSchema = new mongoose.Schema({
   title: String,
   price: Number,
   location: String,
+  lat: Number,
+  lng: Number,
   contact: String,
   description: String,
   category: {
