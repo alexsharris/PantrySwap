@@ -131,7 +131,7 @@
 @layer components {
   /* For x margins on each page */
   .site-margins {
-    @apply py-5 md:py-10 md:px-20 px-5 flex-1;
+    @apply py-5 md:py-10 md:px-20 px-5 min-w-screen;
   }
 
   /* Cards and windows */

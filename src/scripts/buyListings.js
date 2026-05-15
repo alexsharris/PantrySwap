@@ -71,7 +71,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         categoryArray.includes(selected),
       );
     });
-
+    if (filtered.length === 0) {
+      listingHolder.innerHTML = `
+      <div class="col-span-full text-center text-medium-grey py-10">
+        No listings match your filters...
+      </div>
+    `;
+      return;
+    }
     filtered.reverse().forEach((newListing) => {
       const newCard = document.createElement("listing-card");
 
