@@ -15,7 +15,7 @@ async function GetDefaultInformation() {
   document.getElementById("UserNewName").placeholder = ServerResponseJson.name;
   document.getElementById("UserNewEmail").placeholder =
     ServerResponseJson.email;
-  console.log(ServerResponseJson.profilePicture)
+  console.log(ServerResponseJson.profilePicture);
 
   // some of the info could not exist if they user is recently signed up
   if (ServerResponseJson.phone) {
@@ -26,9 +26,9 @@ async function GetDefaultInformation() {
     document.getElementById("UserNewCity").placeholder =
       ServerResponseJson.city;
   }
-  if (ServerResponseJson.profilePicture){
-    document.getElementById("userPFP").src = ServerResponseJson.profilePicture
-    console.log("pfp found")
+  if (ServerResponseJson.profilePicture) {
+    document.getElementById("userPFP").src = ServerResponseJson.profilePicture;
+    console.log("pfp found");
   }
 }
 GetDefaultInformation();
@@ -51,7 +51,6 @@ const button = [
     hover: "hover-outline",
     onClick: changeData,
   },
-
 ];
 
 function readImageAsBase64(file) {
@@ -72,17 +71,16 @@ function readImageAsBase64(file) {
 
 let currentPFP;
 
-const uploadImgBtn = document.getElementById("profilePicBtn")
-uploadImgBtn.addEventListener("click", async ()=>{
-  console.log("pressed btn")
+const uploadImgBtn = document.getElementById("profilePicBtn");
+uploadImgBtn.addEventListener("click", async () => {
+  console.log("pressed btn");
   const PFP = document.getElementById("userProfilePic").files[0];
-  console.log(PFP)
-  const encodedImg = await readImageAsBase64(PFP)
-  console.log(encodedImg)
-  currentPFP = encodedImg
-  document.getElementById("userPFP").src = currentPFP
-})
-
+  console.log(PFP);
+  const encodedImg = await readImageAsBase64(PFP);
+  console.log(encodedImg);
+  currentPFP = encodedImg;
+  document.getElementById("userPFP").src = currentPFP;
+});
 
 async function changeData() {
   const Name = document.getElementById("UserNewName").value;
@@ -106,8 +104,8 @@ async function changeData() {
   if (City) {
     UserNewCity = City;
   }
-  if (currentPFP){
-    UserNewPFP = currentPFP
+  if (currentPFP) {
+    UserNewPFP = currentPFP;
   }
 
   const Response = await fetch("/ChangeData", {
@@ -119,7 +117,7 @@ async function changeData() {
       UserNewEmail,
       UserNewphone,
       UserNewCity,
-      UserNewPFP
+      UserNewPFP,
     }),
   });
   await GetDefaultInformation();
@@ -154,6 +152,8 @@ const buttons = [
 // calling the function to send the delete request
 
 async function deleteAccount() {
-   await fetch("/DeleteAccount", { method: "DELETE" });
-   window.location.href = "/Login";
+  const Response = await fetch("/DeleteAccount", { method: "DELETE" });
+  if (Response.ok) {
+    window.location.href = "/login";
+  }
 }
