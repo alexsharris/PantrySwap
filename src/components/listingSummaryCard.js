@@ -44,7 +44,7 @@ class ListingCard extends HTMLElement {
       <img src="${this.image}"class="w-full h-${this.imageSize} object-cover">
       <div class="p-4">
         <${this.headerSize} class="font-bold truncate">${this.title}</${this.headerSize}>
-        <p class="font-semibold text-orange">$${this.price}</p>
+        <p class="font-semibold text-orange">${this.price == 0 || !this.price ? "FREE" : `$${this.price}`}</p>
         <div class="button-container flex gap-2 mt-2 justify-between"></div>
       </div>
       <div class="absolute top-0 right-0 m-3">
