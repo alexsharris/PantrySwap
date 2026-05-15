@@ -45,7 +45,8 @@ function prefillForm(listingRecord) {
     listingRecord.category.includes("Baked Goods") ? true : false;
   document.getElementById("editCookedMeals").checked =
     listingRecord.category.includes("Cooked Meals") ? true : false;
-  document.getElementById("listingImg").src = listingRecord.image;
+  document.getElementById("listingImg").src =
+    listingRecord.image || "images/pantry_share_img_10.jpg";
 }
 
 // translate image file into string
