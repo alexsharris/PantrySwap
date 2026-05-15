@@ -188,12 +188,22 @@ app.post("/SignUp", async (req, res) => {
   const NewUserEmail = req.body.emailSignup;
   const NewUserName = req.body.name;
   const NewUserPassword = req.body.passwordSignup;
-  if (!NewUserPassword || !NewUserPassword.trim() || !NewUserEmail || !NewUserEmail.trim() || !NewUserName || !NewUserName.trim()) {
+  if (
+    !NewUserPassword ||
+    !NewUserPassword.trim() ||
+    !NewUserEmail ||
+    !NewUserEmail.trim() ||
+    !NewUserName ||
+    !NewUserName.trim()
+  ) {
     return res.status(400).json({ error: "Please fill out all the fields!" });
   }
 
   const emailExists = await UserModel.findOne({ email: NewUserEmail });
-  if (emailExists) return res.status(400).json({ error: "There's an account associated with this email!" });
+  if (emailExists)
+    return res
+      .status(400)
+      .json({ error: "There's an account associated with this email!" });
 
   // create a new user in DB
   try {
@@ -617,11 +627,16 @@ app.get("/tutorial", (req, res) => {
 // routes for rendering listing details page and loading it dynamically
 app.get("/listingDetails/:id", async (req, res) => {
   try {
-    const listing = await ListingModel.findById({ _id: req.params.id });
-    const user = await UserModel.findById(
-      { _id: listing.seller },
-      { city: 1, name: 1, profilePicture: 1, phone: 1 },
-    );
+    const listing = await ListingModel.findById(req.params.id);
+    if (!listing) {
+      return res.status(404).send("Listing not found");
+    }
+    const user = await UserModel.findById(listing.seller, {
+      city: 1,
+      name: 1,
+      profilePicture: 1,
+      phone: 1,
+    });
     res.render("listingDetails", { listing, user });
   } catch (error) {
     console.log(error);

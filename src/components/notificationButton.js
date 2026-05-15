@@ -3,6 +3,8 @@ import {
   displaySimpleWindow,
   closePopupWindow,
   displayWindow,
+  isLocked,
+  setManualLock,
 } from "../scripts/popupWindow.js";
 import { NotifTypes } from "../scripts/notificationSystem.js";
 import {
@@ -57,7 +59,6 @@ const seedNotifications = [
     createdAt: new Date(),
   },
 ];
-
 // =============================
 // WINDOW LOGIC
 // =============================
@@ -189,6 +190,8 @@ class NotificationButton extends HTMLElement {
   }
 
   async clickEvent() {
+    if (isLocked()) return;
+    setManualLock(true);
     showWindow(this.notifications);
 
     if (!this.user) return;
