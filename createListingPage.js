@@ -1,8 +1,4 @@
-import {
-  displaySimpleWindow,
-  closePopupWindow,
-  displayWindow,
-} from "../scripts/popupWindow.js";
+import { displaySimpleWindow, closePopupWindow, displayWindow } from "../scripts/popupWindow.js";
 
 //==================================================================================
 // start of AI chatbot
@@ -22,15 +18,15 @@ const closeBtn = document.getElementById("closeAiSidebar");
 // then appends the message to the chat window and auto-scrolls to the latest message.
 //==========================================================================================
 function appendMessage(role, text) {
-  const msgDiv = document.createElement("div");
-  // change the class string to "chat chat-end" if its users and to "chat chat-start " if its ai
+    const msgDiv = document.createElement("div");
+    // change the class string to "chat chat-end" if its users and to "chat chat-start " if its ai
 
-  msgDiv.className = `chat ${role === "user" ? "chat-end" : "chat-start"}`;
-  // create and insert the chat bubble with the message text, but for user assign an orange bg with white text
+    msgDiv.className = `chat ${role === "user" ? "chat-end" : "chat-start"}`;
+    // create and insert the chat bubble with the message text, but for user assign an orange bg with white text
 
-  msgDiv.innerHTML = `<div class="chat-bubble text-sm  ${role === "user" ? "bg-orange text-white" : ""}">${text}</div>`;
-  chatWindow.appendChild(msgDiv);
-  chatWindow.scrollTop = chatWindow.scrollHeight; // chat box automatically scroll to the bottom
+    msgDiv.innerHTML = `<div class="chat-bubble text-sm  ${role === "user" ? "bg-orange text-white" : ""}">${text}</div>`;
+    chatWindow.appendChild(msgDiv);
+    chatWindow.scrollTop = chatWindow.scrollHeight; // chat box automatically scroll to the bottom
 }
 
 //=========================================================================================
@@ -39,72 +35,69 @@ function appendMessage(role, text) {
 // @author https://gemini.google.com/
 //==========================================================================================
 function processAiResponse(rawText) {
-  // Check if the response contains the [UPDATE_FORM] command
-  // means AI wants to update the form
-  if (rawText.includes("[UPDATE_FORM]")) {
-    const parts = rawText.split("[UPDATE_FORM]");
-    const textToDisplay = parts[0]; // The friendly message
-    const jsonString = parts[1]; // The actual form data
-    // Shows AI message in chat UI
-    appendMessage("assistant", textToDisplay);
+    // Check if the response contains the [UPDATE_FORM] command
+    // means AI wants to update the form
+    if (rawText.includes("[UPDATE_FORM]")) {
+        const parts = rawText.split("[UPDATE_FORM]");
+        const textToDisplay = parts[0]; // The friendly message
+        const jsonString = parts[1]; // The actual form data
+        // Shows AI message in chat UI
+        appendMessage("assistant", textToDisplay);
 
-    try {
-      // regex method - Find everything from the first { to the last } in the json response
-      const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("No JSON object found in response"); // Manually creates an error
-      const data = JSON.parse(jsonMatch[0]); // Converts text into real JS object
+        try {
+            // regex method - Find everything from the first { to the last } in the json response
+            const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) throw new Error("No JSON object found in response"); // Manually creates an error
+            const data = JSON.parse(jsonMatch[0]); // Converts text into real JS object
 
-      // Fill standard text fields
-      if (data.title) document.getElementById("editTitle").value = data.title;
-      if (data.location)
-        document.getElementById("editLocation").value = data.location;
-      if (data.price) document.getElementById("editPrice").value = data.price;
-      if (data.description)
-        document.getElementById("editDescription").value = data.description;
-      if (data.contact)
-        document.getElementById("editContact").value = data.contact;
+            // Fill standard text fields
+            if (data.title) document.getElementById("editTitle").value = data.title;
+            if (data.location) document.getElementById("editLocation").value = data.location;
+            if (data.price) document.getElementById("editPrice").value = data.price;
+            if (data.description) document.getElementById("editDescription").value = data.description;
+            if (data.contact) document.getElementById("editContact").value = data.contact;
 
-      // Handle Categories (Checkboxes) - check if they exist and if category is an array
-      //   this check is necessarry because AI might send a string instead of an array
-      if (data.category && Array.isArray(data.category)) {
-        const catMap = {
-          Produce: "editProduce", // the values are the ids of the checkboxes in html
-          Meat: "editMeat",
-          Dairy: "editDairy",
-          "Baked Goods": "editBakedGoods",
-          "Cooked Meals": "editCookedMeals",
-        };
+            // Handle Categories (Checkboxes) - check if they exist and if category is an array
+            //   this check is necessarry because AI might send a string instead of an array
+            if (data.category && Array.isArray(data.category)) {
+                const catMap = {
+                    Produce: "editProduce", // the values are the ids of the checkboxes in html
+                    Meat: "editMeat",
+                    Dairy: "editDairy",
+                    "Baked Goods": "editBakedGoods",
+                    "Cooked Meals": "editCookedMeals",
+                };
 
-        // Clear existing checkboxes first if needed
-        // Object.values(catMap) pulls out just the values of catMapt which are ids
-        Object.values(catMap).forEach((id) => {
-          const el = document.getElementById(id);
-          if (el) el.checked = false;
-        });
-        // data.category is the array from the AI, e.g. ["Produce", "Dairy"].
-        //  For each name, it looks up the corresponding checkbox ID in catMap, finds it in the DOM, and checks it.
-        data.category.forEach((catName) => {
-          const id = catMap[catName];
-          if (id) document.getElementById(id).checked = true;
-        });
-      }
+                // Clear existing checkboxes first if needed
+                // Object.values(catMap) pulls out just the values of catMapt which are ids
+                Object.values(catMap).forEach((id) => {
+                    const el = document.getElementById(id);
+                    if (el) el.checked = false;
+                });
+                // data.category is the array from the AI, e.g. ["Produce", "Dairy"].
+                //  For each name, it looks up the corresponding checkbox ID in catMap, finds it in the DOM, and checks it.
+                data.category.forEach((catName) => {
+                    const id = catMap[catName];
+                    if (id) document.getElementById(id).checked = true;
+                });
+            }
 
-      // dynamically build food bars using the AI's foods array,
-      //   mirrors what addFood() does but without the popup
-      if (data.foods && Array.isArray(data.foods)) {
-        const foodsList = document.getElementById("foodsList");
-        foodsList.innerHTML = "";
-        foodArray = []; // reset the global food array, because AI is going to replace it when user interacts with it
+            // dynamically build food bars using the AI's foods array,
+            //   mirrors what addFood() does but without the popup
+            if (data.foods && Array.isArray(data.foods)) {
+                const foodsList = document.getElementById("foodsList");
+                foodsList.innerHTML = "";
+                foodArray = []; // reset the global food array, because AI is going to replace it when user interacts with it
 
-        data.foods.forEach((item) => {
-          //The || 1 is a safety net — if the AI sends something which is not an int, it defaults to 1 instead of crashing.
-          const quantity = item.quantity || 1;
+                data.foods.forEach((item) => {
+                    //The || 1 is a safety net — if the AI sends something which is not an int, it defaults to 1 instead of crashing.
+                    const quantity = item.quantity || 1;
 
-          foodArray.push({ name: item.name, quantity: quantity });
-          const index = foodArray.length - 1; // after pushing each item capture the index to work with minusQuant or plusQuant
+                    foodArray.push({ name: item.name, quantity: quantity });
+                    const index = foodArray.length - 1; // after pushing each item capture the index to work with minusQuant or plusQuant
 
-          const foodBar = document.createElement("div");
-          foodBar.innerHTML = `
+                    const foodBar = document.createElement("div");
+                    foodBar.innerHTML = `
             <div class="flex justify-between rounded-lg text-light-brown border-[#9b9b9b] border-solid border">
               <div class="py-2 px-4">${item.name}</div>
               <div class="flex">
@@ -115,37 +108,37 @@ function processAiResponse(rawText) {
             </div>
           `;
 
-          let qty = quantity;
-          const itemQuant = foodBar.querySelector("#itemQuant");
+                    let qty = quantity;
+                    const itemQuant = foodBar.querySelector("#itemQuant");
 
-          foodBar.querySelector("#minusQuant").addEventListener("click", () => {
-            if (qty > 0) {
-              qty -= 1;
-              itemQuant.textContent = qty;
-              foodArray[index].quantity = qty;
-              if (foodArray[index].quantity === 0) {
-                foodArray.pop();
-                foodBar.remove();
-              }
+                    foodBar.querySelector("#minusQuant").addEventListener("click", () => {
+                        if (qty > 0) {
+                            qty -= 1;
+                            itemQuant.textContent = qty;
+                            foodArray[index].quantity = qty;
+                            if (foodArray[index].quantity === 0) {
+                                foodArray.pop();
+                                foodBar.remove();
+                            }
+                        }
+                    });
+
+                    foodBar.querySelector("#plusQuant").addEventListener("click", () => {
+                        qty += 1;
+                        itemQuant.textContent = qty;
+                        foodArray[index].quantity = qty;
+                    });
+
+                    foodsList.appendChild(foodBar);
+                });
             }
-          });
-
-          foodBar.querySelector("#plusQuant").addEventListener("click", () => {
-            qty += 1;
-            itemQuant.textContent = qty;
-            foodArray[index].quantity = qty;
-          });
-
-          foodsList.appendChild(foodBar);
-        });
-      }
-    } catch (e) {
-      console.error("Failed to parse AI JSON:", e);
+        } catch (e) {
+            console.error("Failed to parse AI JSON:", e);
+        }
+    } else {
+        // Just a normal conversation message
+        appendMessage("assistant", rawText);
     }
-  } else {
-    // Just a normal conversation message
-    appendMessage("assistant", rawText);
-  }
 }
 
 let chatHistory = []; // Initialize outside the function to maintain state
@@ -157,84 +150,84 @@ let chatHistory = []; // Initialize outside the function to maintain state
 // @author https://gemini.google.com/
 //==========================================================================================
 async function handleChat() {
-  const message = chatInput.value.trim();
-  if (!message) return;
+    const message = chatInput.value.trim();
+    if (!message) return;
 
-  // Display user message and clear input
-  appendMessage("user", message);
-  chatInput.value = "";
+    // Display user message and clear input
+    appendMessage("user", message);
+    chatInput.value = "";
 
-  // Show loading state
-  const loadingId = "ai-loading-" + Date.now(); //creates a unique id
-  const loadingDiv = document.createElement("div");
-  loadingDiv.id = loadingId; //assign that unique id to created div
-  loadingDiv.className = "text-xs text-orange italic ml-2 mb-4";
-  loadingDiv.innerText = "Pantry Swap is thinking...";
-  chatWindow.appendChild(loadingDiv);
-  chatWindow.scrollTop = chatWindow.scrollHeight; // automatically scrolls the chat to the bottom
+    // Show loading state
+    const loadingId = "ai-loading-" + Date.now(); //creates a unique id
+    const loadingDiv = document.createElement("div");
+    loadingDiv.id = loadingId; //assign that unique id to created div
+    loadingDiv.className = "text-xs text-orange italic ml-2 mb-4";
+    loadingDiv.innerText = "Pantry Swap is thinking...";
+    chatWindow.appendChild(loadingDiv);
+    chatWindow.scrollTop = chatWindow.scrollHeight; // automatically scrolls the chat to the bottom
 
-  // Scrape form data to let the AI know what's already filled
-  const formData = {
-    title: document.getElementById("editTitle").value,
-    location: document.getElementById("editLocation").value,
-    price: document.getElementById("editPrice").value,
-    description: document.getElementById("editDescription").value,
-    contact: document.getElementById("editContact").value,
-  };
+    // Scrape form data to let the AI know what's already filled
+    const formData = {
+        title: document.getElementById("editTitle").value,
+        location: document.getElementById("editLocation").value,
+        price: document.getElementById("editPrice").value,
+        description: document.getElementById("editDescription").value,
+        contact: document.getElementById("editContact").value,
+    };
 
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      // ADDED: Sending chatHistory along with the message and form data
-      body: JSON.stringify({
-        message,
-        formData,
-        history: chatHistory,
-      }),
-    });
+    try {
+        const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            // ADDED: Sending chatHistory along with the message and form data
+            body: JSON.stringify({
+                message,
+                formData,
+                history: chatHistory,
+            }),
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    const loadingEl = document.getElementById(loadingId); // Find the loading div again using its ID and removes it
-    if (loadingEl) loadingEl.remove();
+        const loadingEl = document.getElementById(loadingId); // Find the loading div again using its ID and removes it
+        if (loadingEl) loadingEl.remove();
 
-    //Checks whether backend returned text
-    if (data.text) {
-      // Save both the user message and AI response to chatHistory
-      // This prevents the AI from repeating questions it already asked
-      chatHistory.push({ role: "user", parts: [{ text: message }] });
-      chatHistory.push({ role: "model", parts: [{ text: data.text }] });
+        //Checks whether backend returned text
+        if (data.text) {
+            // Save both the user message and AI response to chatHistory
+            // This prevents the AI from repeating questions it already asked
+            chatHistory.push({ role: "user", parts: [{ text: message }] });
+            chatHistory.push({ role: "model", parts: [{ text: data.text }] });
 
-      processAiResponse(data.text);
-    } else {
-      appendMessage("assistant", "Something went wrong. Please try again.");
+            processAiResponse(data.text);
+        } else {
+            appendMessage("assistant", "Something went wrong. Please try again.");
+        }
+    } catch (error) {
+        const loadingEl = document.getElementById(loadingId);
+        if (loadingEl) loadingEl.innerText = "Error: Connection lost.";
+        console.error("Chat Error:", error);
     }
-  } catch (error) {
-    const loadingEl = document.getElementById(loadingId);
-    if (loadingEl) loadingEl.innerText = "Error: Connection lost.";
-    console.error("Chat Error:", error);
-  }
 }
 
 // When the user clicks Send button or presses Enter, run the chat function.
 sendBtn.addEventListener("click", handleChat);
 chatInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") handleChat();
+    if (e.key === "Enter") handleChat();
 });
 
 // Open the AI chatbot
 openBtn.addEventListener("click", () => {
-  sidebar.classList.remove("translate-x-full"); // // element slides into screen from the right
-  openBtn.style.opacity = "0"; // Makes open button invisible
-  openBtn.style.pointerEvents = "none"; // Disables mouse interaction with button.
+    sidebar.classList.remove("translate-x-full"); // // element slides into screen from the right
+    openBtn.style.opacity = "0"; // Makes open button invisible
+    openBtn.style.pointerEvents = "none"; // Disables mouse interaction with button.
 });
 
 // Close the AI chatbot
 closeBtn.addEventListener("click", () => {
-  sidebar.classList.add("translate-x-full"); // element slides completely off screen to the right
-  openBtn.style.opacity = "1"; // Makes open button visible
-  openBtn.style.pointerEvents = "auto"; // Enables mouse interaction with button
+    sidebar.classList.add("translate-x-full"); // element slides completely off screen to the right
+    openBtn.style.opacity = "1"; // Makes open button visible
+    openBtn.style.pointerEvents = "auto"; // Enables mouse interaction with button
 });
 //==================================================================================
 // end of AI chatbot
@@ -243,21 +236,21 @@ closeBtn.addEventListener("click", () => {
 let foodArray = [];
 
 async function loadUserData() {
-  const response = await fetch("/user");
-  const userData = await response.json();
-  console.log(userData);
-  return userData;
+    const response = await fetch("/user");
+    const userData = await response.json();
+    console.log(userData);
+    return userData;
 }
 
 function prefillForm(userRecord) {
-  console.log(userRecord);
-  document.getElementById("editLocation").value = userRecord.city || "";
-  document.getElementById("editContact").value = userRecord.phone || "";
+    console.log(userRecord);
+    document.getElementById("editLocation").value = userRecord.city || "";
+    document.getElementById("editContact").value = userRecord.phone || "";
 }
 
 async function initializePage() {
-  const data = await loadUserData();
-  prefillForm(data);
+    const data = await loadUserData();
+    prefillForm(data);
 }
 
 initializePage();
@@ -275,38 +268,38 @@ const form = `
 </form>`;
 
 const buttons = [
-  {
-    label: "Add food",
-    color: "box-color-0",
-    hover: "hover-outline",
-    onClick: addFood,
-  },
-  {
-    label: "cancel",
-    color: "box-color-1",
-    hover: "hover-outline",
-    onClick: closePopupWindow,
-  },
+    {
+        label: "Add food",
+        color: "box-color-0",
+        hover: "hover-outline",
+        onClick: addFood,
+    },
+    {
+        label: "cancel",
+        color: "box-color-1",
+        hover: "hover-outline",
+        onClick: closePopupWindow,
+    },
 ];
 
 function addFood() {
-  const foodForm = document.getElementById("food-form");
-  const formData = new FormData(foodForm);
+    const foodForm = document.getElementById("food-form");
+    const formData = new FormData(foodForm);
 
-  console.log("form data: ", formData.entries);
+    console.log("form data: ", formData.entries);
 
-  let isValid = true;
+    let isValid = true;
 
-  for (const [key, value] of formData.entries()) {
-    console.log(`key: ${key}, value: ${value}`); //must use fieldData.get('key') to access the values - cannot use fieldData.key
-    if (!value.trim()) isValid = false;
-  }
+    for (const [key, value] of formData.entries()) {
+        console.log(`key: ${key}, value: ${value}`); //must use fieldData.get('key') to access the values - cannot use fieldData.key
+        if (!value.trim()) isValid = false;
+    }
 
-  if (isValid) {
-    const foodsList = document.getElementById("foodsList");
-    const foodBar = document.createElement("div");
+    if (isValid) {
+        const foodsList = document.getElementById("foodsList");
+        const foodBar = document.createElement("div");
 
-    foodBar.innerHTML += `
+        foodBar.innerHTML += `
     <div id="foodBar" class="flex justify-between rounded-lg text-light-brown border-[#9b9b9b] border-solid border">
         <!-- left -->
         <div id="" class="py-2 px-4">${formData.get("name")}</div>
@@ -322,130 +315,129 @@ function addFood() {
     </div>
     `;
 
-    const itemQuant = foodBar.querySelector("#itemQuant");
-    let quantity = parseInt(formData.get("quantity"));
+        const itemQuant = foodBar.querySelector("#itemQuant");
+        let quantity = parseInt(formData.get("quantity"));
 
-    foodArray.push({ name: formData.get("name"), quantity: quantity });
-    let index = foodArray.length - 1;
+        foodArray.push({ name: formData.get("name"), quantity: quantity });
+        let index = foodArray.length - 1;
 
-    foodBar.querySelector("#minusQuant").addEventListener("click", () => {
-      if (quantity > 0) {
-        quantity -= 1;
-        itemQuant.textContent = quantity;
-        foodArray[index].quantity = quantity;
-        if (foodArray[index].quantity == 0) {
-          foodArray.pop();
-          foodBar.remove();
-        }
-      }
-    });
-    foodBar.querySelector("#plusQuant").addEventListener("click", () => {
-      if (quantity > 0) {
-        quantity += 1;
-        itemQuant.textContent = quantity;
-        foodArray[index].quantity = quantity;
-      }
-    });
-    foodsList.appendChild(foodBar);
-    closePopupWindow();
-  } else {
-    if (foodForm.querySelector(".form-error")) return;
+        foodBar.querySelector("#minusQuant").addEventListener("click", () => {
+            if (quantity > 0) {
+                quantity -= 1;
+                itemQuant.textContent = quantity;
+                foodArray[index].quantity = quantity;
+                if (foodArray[index].quantity == 0) {
+                    foodArray.pop();
+                    foodBar.remove();
+                }
+            }
+        });
+        foodBar.querySelector("#plusQuant").addEventListener("click", () => {
+            if (quantity > 0) {
+                quantity += 1;
+                itemQuant.textContent = quantity;
+                foodArray[index].quantity = quantity;
+            }
+        });
+        foodsList.appendChild(foodBar);
+        closePopupWindow();
+    } else {
+        if (foodForm.querySelector(".form-error")) return;
 
-    const error = document.createElement("div");
-    error.className = "form-error text-red text-sm";
-    error.textContent = "Required fields missing";
+        const error = document.createElement("div");
+        error.className = "form-error text-red text-sm";
+        error.textContent = "Required fields missing";
 
-    foodForm.appendChild(error);
-  }
+        foodForm.appendChild(error);
+    }
 }
 
 //add food button
 document.getElementById("addFoodButton").addEventListener("click", () => {
-  displaySimpleWindow("Add food" + form, buttons, false);
+    displaySimpleWindow("Add food" + form, buttons, false);
 });
 
 //cancel button
 document.getElementById("cancelButton").addEventListener("click", () => {
-  window.location.href = "/sell";
+    window.location.href = "/sell";
 });
 
 // translate image file into string
 function readImageAsBase64(file) {
-  return new Promise((resolve, reject) => {
-    if (!file) {
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      resolve(e.target.result); // full Base64 string
-    };
-    reader.onerror = function () {
-      reject(new Error("Error reading image"));
-    };
-    reader.readAsDataURL(file);
-  });
+    return new Promise((resolve, reject) => {
+        if (!file) {
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            resolve(e.target.result); // full Base64 string
+        };
+        reader.onerror = function () {
+            reject(new Error("Error reading image"));
+        };
+        reader.readAsDataURL(file);
+    });
 }
 
-
-let currentImg
+let currentImg;
 // upload image button
-const uploadImgBtn = document.getElementById("uploadImgBtn")
-uploadImgBtn.addEventListener("click", async ()=>{
-  console.log("pressed btn")
-  const listingImg = document.getElementById("listingImageUpload").files[0]
-  console.log(listingImg)
-  const encodedImg = await readImageAsBase64(listingImg)
-  console.log(encodedImg)
-  currentImg = encodedImg
-  document.getElementById("listingImg").src = currentImg
-})
+const uploadImgBtn = document.getElementById("uploadImgBtn");
+uploadImgBtn.addEventListener("click", async () => {
+    console.log("pressed btn");
+    const listingImg = document.getElementById("listingImageUpload").files[0];
+    console.log(listingImg);
+    const encodedImg = await readImageAsBase64(listingImg);
+    console.log(encodedImg);
+    currentImg = encodedImg;
+    document.getElementById("listingImg").src = currentImg;
+});
 
 //create button
 document.querySelector("form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  //get back the updated values
-  const updatedTitle = document.getElementById("editTitle").value;
-  const updatedLocation = document.getElementById("editLocation").value;
-  const updatedPrice = document.getElementById("editPrice").value;
-  const updatedContact = document.getElementById("editContact").value;
-  const updatedDescription = document.getElementById("editDescription").value;
-  const updatedProduce = document.getElementById("editProduce").checked;
-  const updatedMeat = document.getElementById("editMeat").checked;
-  const updatedDairy = document.getElementById("editDairy").checked;
-  const updatedBakedGoods = document.getElementById("editBakedGoods").checked;
-  const updatedCookedMeals = document.getElementById("editCookedMeals").checked;
-  const updatedImage = currentImg
+    event.preventDefault();
+    //get back the updated values
+    const updatedTitle = document.getElementById("editTitle").value;
+    const updatedLocation = document.getElementById("editLocation").value;
+    const updatedPrice = document.getElementById("editPrice").value;
+    const updatedContact = document.getElementById("editContact").value;
+    const updatedDescription = document.getElementById("editDescription").value;
+    const updatedProduce = document.getElementById("editProduce").checked;
+    const updatedMeat = document.getElementById("editMeat").checked;
+    const updatedDairy = document.getElementById("editDairy").checked;
+    const updatedBakedGoods = document.getElementById("editBakedGoods").checked;
+    const updatedCookedMeals = document.getElementById("editCookedMeals").checked;
+    const updatedImage = currentImg;
 
-  // //validate required fields not left blank
-  if (foodArray.length == 0) {
-    alert("Please add a food item.");
-    return;
-  }
+    // //validate required fields not left blank
+    if (foodArray.length == 0) {
+        alert("Please add a food item.");
+        return;
+    }
 
-  let updatedCategory = [];
-  updatedProduce == true ? updatedCategory.push("Produce") : undefined;
-  updatedMeat == true ? updatedCategory.push("Meat") : undefined;
-  updatedDairy == true ? updatedCategory.push("Dairy") : undefined;
-  updatedBakedGoods == true ? updatedCategory.push("Baked Goods") : undefined;
-  updatedCookedMeals == true ? updatedCategory.push("Cooked Meals") : undefined;
+    let updatedCategory = [];
+    updatedProduce == true ? updatedCategory.push("Produce") : undefined;
+    updatedMeat == true ? updatedCategory.push("Meat") : undefined;
+    updatedDairy == true ? updatedCategory.push("Dairy") : undefined;
+    updatedBakedGoods == true ? updatedCategory.push("Baked Goods") : undefined;
+    updatedCookedMeals == true ? updatedCategory.push("Cooked Meals") : undefined;
 
-  const response = await fetch(`/CreateListing`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      //seller is added in on the server.js
-      title: updatedTitle,
-      location: updatedLocation,
-      price: updatedPrice,
-      contact: updatedContact,
-      description: updatedDescription,
-      category: updatedCategory,
-      foods: foodArray,
-      image: updatedImage,
-    }),
-  });
-  if (response.ok) {
-    alert("Listing created!");
-    window.location.href = "/sell";
-  }
+    const response = await fetch(`/CreateListing`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+            //seller is added in on the server.js
+            title: updatedTitle,
+            location: updatedLocation,
+            price: updatedPrice,
+            contact: updatedContact,
+            description: updatedDescription,
+            category: updatedCategory,
+            foods: foodArray,
+            image: updatedImage,
+        }),
+    });
+    if (response.ok) {
+        alert("Listing created!");
+        window.location.href = "/sell";
+    }
 });
