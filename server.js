@@ -188,12 +188,16 @@ app.post("/SignUp", async (req, res) => {
   const NewUserEmail = req.body.emailSignup;
   const NewUserName = req.body.name;
   const NewUserPassword = req.body.passwordSignup;
+  if (!NewUserPassword || !NewUserPassword.trim() || !NewUserEmail || !NewUserEmail.trim() || !NewUserName || !NewUserName.trim()) {
+    return res.status(400).json({ error: "Please fill out all the fields!" });
+  }
 
-  // hash password to store it in DB
-  const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
+  const emailExists = await UserModel.findOne({ email: NewUserEmail });
+  if (emailExists) return res.status(400).json({ error: "There's an account associated with this email!" });
 
   // create a new user in DB
   try {
+    const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
     const user = await UserModel.create({
       name: NewUserName,
       password: HashedPassword,
@@ -286,7 +290,7 @@ app.put("/ChangeData", async (req, res) => {
 app.delete("/DeleteAccount", async (req, res) => {
   try {
     await UserModel.findByIdAndDelete({ _id: req.session.UserID });
-    req.session.destroy(() => res.redirect("/Login"));
+    req.session.destroy(() => res.send("Account deleted!"));
   } catch (error) {
     console.log(error);
     res.status(500).send("Delete failed!");
@@ -616,7 +620,7 @@ app.get("/listingDetails/:id", async (req, res) => {
     const listing = await ListingModel.findById({ _id: req.params.id });
     const user = await UserModel.findById(
       { _id: listing.seller },
-      { city: 1, name: 1 },
+      { city: 1, name: 1, profilePicture: 1, phone: 1 },
     );
     res.render("listingDetails", { listing, user });
   } catch (error) {
