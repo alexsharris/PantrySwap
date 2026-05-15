@@ -1,3 +1,8 @@
+import {
+  NotifTypes,
+  newNotificationWithGetReciever,
+} from "../scripts/notificationSystem.js";
+
 const bookmarkSVG = `<svg 
               xmlns="http://www.w3.org/2000/svg"
               fill="currentColor"
@@ -16,17 +21,19 @@ const bookmarkSVG = `<svg
 export const ButtonStyle = Object.freeze({
   SMALL: {
     name: "SMALL",
-    saveClass: "bg-white text-black hover-outline p-4 rounded-full",
+    sharedClasses: "hover-outline p-4 rounded-full",
+    saveClass: "bg-white text-black",
     saveText: "",
-    unsaveClass: "bg-white text-orange hover-outline p-4 rounded-full",
+    unsaveClass: "bg-orange text-white drop-shadow-md drop-shadow-black/50",
     unsaveText: "",
   },
 
   FULL: {
     name: "FULL",
-    saveClass: "box-color-0 hover-bright",
+    sharedClasses: "hover-bright",
+    saveClass: "box-color-0",
     saveText: "Save for Later",
-    unsaveClass: "box-color-2 hover-bright",
+    unsaveClass: "box-color-2",
     unsaveText: "Remove Bookmark",
   },
 });
@@ -38,10 +45,10 @@ class bookmarkButton extends HTMLElement {
     this.user = null;
     this.userId = null;
     this.listingId = this.getAttribute("listing-id");
-    this.saveState = false;
 
     this.buttonStyle =
       ButtonStyle[this.getAttribute("button-style")] || ButtonStyle.SMALL;
+    this.isBookmarked = this.getAttribute("is-saved") === "true";
 
     this.renderBtn();
     this.addEventListener("click", () => this.clickEvent());
@@ -67,26 +74,57 @@ class bookmarkButton extends HTMLElement {
   }
 
   async clickEvent() {
-    this.saveState = !this.saveState;
+    await this.bookmarkListing();
     this.renderBtn();
+  }
+
+  async bookmarkListing() {
+    const id = this.listingId;
+    try {
+      let data;
+      if (!this.isBookmarked) {
+        data = await (
+          await fetch(`/bookmarkListing/${id}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id }),
+          })
+        ).json();
+        // send notif to the owning user
+        newNotificationWithGetReciever(id, NotifTypes.BOOKMARKED);
+      } else {
+        data = await (
+          await fetch(`/removeBookmark/${id}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id }),
+          })
+        ).json();
+      }
+      this.isBookmarked = !this.isBookmarked;
+      // console.log(data);
+    } catch (err) {
+      console.error("Bookmark request failed:", err);
+    }
   }
   // ======================
   // RENDER LOGIC
   // ======================
 
   async renderBtn() {
-    console.log(this.saveState);
     this.innerHTML = `
-    <button class="${
-      this.saveState ? this.buttonStyle.unsaveClass : this.buttonStyle.saveClass
+    <button class=" ${this.buttonStyle.sharedClasses} ${
+      this.isBookmarked
+        ? this.buttonStyle.unsaveClass
+        : this.buttonStyle.saveClass
     }">
       <div class="flex gap-2">
         ${bookmarkSVG}
-        ${
-          this.saveState
-            ? this.buttonStyle.unsaveText
-            : this.buttonStyle.saveText
-        }
+        ${this.isBookmarked ? this.buttonStyle.unsaveText : this.buttonStyle.saveText}
       </div>
     </button>
   `;

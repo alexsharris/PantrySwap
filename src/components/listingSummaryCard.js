@@ -6,13 +6,26 @@ class ListingCard extends HTMLElement {
     super();
   }
 
-  setListingInfo(title, image, price, listingID, imageSize = "default") {
+  async setListingInfo(
+    title,
+    image,
+    price,
+    listingID,
+    imageSize = "default",
+    savedItems = [],
+    showItems = [true, false, false],
+  ) {
     this.title = title;
     this.image = image || "images/pantry_share_img_10.jpg";
     this.price = price;
     this.listingID = listingID || null;
     this.imageSize = imageSize == "small" ? 20 : 50;
     this.headerSize = imageSize == "small" ? `h4` : `h2`;
+    this.savedItems = savedItems;
+
+    this.showBookmark = showItems[0];
+    this.showListingStatus = showItems[1];
+    this.showEditButton = showItems[2];
     this.render();
   }
 
@@ -30,12 +43,13 @@ class ListingCard extends HTMLElement {
         <div class="button-container flex gap-2 mt-2 justify-between"></div>
       </div>
       <div class="absolute top-0 right-0 m-3">
-        <bookmark-btn
-          class="bookmark-btn"
+       <bookmark-btn
+          class="bookmark-btn hidden"
           listing-id="${this.listingID}"
+          is-saved="${this.savedItems.includes(this.listingID)}"
           button-style="SMALL"
         ></bookmark-btn>
-        <div class="status-el bg-white border-2 border-light-grey rounded-full flex gap-3 items-center px-4 py-2">
+        <div class="status-el hidden bg-white border-2 border-light-grey rounded-full flex gap-3 items-center px-4 py-2">
             <div class="status-color rounded-full size-5"></div>
             <p class="status-text font-semibold"></p>
         </div>
@@ -44,14 +58,7 @@ class ListingCard extends HTMLElement {
   `;
 
     if (this.listingID) {
-      // Action Buttons
-      const editButton = document.createElement("button");
-      editButton.className = `editButton box-color-3 hover-bright font-bold w-full`;
-      editButton.innerHTML = "Edit";
-      editButton.addEventListener("click", () => {
-        this.clickEvent();
-      });
-
+      // view details button
       const viewButton = document.createElement("button");
       viewButton.className =
         "view-button box-color-0 hover-bright font-bold w-full";
@@ -60,15 +67,25 @@ class ListingCard extends HTMLElement {
         this.clickEvent();
       });
       this.querySelector(".button-container").append(viewButton);
-      this.querySelector(".button-container").append(editButton);
+
+      // edit button
+      if (this.showEditButton) {
+        const editButton = document.createElement("button");
+        editButton.className = `editButton box-color-3 hover-bright font-bold w-full`;
+        editButton.innerHTML = "Edit";
+        editButton.addEventListener("click", () => {
+          this.clickEvent();
+        });
+        this.querySelector(".button-container").append(editButton);
+      }
 
       // bookmark button
       const bookmarkBtn = this.querySelector(".bookmark-btn");
-      bookmarkBtn.classList.add("visible");
+      if (this.showBookmark) bookmarkBtn.classList.remove("hidden");
 
       // Status Tag
       const statusEl = this.querySelector(".status-el");
-      statusEl.classList.add("hidden");
+      if (this.showListingStatus) statusEl.classList.remove("hidden");
 
       const statusCol = this.querySelector(".status-color");
       const statusText = this.querySelector(".status-text");

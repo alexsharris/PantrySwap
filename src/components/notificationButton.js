@@ -92,6 +92,8 @@ const formatNotificationItem = (notification, listing) => {
       listing.price,
       null,
       "small",
+      [],
+      [false, false, false],
     );
   }
 
