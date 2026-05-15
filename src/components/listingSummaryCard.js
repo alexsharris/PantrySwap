@@ -7,21 +7,26 @@ class ListingCard extends HTMLElement {
   }
 
   async setListingInfo(
+    listingID,
     title,
     image,
     price,
-    listingID,
     imageSize = "default",
-    savedItems = [],
     showItems = [true, false, false],
+    savedItems = [],
+    listingStatus = "listed",
   ) {
+    this.listingID = listingID || null;
+
     this.title = title;
     this.image = image || "images/pantry_share_img_10.jpg";
     this.price = price;
-    this.listingID = listingID || null;
+
     this.imageSize = imageSize == "small" ? 20 : 50;
     this.headerSize = imageSize == "small" ? `h4` : `h2`;
+
     this.savedItems = savedItems;
+    this.listingStatus = listingStatus;
 
     this.showBookmark = showItems[0];
     this.showListingStatus = showItems[1];
@@ -80,17 +85,26 @@ class ListingCard extends HTMLElement {
       }
 
       // bookmark button
-      const bookmarkBtn = this.querySelector(".bookmark-btn");
-      if (this.showBookmark) bookmarkBtn.classList.remove("hidden");
+      if (this.showBookmark) {
+        const bookmarkBtn = this.querySelector(".bookmark-btn");
+        bookmarkBtn.classList.remove("hidden");
+      }
 
       // Status Tag
-      const statusEl = this.querySelector(".status-el");
-      if (this.showListingStatus) statusEl.classList.remove("hidden");
-
-      const statusCol = this.querySelector(".status-color");
-      const statusText = this.querySelector(".status-text");
-      statusCol.classList.add("bg-green");
-      statusText.innerHTML = "Listed";
+      if (this.showListingStatus) {
+        const statusEl = this.querySelector(".status-el");
+        statusEl.classList.remove("hidden");
+        const statusCol = this.querySelector(".status-color");
+        const statusText = this.querySelector(".status-text");
+        statusCol.classList.add(
+          this.listingStatus == "listed"
+            ? "bg-green"
+            : this.listingStatus == "unlisted"
+              ? "bg-red"
+              : "bg-light-grey",
+        );
+        statusText.innerHTML = this.listingStatus;
+      }
     }
   }
 }

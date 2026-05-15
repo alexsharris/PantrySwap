@@ -87,13 +87,13 @@ const formatNotificationItem = (notification, listing) => {
     newCard = document.createElement("listing-card");
 
     newCard.setListingInfo(
+      null,
       listing.title,
       listing.image,
       listing.price,
-      null,
       "small",
-      [],
       [false, false, false],
+      [],
     );
   }
 

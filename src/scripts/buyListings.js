@@ -11,21 +11,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   const savedItems = currentUser.savedItems || [];
   const listingHolder = document.getElementById("listingsHolder");
 
-  data
-    .sort((a, b) => a - b)
-    .forEach((newListing) => {
-      if (!newListing || newListing.status !== "listed") return;
+  data.reverse().forEach((newListing) => {
+    if (!newListing || newListing.status !== "listed") return;
 
-      const newCard = document.createElement("listing-card");
+    const newCard = document.createElement("listing-card");
 
-      newCard.setListingInfo(
-        newListing.title,
-        newListing.image,
-        newListing.price,
-        newListing._id,
-        "default",
-        savedItems,
-      );
-      listingHolder.appendChild(newCard);
-    });
+    newCard.setListingInfo(
+      newListing._id,
+      newListing.title,
+      newListing.image,
+      newListing.price,
+      "default",
+      [true, false, false],
+      savedItems,
+    );
+    listingHolder.appendChild(newCard);
+  });
 });

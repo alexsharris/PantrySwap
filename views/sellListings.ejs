@@ -40,48 +40,7 @@
         </button>
       </div>
 
-      <div class="card-grid" id="sellerListings"></div>
-
-      <template id="sellerListingTemplate">
-        <div
-          class="listingCard flex flex-col relative bg-white rounded-lg shadow-lg shadow-[#D9D9D9]"
-        >
-          <!--image-->
-          <div class="relative bg-white/50 rounded-t-lg mb-4">
-            <div
-              class="absolute flex items-center justify-center rounded-full h-6 bg-white px-2 py-1 top-3 right-3"
-            >
-              <div class="statusIndicator rounded-full h-2 w-2 mr-2"></div>
-              <p class="listingStatus text-xs"></p>
-            </div>
-            <img src="" class="listingImage mx-auto rounded-t-lg" />
-          </div>
-          <!--bottom-->
-          <div class="flex flex-col flex-1">
-            <!--Text-->
-            <div class="flex-1 mx-4 mb-4">
-              <h2 class="listingTitle font-bold"></h2>
-              <p class="listingPrice text-xs font-medium text-[#FF6700]"></p>
-            </div>
-            <!--Buttons-->
-            <div class="mt-auto flex flex-1 gap-2 items-end mx-4">
-              <button
-                id=""
-                class="viewButton flex-1 text-xs rounded-lg bg-[#FF6700] font-bold px-3 py-2 mb-4 text-white"
-              >
-                View
-              </button>
-              <button
-                id=""
-                type="button"
-                class="editButton flex-1 text-xs rounded-lg bg-[#D9D9D9] font-bold px-3 py-2 mb-4"
-              >
-                Edit
-              </button>
-            </div>
-          </div>
-        </div>
-      </template>
+      <div class="card-grid" id="listingsHolder"></div>
     </div>
   </body>
 </html>
