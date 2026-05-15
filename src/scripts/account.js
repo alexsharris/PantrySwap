@@ -30,6 +30,14 @@ async function GetDefaultInformation() {
     document.getElementById("userPFP").src = ServerResponseJson.profilePicture
     console.log("pfp found")
   }
+  if (ServerResponseJson.address) {
+    document.getElementById("UserNewAddress").placeholder =
+      ServerResponseJson.address;
+  }
+  if (ServerResponseJson.postalCode) {
+    document.getElementById("UserNewPostalCode").placeholder =
+      ServerResponseJson.postalCode;
+  }
 }
 GetDefaultInformation();
 
@@ -89,9 +97,11 @@ async function changeData() {
   const Email = document.getElementById("UserNewEmail").value;
   const Phone = document.getElementById("UserNewphone").value;
   const City = document.getElementById("UserNewCity").value;
+  const Address = document.getElementById("UserNewAddress").value;
+  const PostalCode = document.getElementById("UserNewPostalCode").value;
 
   // should be defined outside if statements to be accessible
-  let UserNewName, UserNewEmail, UserNewphone, UserNewCity, UserNewPFP;
+  let UserNewName, UserNewEmail, UserNewphone, UserNewCity, UserNewPFP, UserNewAddress, UserNewPostalCode
 
   // only send the fields that are actually updated (not falsey or empty)
   if (Name) {
@@ -109,6 +119,12 @@ async function changeData() {
   if (currentPFP){
     UserNewPFP = currentPFP
   }
+  if (Address){
+    UserNewAddress = Address
+  }
+  if (PostalCode){
+    UserNewPostalCode = PostalCode
+  }
 
   const Response = await fetch("/ChangeData", {
     method: "PUT",
@@ -119,7 +135,9 @@ async function changeData() {
       UserNewEmail,
       UserNewphone,
       UserNewCity,
-      UserNewPFP
+      UserNewPFP,
+      UserNewAddress,
+      UserNewPostalCode
     }),
   });
   await GetDefaultInformation();
