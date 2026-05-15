@@ -190,7 +190,6 @@ class NotificationButton extends HTMLElement {
   }
 
   async clickEvent() {
-    console.log(isLocked());
     if (isLocked()) return;
     setManualLock(true);
     showWindow(this.notifications);
