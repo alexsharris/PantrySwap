@@ -2,11 +2,11 @@ import {
   displaySimpleWindow,
   closePopupWindow,
   displayWindow,
-} from "../scripts/popupWindow.js";
+} from "/src/scripts/popupWindow.js";
 import {
   NotifTypes,
   newNotifForConnectedUsers,
-} from "./src/scripts/notificationSystem.js";
+} from "/src/scripts/notificationSystem.js";
 
 //GRAB THE ID FROM THE URL
 const params = new URLSearchParams(window.location.search);
@@ -45,7 +45,8 @@ function prefillForm(listingRecord) {
     listingRecord.category.includes("Baked Goods") ? true : false;
   document.getElementById("editCookedMeals").checked =
     listingRecord.category.includes("Cooked Meals") ? true : false;
-  document.getElementById("listingImg").src = listingRecord.image;
+  document.getElementById("listingImg").src =
+    listingRecord.image || "images/pantry_share_img_10.jpg";
 }
 
 // translate image file into string

@@ -3,6 +3,8 @@ import {
   displaySimpleWindow,
   closePopupWindow,
   displayWindow,
+  isLocked,
+  setManualLock,
 } from "../scripts/popupWindow.js";
 import { NotifTypes } from "../scripts/notificationSystem.js";
 import {
@@ -57,7 +59,6 @@ const seedNotifications = [
     createdAt: new Date(),
   },
 ];
-
 // =============================
 // WINDOW LOGIC
 // =============================
@@ -87,11 +88,13 @@ const formatNotificationItem = (notification, listing) => {
     newCard = document.createElement("listing-card");
 
     newCard.setListingInfo(
+      null,
       listing.title,
       listing.image,
       listing.price,
-      null,
       "small",
+      [false, false, false],
+      [],
     );
   }
 
@@ -187,6 +190,8 @@ class NotificationButton extends HTMLElement {
   }
 
   async clickEvent() {
+    if (isLocked()) return;
+    setManualLock(true);
     showWindow(this.notifications);
 
     if (!this.user) return;
