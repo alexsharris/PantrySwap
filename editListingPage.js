@@ -209,11 +209,11 @@ function listingStatus(listingRecord) {
 
   if (listingRecord.status == "unlisted") {
     statusCircle.classList.remove("bg-green-500");
-    statusCircle.classList.add("bg-gray-500");
+    statusCircle.classList.add("bg-red");
     statusLabel.innerText = "Unlisted";
     listingStatusButton.innerText = "Re-list";
   } else if (listingRecord.status == "listed") {
-    statusCircle.classList.remove("bg-gray-500");
+    statusCircle.classList.remove("bg-red");
     statusCircle.classList.add("bg-green-500");
     statusLabel.innerText = "Listed";
     listingStatusButton.innerText = "Unlist";
