@@ -12,6 +12,10 @@ import "../components/bookmarkButton.js";
 // get the id of the document from the url
 const id = window.location.pathname.split("/").pop();
 
+//=======================================================================================
+// Fetches the current user's saved items and injects the bookmark button component,
+// passing whether this listing is already saved so the button renders the correct state.
+//=======================================================================================
 async function renderBookmarkButton() {
   const bookmarkButtonDiv = document.getElementById("save-button-div");
   const currentUser = await (await fetch("/user")).json();
@@ -30,14 +34,21 @@ renderBookmarkButton();
 //This function gets all the reviews submitted for a seller and displays them dynamically
 //=======================================================================================
 async function displayReviews(id) {
+  //array for store all the ratings for the seller to calculate average
+  let allRatings = [];
   const reviewsResponse = await (await fetch(`/sellerReviews/${id}`)).json(); // this would be an array
   const reviewContainer = document.getElementById("reviewsContainer");
   reviewContainer.innerHTML = "";
   let ratings = 0;
-  reviewsResponse.forEach((review) => {
-    ratings++;
-    const element = document.createElement("div");
-    element.innerHTML = `<div class="flex flex-col gap-3">
+  if (reviewsResponse.length === 0) {
+    reviewContainer.classList.add("text-sm");
+    reviewContainer.innerHTML = "This seller has no reviews yet.";
+  } else {
+    reviewsResponse.forEach((review) => {
+      ratings++;
+      allRatings.push(Number(review.rating));
+      const element = document.createElement("div");
+      element.innerHTML = `<div class="flex flex-col gap-3">
             <h2 id="reviewTitle">${review.title}</h2>
             <!-- container of stars -->
             <div id="starContainer" class="flex flex-row gap-1 items-center">
@@ -116,22 +127,35 @@ async function displayReviews(id) {
             <p  class="font-bold pb-4">${review.reviewerName}</p>
             <hr class="border-light-grey">
           </div>`;
-    reviewContainer.appendChild(element);
-    //handle the stars in each review
-    const starValueDB = review.rating;
-    document.querySelectorAll("#starContainer svg").forEach((star) => {
-      if (star.dataset.value <= starValueDB) {
-        star.classList.add("text-orange");
-        star.classList.remove("text-light-grey");
-      } else {
-        star.classList.remove("text-orange");
-        star.classList.add("text-light-grey");
-      }
+      reviewContainer.appendChild(element);
+      //handle the stars in each review
+      const starValueDB = review.rating;
+      document.querySelectorAll("#starContainer svg").forEach((star) => {
+        if (star.dataset.value <= starValueDB) {
+          star.classList.add("text-orange");
+          star.classList.remove("text-light-grey");
+        } else {
+          star.classList.remove("text-orange");
+          star.classList.add("text-light-grey");
+        }
+      });
     });
-  });
+  }
 
   // display total number of reviews seller has
   document.getElementById("numberReviews").innerHTML = ratings;
+
+  // display rating average for the seller
+
+  let sum = 0;
+  for (let i = 0; i < allRatings.length; i++) {
+    sum += allRatings[i];
+  }
+
+  const average =
+    allRatings.length > 0 ? (sum / allRatings.length).toFixed(1) : "0";
+
+  document.getElementById("average").innerHTML = average;
 }
 displayReviews(id);
 //======================================================================================

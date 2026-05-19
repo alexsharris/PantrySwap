@@ -670,6 +670,33 @@ app.get("/tutorial", (req, res) => {
   res.render("tutorial.ejs");
 });
 
+// ============================================================================================
+// This function extracts only the street name of the listing to show it on the details page
+// to avoid exposing the full address for privacy concerns.
+// this is used in the following route.
+// ============================================================================================
+function extractStreet(location) {
+
+  //recover in case there is no location in the database 
+  if (!location) return "Address not provided!";
+
+  // split by comma, take the street segment and trim whitespace
+  const streetPart = location.split(",")[0].trim();
+
+  // split into words
+  const tokens = streetPart.split(" ");
+
+  // drop the first word/numeric part
+  // isNaN means is not a number
+  const firstIsNumber = !isNaN(Number(tokens[0]));
+
+  //if the first part is true, slice it and join the rest to reform a string
+  const street = firstIsNumber ? tokens.slice(1).join(" ") : streetPart;
+
+  // recover if the extraction leaves us with nothing(null), fall back to full address in worst case scenario
+  return street || location;
+}
+
 // routes for rendering listing details page and loading it dynamically
 app.get("/listingDetails/:id", async (req, res) => {
   try {
@@ -683,7 +710,12 @@ app.get("/listingDetails/:id", async (req, res) => {
       profilePicture: 1,
       phone: 1,
     });
-    res.render("listingDetails", { listing, user });
+
+    res.render("listingDetails", {
+      listing,
+      user,
+      street: extractStreet(listing.location),
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send("Unexpected server error!");
