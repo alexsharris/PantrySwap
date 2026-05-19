@@ -97,6 +97,16 @@
             <% } %>
             
           </div>
+
+          <!-- container for categories -->
+           <div class="flex flex-col gap-1">
+            <h3 class="font-bold">Categories</h3>
+            <ul class="flex flex-col gap-2 text-sm list-disc list-inside pl-3">
+            <% for (const category of (listing.category || [])) { %>
+              <li><%= category %></li>
+            <% } %>
+            </ul>
+           </div>
         </div>
 
         <!-- contents pickup info and contact -->
