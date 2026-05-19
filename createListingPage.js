@@ -437,7 +437,8 @@ document.querySelector("form").addEventListener("submit", async (event) => {
         }),
     });
     if (response.ok) {
-        alert("Listing created!");
+        // alert("Listing created!");
+        displaySimpleWindow("Listing created!")
         window.location.href = "/sell";
     }
 });
