@@ -38,6 +38,8 @@ const UserSchema = new mongoose.Schema({
   phone: String,
   password: String,
   city: String,
+  address: String,
+  postalCode: String,
   profilePicture: String,
   savedItems: [String], // the idea is to store _id of documents in listedItems here
   listedItems: [String], // the idea is to store _id of documents in listedItems here
@@ -63,6 +65,8 @@ const ListingsSchema = new mongoose.Schema({
   title: String,
   price: Number,
   location: String,
+  lat: Number,
+  lng: Number,
   contact: String,
   description: String,
   category: {
@@ -275,7 +279,8 @@ app.put("/ChangeData", async (req, res) => {
     const UserNewphone = req.body.UserNewphone;
     const UserNewCity = req.body.UserNewCity;
     const UserNewPFP = req.body.UserNewPFP;
-    console.log(UserNewPFP);
+    const UserNewAddress = req.body.UserNewAddress;
+    const UserNewPostalCode = req.body.UserNewPostalCode;
 
     // check if the value exists, if so, update the DB
     const UpdatedFields = {};
@@ -285,6 +290,8 @@ app.put("/ChangeData", async (req, res) => {
     if (UserNewphone) UpdatedFields.phone = UserNewphone;
     if (UserNewCity) UpdatedFields.city = UserNewCity;
     if (UserNewPFP) UpdatedFields.profilePicture = UserNewPFP;
+    if (UserNewAddress) UpdatedFields.address = UserNewAddress;
+    if (UserNewPostalCode) UpdatedFields.postalCode = UserNewPostalCode;
 
     const user = await UserModel.findByIdAndUpdate(
       { _id: req.session.UserID },
@@ -340,6 +347,8 @@ app.put("/EditListing/:listingID", async (req, res) => {
     updatedDescription,
     updatedCategory,
     updatedFoods,
+    updatedLat,
+    updatedLng,
   } = req.body;
   try {
     const listingRecord = await ListingModel.findOne({ _id: listingID });
@@ -353,6 +362,8 @@ app.put("/EditListing/:listingID", async (req, res) => {
     if (updatedCategory) listingRecord.category = updatedCategory;
     if (updatedFoods) listingRecord.foods = updatedFoods;
     if (updatedImage) listingRecord.image = updatedImage;
+    if (updatedLat) listingRecord.lat = updatedLat;
+    if (updatedLng) listingRecord.lng = updateLng;
 
     await listingRecord.save();
     res.sendStatus(200);
@@ -418,6 +429,8 @@ app.post("/CreateListing", async (req, res) => {
     description,
     category,
     foods,
+    lat,
+    lng,
   } = req.body;
   try {
     const newListing = await ListingModel.create({
@@ -430,6 +443,8 @@ app.post("/CreateListing", async (req, res) => {
       description: description,
       category: category,
       foods: foods,
+      lat: lat,
+      lng: lng,
     });
 
     await UserModel.findByIdAndUpdate(
