@@ -12,6 +12,10 @@ import "../components/bookmarkButton.js";
 // get the id of the document from the url
 const id = window.location.pathname.split("/").pop();
 
+//=======================================================================================
+// Fetches the current user's saved items and injects the bookmark button component,
+// passing whether this listing is already saved so the button renders the correct state.
+//=======================================================================================
 async function renderBookmarkButton() {
   const bookmarkButtonDiv = document.getElementById("save-button-div");
   const currentUser = await (await fetch("/user")).json();
