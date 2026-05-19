@@ -238,6 +238,33 @@ async function initializePage() {
     </div>
     </form>`;
 
+  const deleteConfirmButton = [
+  {
+    label: "yes, delete",
+    color: "box-color-0",
+    hover: "hover-outline",
+    onClick: async () => {
+      // console.log("Deleted")
+      const response = await fetch(`/DeleteListing/${listingID}`, {
+        method: "PUT",
+      }); //soft delete
+
+      if (response.ok) {
+        newNotifForConnectedUsers(listingID, NotifTypes.DELETED);
+        displaySimpleWindow("Deleted!");
+        window.location.href = "/sell"
+  }
+      },
+  },
+  {
+    label: "no, cancel",
+    color: "box-color-1",
+    hover: "hover-outline",
+    onClick: () => console.log("Cancelled"),
+  },
+];
+
+
   const buttons = [
     {
       label: "Add food",
@@ -257,21 +284,17 @@ async function initializePage() {
   document.getElementById("addFoodButton").addEventListener("click", () => {
     displaySimpleWindow("Add food" + form, buttons, false);
   });
+
+  //delete button
+  document.getElementById("deleteButton").addEventListener("click", async () => {
+    displaySimpleWindow("Are you sure you want to delete this listing?", deleteConfirmButton);
+  });
+
 }
 
 initializePage();
 
-//delete button
-document.getElementById("deleteButton").addEventListener("click", async () => {
-  const response = await fetch(`/DeleteListing/${listingID}`, {
-    method: "PUT",
-  }); //soft delete
 
-  if (response.ok) {
-    newNotifForConnectedUsers(listingID, NotifTypes.DELETED);
-    alert("Listing Deleted!");
-  }
-});
 
 //Unlist or Re-list button
 document
