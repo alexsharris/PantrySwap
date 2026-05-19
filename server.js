@@ -3,6 +3,17 @@ require("dotenv").config();
 const port = process.env.PORT || 5000;
 const db = process.env.MONGO_URI;
 const secret = process.env.SESSION_SECRET;
+//setting up dymo for email validation - pulled from dymo documentation
+const DymoAPI = require("dymo-api");
+const dymoClient = new DymoAPI({
+  apiKey: process.env.DYMO_API_KEY,
+  rules: {
+    email: {
+      // Default protections: block fraud, invalid formats, or domains without MX records
+      deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"],
+    },
+  },
+});
 
 // storing sessions in a file
 var session = require("express-session");
@@ -143,6 +154,13 @@ async function main() {
     });
 }
 
+
+// home route
+app.get("/", (req, res)=>{
+  res.sendFile(__dirname + "/login.html");
+})
+
+
 // Login routes
 
 app.get("/Login", (req, res) => {
@@ -203,14 +221,27 @@ app.post("/SignUp", async (req, res) => {
     return res.status(400).json({ error: "Please fill out all the fields!" });
   }
 
-  const emailExists = await UserModel.findOne({ email: NewUserEmail });
-  if (emailExists)
-    return res
-      .status(400)
-      .json({ error: "There's an account associated with this email!" });
-
   // create a new user in DB
   try {
+    const emailExists = await UserModel.findOne({ email: NewUserEmail });
+    if (emailExists)
+      return res
+        .status(400)
+        .json({ error: "There's an account associated with this email!" });
+    try {
+      // check if the email is valid using dymo api - source : dymo documentation
+      const decision = await dymoClient.isValidEmail(NewUserEmail);
+
+      // allow which is a boolean is the final descision after applying all the deny rules
+      // i created an error manually to force it to jump to catch to print the message on frontend.
+      if (!decision.allow)  throw new Error("Invalid email"); 
+      
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ error: "Please use a valid email address." });
+    }
+
     const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
     const user = await UserModel.create({
       name: NewUserName,
