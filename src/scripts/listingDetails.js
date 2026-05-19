@@ -30,12 +30,15 @@ renderBookmarkButton();
 //This function gets all the reviews submitted for a seller and displays them dynamically
 //=======================================================================================
 async function displayReviews(id) {
+  //array for store all the ratings for the seller to calculate average
+  let allRatings = [];
   const reviewsResponse = await (await fetch(`/sellerReviews/${id}`)).json(); // this would be an array
   const reviewContainer = document.getElementById("reviewsContainer");
   reviewContainer.innerHTML = "";
   let ratings = 0;
   reviewsResponse.forEach((review) => {
     ratings++;
+    allRatings.push(Number(review.rating));
     const element = document.createElement("div");
     element.innerHTML = `<div class="flex flex-col gap-3">
             <h2 id="reviewTitle">${review.title}</h2>
@@ -132,6 +135,17 @@ async function displayReviews(id) {
 
   // display total number of reviews seller has
   document.getElementById("numberReviews").innerHTML = ratings;
+
+  // display rating average for the seller
+
+  let sum = 0;
+  for (let i = 0; i < allRatings.length; i++) {
+    sum += allRatings[i];
+  }
+
+  const average = allRatings.length > 0 ? (sum / allRatings.length).toFixed(1) : "0";
+
+  document.getElementById("average").innerHTML = average;
 }
 displayReviews(id);
 //======================================================================================
