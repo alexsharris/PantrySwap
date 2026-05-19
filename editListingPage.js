@@ -371,7 +371,8 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     }),
   });
   if (response.ok) {
-    alert("Listing saved!");
+    // alert("Listing saved!");
+    displaySimpleWindow("Saved!")
     initializePage();
   }
 });
