@@ -90,9 +90,12 @@
           <!-- description -->
           <div class="flex flex-col gap-1">
             <h3 class="font-bold">Description</h3>
-            <p id="description">
-              <%= listing.description %>
-            </p>
+            <% if(listing.description){ %>
+              <p id="description"><%= listing.description %></p>
+            <% } else { %>
+              <p id="description">No description is provided.</p>
+            <% } %>
+            
           </div>
         </div>
 
