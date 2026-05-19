@@ -154,6 +154,13 @@ async function main() {
     });
 }
 
+
+// home route
+app.get("/", (req, res)=>{
+  res.sendFile(__dirname + "/login.html");
+})
+
+
 // Login routes
 
 app.get("/Login", (req, res) => {
