@@ -36,11 +36,15 @@ async function displayReviews(id) {
   const reviewContainer = document.getElementById("reviewsContainer");
   reviewContainer.innerHTML = "";
   let ratings = 0;
-  reviewsResponse.forEach((review) => {
-    ratings++;
-    allRatings.push(Number(review.rating));
-    const element = document.createElement("div");
-    element.innerHTML = `<div class="flex flex-col gap-3">
+  if (reviewsResponse.length === 0) {
+    reviewContainer.classList.add("text-sm");
+    reviewContainer.innerHTML = "This seller has no reviews yet.";
+  } else {
+    reviewsResponse.forEach((review) => {
+      ratings++;
+      allRatings.push(Number(review.rating));
+      const element = document.createElement("div");
+      element.innerHTML = `<div class="flex flex-col gap-3">
             <h2 id="reviewTitle">${review.title}</h2>
             <!-- container of stars -->
             <div id="starContainer" class="flex flex-row gap-1 items-center">
@@ -119,19 +123,20 @@ async function displayReviews(id) {
             <p  class="font-bold pb-4">${review.reviewerName}</p>
             <hr class="border-light-grey">
           </div>`;
-    reviewContainer.appendChild(element);
-    //handle the stars in each review
-    const starValueDB = review.rating;
-    document.querySelectorAll("#starContainer svg").forEach((star) => {
-      if (star.dataset.value <= starValueDB) {
-        star.classList.add("text-orange");
-        star.classList.remove("text-light-grey");
-      } else {
-        star.classList.remove("text-orange");
-        star.classList.add("text-light-grey");
-      }
+      reviewContainer.appendChild(element);
+      //handle the stars in each review
+      const starValueDB = review.rating;
+      document.querySelectorAll("#starContainer svg").forEach((star) => {
+        if (star.dataset.value <= starValueDB) {
+          star.classList.add("text-orange");
+          star.classList.remove("text-light-grey");
+        } else {
+          star.classList.remove("text-orange");
+          star.classList.add("text-light-grey");
+        }
+      });
     });
-  });
+  }
 
   // display total number of reviews seller has
   document.getElementById("numberReviews").innerHTML = ratings;
@@ -143,7 +148,8 @@ async function displayReviews(id) {
     sum += allRatings[i];
   }
 
-  const average = allRatings.length > 0 ? (sum / allRatings.length).toFixed(1) : "0";
+  const average =
+    allRatings.length > 0 ? (sum / allRatings.length).toFixed(1) : "0";
 
   document.getElementById("average").innerHTML = average;
 }
