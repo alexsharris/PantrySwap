@@ -14,6 +14,7 @@ class ListingCard extends HTMLElement {
     imageSize = "default",
     showItems = [true, false, false],
     savedItems = [],
+    dist = null,
     listingStatus = "listed",
   ) {
     this.listingID = listingID || null;
@@ -21,6 +22,7 @@ class ListingCard extends HTMLElement {
     this.title = title;
     this.image = image || "images/pantry_share_img_10.jpg";
     this.price = price;
+    this.dist = dist;
 
     this.imageSize = imageSize == "small" ? 20 : 50;
     this.headerSize = imageSize == "small" ? `h4` : `h2`;
@@ -31,6 +33,7 @@ class ListingCard extends HTMLElement {
     this.showBookmark = showItems[0];
     this.showListingStatus = showItems[1];
     this.showEditButton = showItems[2];
+    this.showDist = dist;
     this.render();
   }
 
@@ -39,8 +42,11 @@ class ListingCard extends HTMLElement {
     <div class="card p-0 relative">
       <img src="${this.image}"class="w-full h-${this.imageSize} object-cover">
       <div class="p-4">
-        <${this.headerSize} class="font-bold truncate">${this.title}</${this.headerSize}>
-        <p class="font-semibold text-orange">${this.price == 0 || !this.price ? "FREE" : `$${this.price}`}</p>
+        <${this.headerSize} class="font-bold truncate mb-2">${this.title}</${this.headerSize}>
+        <div class="flex gap-2 items-center">
+          <p class="font-semibold text-orange">${this.price == 0 || !this.price ? "FREE" : `$${this.price}`}</p>
+          <div class="distLabel bg-peach px-2 py-1 rounded-full hidden"><p class="text-[10px]">${this.dist} km</p></div>
+        </div>
         <div class="button-container flex gap-2 mt-2 justify-between"></div>
       </div>
       <div class="absolute top-0 right-0 m-3">
@@ -84,6 +90,12 @@ class ListingCard extends HTMLElement {
       if (this.showBookmark) {
         const bookmarkBtn = this.querySelector(".bookmark-btn");
         bookmarkBtn.classList.remove("hidden");
+      }
+
+      // distance label
+      if (this.dist) {
+        const distLabel = this.querySelector(".distLabel");
+        distLabel.classList.remove("hidden");
       }
 
       // Status Tag
