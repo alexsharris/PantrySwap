@@ -4,6 +4,16 @@ const port = process.env.PORT || 5000;
 const db = process.env.MONGO_URI;
 const secret = process.env.SESSION_SECRET;
 
+// nodemailer for sending OTP emails via Gmail
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 //setting up dymo for email validation - pulled from dymo documentation
 const DymoAPI = require("dymo-api");
 const dymoClient = new DymoAPI({
@@ -198,12 +208,71 @@ app.post("/Login", async (req, res) => {
   }
 });
 
+// send OTP route — used by signup form
+app.post("/send-otp", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || !email.trim())
+    return res.status(400).json({ error: "Email is required." });
+
+  // check if email is already registered before sending OTP
+  const emailExists = await UserModel.findOne({ email });
+  if (emailExists)
+    return res.status(400).json({ error: "There's an account associated with this email!" });
+
+  // validate email with dymo before sending
+  try {
+    const decision = await dymoClient.isValidEmail(email);
+    if (!decision.allow)
+      return res.status(400).json({ error: "Please use a valid email address." });
+  } catch (error) {
+    // dymo API failed, fail open
+  }
+
+  // generate a 6-digit OTP and save it to session with a 2-minute expiry
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  //sessions work for non logged in users as well
+  req.session.otp = { code: otp, expiry: Date.now() + 2 * 60 * 1000, email };
+
+  // send the OTP email via Gmail
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your Pantry Swap verification code",
+      html: `<p>Your verification code is <strong>${otp}</strong>. It expires in 2 minutes.</p>`,
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed to send verification email." });
+  }
+});
+
+// verify OTP route — checks the code and sets a verified flag in session
+app.post("/verify-otp", (req, res) => {
+  const { email, otp } = req.body;
+  const sessionOtp = req.session.otp;
+
+  if (!sessionOtp) return res.status(400).json({ error: "Please request a verification code first." });
+  if (Date.now() > sessionOtp.expiry) return res.status(400).json({ error: "Verification code has expired." });
+  if (sessionOtp.email !== email) return res.status(400).json({ error: "Email does not match the one the code was sent to." });
+  if (sessionOtp.code !== otp) return res.status(400).json({ error: "Incorrect verification code." });
+
+  // mark email as verified in session and clear the OTP
+  req.session.otpVerified = email;
+  delete req.session.otp;
+
+  res.json({ success: true });
+});
+
 // signup route
 
 app.post("/SignUp", async (req, res) => {
   const NewUserEmail = req.body.emailSignup;
   const NewUserName = req.body.name;
   const NewUserPassword = req.body.passwordSignup;
+
   if (
     !NewUserPassword ||
     !NewUserPassword.trim() ||
@@ -215,27 +284,14 @@ app.post("/SignUp", async (req, res) => {
     return res.status(400).json({ error: "Please fill out all the fields!" });
   }
 
+  // check that this email was verified via OTP before allowing signup
+  if (req.session.otpVerified !== NewUserEmail)
+    return res.status(400).json({ error: "Please verify your email first." });
+
+  delete req.session.otpVerified;
+
   // create a new user in DB
   try {
-    const emailExists = await UserModel.findOne({ email: NewUserEmail });
-    if (emailExists)
-      return res
-        .status(400)
-        .json({ error: "There's an account associated with this email!" });
-    try {
-      // check if the email is valid using dymo api - source : dymo documentation
-      const decision = await dymoClient.isValidEmail(NewUserEmail);
-
-      // allow which is a boolean is the final descision after applying all the deny rules
-      if (!decision.allow) {
-        return res
-          .status(400)
-          .json({ error: "Please use a valid email address." });
-      }
-    } catch (error) {
-      // if dymo API itself fails (network/SSL), fail open so valid users aren't blocked
-    }
-
     const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
     const user = await UserModel.create({
       name: NewUserName,
@@ -262,6 +318,7 @@ app.post("/SignUp", async (req, res) => {
     res.status(500).json({ error: "registration failed" });
   }
 });
+
 
 // setting up a middleware to protect the following routes for non-logged in users
 
