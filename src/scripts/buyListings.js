@@ -1,4 +1,5 @@
 import "../components/listingSummaryCard.js";
+import { callTutorial } from "./tutorialSystem.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const [listingResponse, userResponse] = await Promise.all([
@@ -21,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const categoriesRoot = document.getElementById("categories");
 
   button.addEventListener("click", (e) => {
+    callTutorial("search");
     e.stopPropagation();
     dropdown.classList.toggle("hidden");
   });

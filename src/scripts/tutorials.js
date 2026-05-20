@@ -3,6 +3,23 @@ export const tutorialData = [
     name: "create",
     steps: [
       {
+        image: "images/tutorialCreateStep1.png",
+        text: "Upload a photo and enter listing information",
+      },
+      {
+        image: "images/tutorialCreateStep2.png",
+        text: "Add food contents and select categories",
+      },
+      {
+        image: "images/tutorialCreateStep3.png",
+        text: "Click create when you are ready to publish",
+      },
+    ],
+  },
+  {
+    name: "search",
+    steps: [
+      {
         image: "images/tutorialSearchStep1.png",
         text: "Choose from a a range of food categories",
       },

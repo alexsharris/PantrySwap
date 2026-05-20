@@ -13,7 +13,22 @@ const popupWindowButtons = [
     customClasses: ["w-full", "text-10"],
   },
   {
-    label: `<img src="images/closeIcon.png" class="size-3">`,
+    label: `
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M18 6l-12 12" />
+      <path d="M6 6l12 12" />
+    </svg>
+    `,
     color: "box-color-3",
     hover: "hover-bright",
     onClick: closePopup,
@@ -87,7 +102,7 @@ function renderTutorialPage() {
   }
 }
 
-async function callTutorial(tutorialName) {
+export async function callTutorial(tutorialName) {
   // Check if we've already done the tutorial
   await getUserTutorialState();
   // if (!tutorialState || tutorialState.includes(tutorialName)) return;
@@ -99,8 +114,8 @@ async function callTutorial(tutorialName) {
   // define custom window contents
   const tutorialWindowMainContent = `
   <div class="flex flex-col gap-3 items-center justify-center">
-  <img id="tutorial-img" src="${getTutorialData("create")["steps"][1].image}" class="size-50 object-scale-down">
-  <p id="tutorial-text" class="font-semibold">${getTutorialData("create")["steps"][0].text}</p>
+  <img id="tutorial-img" src="" class="size-50 object-scale-down">
+  <p id="tutorial-text" class="font-semibold"></p>
   </div>`;
 
   // display popup
@@ -135,5 +150,3 @@ async function callTutorial(tutorialName) {
   // render first page
   renderTutorialPage();
 }
-
-document.addEventListener("load", callTutorial("create"));

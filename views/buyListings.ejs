@@ -8,7 +8,10 @@
     <script type="module" src="/src/components/navbar.js"></script>
     <script type="module" src="/src/scripts/buyListings.js" defer></script>
     <link rel="stylesheet" href="./public/main.css" />
-    <script type="module" src="/src/scripts/tutorialSystem.js" defer></script>
+    <script type="module" defer>
+      import { callTutorial } from "../src/scripts/tutorialSystem.js";
+      document.addEventListener("load", callTutorial("search"));
+    </script>
   </head>
   <body class="min-h-screen flex flex-col">
     <site-navbar></site-navbar>
