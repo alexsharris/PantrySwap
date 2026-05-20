@@ -16,6 +16,20 @@
     <div class="site-margins">
       <!--Heading and create button-->
       <h1 class="mb-4">Your Saved Listings</h1>
+
+      <!-- for empty saved page -->
+      <div
+        id="emptyStateBanner"
+        class="hidden p-10 md:w-[80%] mx-auto w-full mb-20 text-white text-center rounded-4xl bg-orange"
+      >
+        <h2 class="text-white">No saved listings yet.</h2>
+        <p class="text-white/80 text-sm mt-2">
+          Browse listings and save the ones you like!
+        </p>
+        <button onclick="window.location.href='/buy'" class="mt-4 bg-white text-orange font-bold px-5 py-2 rounded-lg hover-bright">
+          Browse Listings
+        </button>
+      </div>
       <div class="card-grid" id="listingsHolder"></div>
     </div>
     <!-- scripts -->
