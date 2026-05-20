@@ -36,7 +36,7 @@ const popupWindowButtons = [
     customClasses: ["rounded-full", "p-4"],
   },
 ];
-
+let currentTutorialName = "";
 let tutorialState = [];
 let currentTutorial = null;
 let currentPage = 0;
@@ -59,20 +59,27 @@ async function getUserTutorialState() {
 // Get the data associated with a tutorial's steps
 const getTutorialData = (name) => tutorialData.find((tut) => tut.name == name);
 
-function closePopup() {
-  //   Set tutorial to completed
-  //   const res = await fetch(
-  //       `/updateUser/${currentUser._id}`,
-  //       {
-  //         method: "PUT",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           "tutorials": tutorialName,
-  //         }),
-  //       },
-  //     );
+async function closePopup() {
+  try {
+    const response = await fetch("/user");
+    const currentUser = await response.json();
+    console.log(currentUser);
+    const res = await fetch(`/addUserTutorial/${currentUser._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tutorialName: currentTutorialName,
+      }),
+    });
+
+    const resData = await response.res;
+    console.log(resData);
+  } catch (e) {
+    console.log(e);
+  }
+
   closePopupWindow();
 }
 
@@ -105,7 +112,8 @@ function renderTutorialPage() {
 export async function callTutorial(tutorialName) {
   // Check if we've already done the tutorial
   await getUserTutorialState();
-  // if (!tutorialState || tutorialState.includes(tutorialName)) return;
+  if (!tutorialState || tutorialState.includes(tutorialName)) return;
+  currentTutorialName = tutorialName;
 
   // check if we have the tutorial data
   currentTutorial = getTutorialData(tutorialName);

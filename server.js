@@ -573,6 +573,26 @@ app.put("/addUserNotification/:id", async (req, res) => {
   }
 });
 
+// Add completed tutorial to user
+app.put("/addUserTutorial/:id", async (req, res) => {
+  try {
+    const { tutorialName } = req.body;
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $addToSet: {
+          tutorials: tutorialName,
+        },
+      },
+      { new: true },
+    );
+    res.json(updatedUser.tutorials);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+});
+
 //update user
 app.put("/updateUser/:id", async (req, res) => {
   try {
