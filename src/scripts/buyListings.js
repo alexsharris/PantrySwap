@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       selectedDistanceText.textContent =
       selectedDistance ? `Distance: ${selectedDistance} km` : "";
     }
-    else {
+    if(selectedDistance === 1000) {
       selectedDistanceText.textContent = "Distance: No limit";
     }
 
@@ -220,12 +220,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       filtered.reverse().forEach((newListing) => {
         const newCard = document.createElement("listing-card");
 
-        //Get distance between user and listing, if permission granted and distance selected
-        let calculatedDistance = null;
-        if(localStorage.getItem("Client Latitude") && localStorage.getItem("Client Longitude") && selectedDistance) {
-          calculatedDistance = calculateDistance(Number(newListing.lat), Number(newListing.lng), Number(localStorage.getItem("Client Latitude")), Number(localStorage.getItem("Client Longitude")));
-        }
-
         newCard.setListingInfo(
           newListing._id,
           newListing.title,
@@ -234,7 +228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           "default",
           [true, false, false],
           savedItems,
-          calculatedDistance
+          null
         );
 
         listingHolder.appendChild(newCard);
