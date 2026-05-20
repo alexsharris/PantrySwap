@@ -3,7 +3,7 @@ const searchTutorial = async function () {
   const response = await fetch("/user");
   const currentUser = await response.json();
   // console.log(currentUser);
-  if (true) {
+  if (false) {
     //Display tutorial
     let tutorialContainer = document.createElement("div");
     tutorialContainer.classList.add(
