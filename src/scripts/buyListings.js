@@ -1,28 +1,36 @@
 import "../components/listingSummaryCard.js";
 import { callTutorial } from "./tutorialSystem.js";
 
+let listingHolder = null;
+let allListings = [];
+const loadLimit = 10;
+let loadBatch = 1;
+let isLoadingMore = false;
+const loadMoreDelay = 800;
 // ===============================================================
 // Get distance between two coordinate pairs
 // ===============================================================
 // formula from stackoverflow
-let calculateDistance = function(latA, lonA, latB, lonB) {
+let calculateDistance = function (latA, lonA, latB, lonB) {
   var R = 6378.137; // Radius of earth in KM
-  var dLat = latB * Math.PI / 180 - latA * Math.PI / 180;
-  var dLon = lonB * Math.PI / 180 - lonA * Math.PI / 180;
-  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-  Math.cos(latA * Math.PI / 180) * Math.cos(latB * Math.PI / 180) *
-  Math.sin(dLon/2) * Math.sin(dLon/2);
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  var dLat = (latB * Math.PI) / 180 - (latA * Math.PI) / 180;
+  var dLon = (lonB * Math.PI) / 180 - (lonA * Math.PI) / 180;
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((latA * Math.PI) / 180) *
+      Math.cos((latB * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   var d = R * c;
   return d.toFixed(1); // km
-}
+};
 
 document.addEventListener("DOMContentLoaded", async () => {
   const [listingResponse, userResponse] = await Promise.all([
     fetch("/loadListings"),
     fetch("/user"),
   ]);
-
 
   // Get client location, store in local storage
   navigator.geolocation.getCurrentPosition(
@@ -39,14 +47,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
     (error) => {
       console.error("Error getting location:", error.message);
-    }
+    },
   );
 
   const data = await listingResponse.json();
   const currentUser = await userResponse.json();
   const savedItems = currentUser.savedItems || [];
 
-  const listingHolder = document.getElementById("listingsHolder");
+  listingHolder = document.getElementById("listingsHolder");
 
   let selectedCategories = [];
   let selectedDistance = null;
@@ -62,15 +70,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const categoriesRoot = document.getElementById("categories");
 
   button.addEventListener("click", (e) => {
-    callTutorial("search");
     e.stopPropagation();
-    if(!distanceDropdown.classList.contains("hidden")) distanceDropdown.classList.toggle("hidden");
+    if (!distanceDropdown.classList.contains("hidden"))
+      distanceDropdown.classList.toggle("hidden");
     dropdown.classList.toggle("hidden");
   });
 
   distanceButton.addEventListener("click", (e) => {
     e.stopPropagation();
-    if(!dropdown.classList.contains("hidden")) dropdown.classList.toggle("hidden");
+    if (!dropdown.classList.contains("hidden"))
+      dropdown.classList.toggle("hidden");
     distanceDropdown.classList.toggle("hidden");
   });
 
@@ -86,8 +95,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectedCategories = Array.from(checkboxes)
       .filter((cb) => cb.checked)
       .map((cb) => cb.value);
-    
-    selectedDistance = parseInt(document.querySelector('input[name="distance"]:checked')?.value);
+
+    selectedDistance = parseInt(
+      document.querySelector('input[name="distance"]:checked')?.value,
+    );
     // console.log(selectedCategories);
     // console.log(selectedDistance);
 
@@ -96,11 +107,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? "Categories: " + selectedCategories.join(", ")
         : "Categories";
 
-    if(selectedDistance <= 10){
-      selectedDistanceText.textContent =
-      selectedDistance ? `Distance: ${selectedDistance} km` : "";
+    if (selectedDistance <= 10) {
+      selectedDistanceText.textContent = selectedDistance
+        ? `Distance: ${selectedDistance} km`
+        : "";
     }
-    if(selectedDistance === 1000) {
+    if (selectedDistance === 1000) {
       selectedDistanceText.textContent = "Distance: No limit";
     }
 
@@ -137,7 +149,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const categoryMatch =
         selectedCategories.length === 0 ||
         selectedCategories.every((selected) =>
-          categoryArray.includes(selected)
+          categoryArray.includes(selected),
         );
 
       // DISTANCE FILTER
@@ -152,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           Number(listingLatitude),
           Number(listingLongitude),
           Number(localStorage.getItem("Client Latitude")),
-          Number(localStorage.getItem("Client Longitude"))
+          Number(localStorage.getItem("Client Longitude")),
         );
 
         distanceMatch = calculatedDistance < Number(selectedDistance);
@@ -171,71 +183,104 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    if(selectedDistance && localStorage.getItem("Client Longitude")) {
+    if (selectedDistance && localStorage.getItem("Client Longitude")) {
+      filtered
+        .sort((a, b) => {
+          const distanceA = calculateDistance(
+            Number(a.lat),
+            Number(a.lng),
+            Number(localStorage.getItem("Client Latitude")),
+            Number(localStorage.getItem("Client Longitude")),
+          );
 
-      filtered.sort((a, b) => {
-        const distanceA = calculateDistance(
-          Number(a.lat),
-          Number(a.lng),
-          Number(localStorage.getItem("Client Latitude")),
-          Number(localStorage.getItem("Client Longitude"))
-        );
+          const distanceB = calculateDistance(
+            Number(b.lat),
+            Number(b.lng),
+            Number(localStorage.getItem("Client Latitude")),
+            Number(localStorage.getItem("Client Longitude")),
+          );
 
-        const distanceB = calculateDistance(
-          Number(b.lat),
-          Number(b.lng),
-          Number(localStorage.getItem("Client Latitude")),
-          Number(localStorage.getItem("Client Longitude"))
-        );
+          return distanceA - distanceB;
+        })
+        .forEach((newListing) => {
+          const newCard = document.createElement("listing-card");
 
-        return distanceA - distanceB;
-      })
-      .forEach((newListing) => {
-        const newCard = document.createElement("listing-card");
+          //Get distance between user and listing
+          let calculatedDistance = calculateDistance(
+            Number(newListing.lat),
+            Number(newListing.lng),
+            Number(localStorage.getItem("Client Latitude")),
+            Number(localStorage.getItem("Client Longitude")),
+          );
 
-        //Get distance between user and listing
-        let calculatedDistance = calculateDistance(
-          Number(newListing.lat),
-          Number(newListing.lng),
-          Number(localStorage.getItem("Client Latitude")),
-          Number(localStorage.getItem("Client Longitude"))
-        );
-        
-        newCard.setListingInfo(
-          newListing._id,
-          newListing.title,
-          newListing.image,
-          newListing.price,
-          "default",
-          [true, false, false],
-          savedItems,
-          calculatedDistance
-        );
+          newCard.setListingInfo(
+            newListing._id,
+            newListing.title,
+            newListing.image,
+            newListing.price,
+            "default",
+            [true, false, false],
+            savedItems,
+            calculatedDistance,
+          );
 
-        listingHolder.appendChild(newCard);
-      });
-
+          listingHolder.appendChild(newCard);
+        });
+    } else {
+      allListings = filtered.reverse();
+      loadBatch = 1;
+      listingHolder.innerHTML = "";
+      displayBatch();
     }
-    else {
-      filtered.reverse().forEach((newListing) => {
-        const newCard = document.createElement("listing-card");
-
-        newCard.setListingInfo(
-          newListing._id,
-          newListing.title,
-          newListing.image,
-          newListing.price,
-          "default",
-          [true, false, false],
-          savedItems,
-          null
-        );
-
-        listingHolder.appendChild(newCard);
-      });
-    }
-    
   }
 
   renderListings();
+
+  function displayBatch() {
+    const start = (loadBatch - 1) * loadLimit;
+    const end = loadBatch * loadLimit;
+
+    if (start >= allListings.length) return;
+
+    let batch = allListings.slice(start, end);
+
+    batch.forEach((newListing) => {
+      const newCard = document.createElement("listing-card");
+
+      newCard.setListingInfo(
+        newListing._id,
+        newListing.title,
+        newListing.image,
+        newListing.price,
+        "default",
+        [true, false, false],
+        savedItems,
+        null,
+      );
+
+      listingHolder.appendChild(newCard);
+    });
+
+    loadBatch++;
+  }
+
+  window.addEventListener("scroll", () => {
+    // dont load more if storage filter
+    if (selectedDistance && localStorage.getItem("Client Longitude")) return;
+    // if loading dont load
+    if (isLoadingMore) return;
+    const start = (loadBatch - 1) * loadLimit;
+    if (start >= allListings.length) return;
+    // pos threshold
+    const threshold = 300;
+    const scrollPosition = window.innerHeight + window.scrollY;
+    const pageHeight = document.body.offsetHeight;
+    if (scrollPosition >= pageHeight - threshold) {
+      isLoadingMore = true;
+      setTimeout(() => {
+        displayBatch();
+        isLoadingMore = false;
+      }, loadMoreDelay);
+    }
+  });
 });
