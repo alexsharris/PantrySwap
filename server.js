@@ -270,6 +270,17 @@ function isAuthenticated(req, res, next) {
   else res.redirect("/Login");
 }
 
+// logout route
+app.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).send("Could not log out.");
+    }
+    res.redirect("/Login");
+  });
+});
+
 // ==================================================================
 // any route that needs protection for non-logged in users goes after this line
 // ==================================================================
