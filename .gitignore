@@ -2,5 +2,4 @@
 sessions/
 node_modules/
 public/main.css
-views/tutorial.ejs
 test.html
