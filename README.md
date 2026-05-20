@@ -24,10 +24,10 @@
     - [Requirements for Installation](#requirements-for-installation)
     - [Order of Installation](#order-of-installation)
     - [Configuration Instructions](#confirguration-instructions)
--[How to Use PantrySwap](#how-to-use-pantryswap)
--[Credits, References, and Licenses](#credits-references-and-licenses)
--[Usage of AI and APIs](#usage-of-ai-and-apis)
--[Links](#links)
+- [How to Use PantrySwap](#how-to-use-pantryswap)
+- [Credits, References, and Licenses](#credits-references-and-licenses)
+- [Usage of AI and APIs](#usage-of-ai-and-apis)
+- [Links](#links)
 
 
 ## Tech Stack
