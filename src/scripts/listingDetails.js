@@ -152,8 +152,11 @@ async function displayReviews(id) {
     sum += allRatings[i];
   }
 
+  // show whole number for a single review or no reviews, one decimal for multiple
   const average =
-    allRatings.length > 0 ? (sum / allRatings.length).toFixed(1) : "0";
+    allRatings.length === 0 ? "0" :
+    allRatings.length === 1 ? String(allRatings[0]) :
+    (sum / allRatings.length).toFixed(1);
 
   document.getElementById("average").innerHTML = average;
 }
