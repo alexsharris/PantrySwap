@@ -27,6 +27,13 @@ const displaySellerListings = async function () {
       );
       listingHolder.appendChild(newCard);
     });
+
+    //children gives a live collection elements we can count with length
+    // if no child is appended, reveal the empty state
+    if (listingHolder.children.length === 0) {
+      const banner = document.getElementById("emptyStateBanner");
+      banner.classList.remove("hidden");
+    }
   } catch (error) {
     console.error(error);
   }
