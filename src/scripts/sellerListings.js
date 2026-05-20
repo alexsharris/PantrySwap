@@ -38,13 +38,17 @@ const checkForEasterEgg = async function () {
   try {
     const res = await fetch("/sellerListings");
     const data = await res.json();
+    const accRes = await fetch("/AccountData");
+    const accData = await accRes.json();
+    console.log(accData)
+    console.log(accData.easterEgg)
     data.forEach((listing)=>{
       console.log(listing.status)
       if(listing.status == "deleted" || listing.status == "unlisted"){
         totalClosed++
       }
     })
-    if(totalClosed >= 3){
+    if(totalClosed >= 5 && !(accData.easterEgg)){
       displaySimpleWindow(`
         <h1 class="mb-3">You've closed ${totalClosed} listings!</h1>
         <h2>Did you know?</h2>
@@ -55,8 +59,17 @@ const checkForEasterEgg = async function () {
       jsConfetti.addConfetti({
       emojis: ['🍇', '🍉', '🍊', '🍏', '🥬', '🍞', '🥚'],
       confettiNumber: 100,
-})  
-    }
+      }) 
+      let seenEasterEgg = true
+      const Response = await fetch("/ChangeData", {
+      method: "PUT",
+      redirect: "follow",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        seenEasterEgg
+      }),
+      });
+      }
   }
   catch (error) {
     console.error(error);
