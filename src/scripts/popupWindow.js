@@ -7,24 +7,27 @@ let manualLock = false;
 export const setManualLock = (val) => (manualLock = val);
 export const isLocked = () => manualLock;
 
+// add the defined buttons passed into the popup function
 function createButtons(functions, autoClose) {
   let buttons = [];
 
+  // If there are no functions provided, create a basic close button
   if (!functions || functions.length === 0) {
     let btn = document.createElement("button");
-    btn.textContent = "OK";
-    formatButton(btn, "box-color-0", "hover-outline");
+    btn.innerHTML = "OK";
+    formatButton(btn, { color: "box-color-0", hover: "hover-outline" });
     buttons.push(btn);
     btn.addEventListener("click", () => console.log("Confirmed"));
     if (autoClose) btn.addEventListener("click", closePopupWindow);
     return buttons;
   }
 
+  // create the actual button elements
   functions.forEach((fnObj) => {
     let btn = document.createElement("button");
-    btn.textContent = fnObj.label;
+    btn.innerHTML = fnObj.label;
 
-    formatButton(btn, fnObj.color, fnObj.hover);
+    formatButton(btn, fnObj);
 
     btn.addEventListener("click", fnObj.onClick);
     if (autoClose) btn.addEventListener("click", closePopupWindow);
@@ -34,8 +37,11 @@ function createButtons(functions, autoClose) {
   return buttons;
 }
 
-function formatButton(buttonEl, buttonColor, buttonHover) {
-  return (buttonEl.className = `${buttonColor} ${buttonHover}`);
+function formatButton(buttonEl, funcObj) {
+  buttonEl.className = `${funcObj.color} ${funcObj.hover}`;
+  if (funcObj.customClasses) {
+    funcObj.customClasses.forEach((cc) => buttonEl.classList.add(cc));
+  }
 }
 
 // ============================================
@@ -48,9 +54,11 @@ export function displaySimpleWindow(message, functions, autoClose = true) {
 
 export function displayWindow(
   message,
-  functions = "",
+  functions = [],
   autoClose = true,
   customCardStle = "",
+  customButtonContainerStyleTop = "",
+  customButtonContainerStyleBottom = "",
 ) {
   if (locked) return;
   locked = true;
@@ -67,6 +75,7 @@ export function displayWindow(
 
   // create content card
   const card = document.createElement("div");
+  card.id = "popup-card";
   const messageEl = document.createElement("div");
   if (customCardStle) {
     card.className = customCardStle;
@@ -78,14 +87,43 @@ export function displayWindow(
 
   messageEl.innerHTML = message;
 
-  const newButtons = createButtons(functions, autoClose);
-  const buttonContainer = document.createElement("div");
-  buttonContainer.className = "flex justify-between gap-2 pt-5";
-  newButtons.forEach((btn) => buttonContainer.appendChild(btn));
+  // button containers
+  const topContainer = document.createElement("div");
+  const bottomContainer = document.createElement("div");
+  topContainer.className = customButtonContainerStyleTop
+    ? customButtonContainerStyleTop
+    : "flex w-full justify-end gap-2 pb-5";
+  bottomContainer.className = customButtonContainerStyleBottom
+    ? customButtonContainerStyleBottom
+    : "flex justify-between gap-2 pt-5";
+
+  // Make buttons
+  const topFunctions = functions.filter(
+    (funcObj) => funcObj.topButton && funcObj.topButton === true,
+  );
+  const bottomFunctions = functions.filter(
+    (funcObj) => !funcObj.topButton || funcObj.topButton === false,
+  );
+
+  let topButtons = [];
+  let bottomButtons = [];
+  if (!functions || functions.length == 0) {
+    bottomButtons = createButtons([], true);
+  } else {
+    topButtons =
+      topFunctions.length > 0 ? createButtons(topFunctions, autoClose) : [];
+    bottomButtons =
+      bottomFunctions.length > 0
+        ? createButtons(bottomFunctions, autoClose)
+        : [];
+  }
+  topButtons.forEach((btn) => topContainer.appendChild(btn));
+  bottomButtons.forEach((btn) => bottomContainer.appendChild(btn));
 
   // assemble
+  card.appendChild(topContainer);
   card.appendChild(messageEl);
-  card.appendChild(buttonContainer);
+  card.appendChild(bottomContainer);
   window.appendChild(card);
   document.body.appendChild(window);
 }

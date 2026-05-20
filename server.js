@@ -72,11 +72,7 @@ const UserSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
     },
   ],
-  tutorials: {
-    create: Boolean,
-    search: Boolean,
-    bookmark: Boolean,
-  },
+  tutorials: [String],
 });
 
 // schema of listings
@@ -164,12 +160,10 @@ async function main() {
     });
 }
 
-
 // home route
-app.get("/", (req, res)=>{
+app.get("/", (req, res) => {
   res.sendFile(__dirname + "/login.html");
-})
-
+});
 
 // Login routes
 
@@ -303,8 +297,7 @@ app.post("/SignUp", async (req, res) => {
       name: NewUserName,
       password: HashedPassword,
       email: NewUserEmail,
-      verified: true,
-      tutorials: { create: false, bookmark: false, search: false },
+      tutorials: [],
     });
 
     // setting up the session for the new user
@@ -333,6 +326,17 @@ function isAuthenticated(req, res, next) {
   if (req.session.UserID) next();
   else res.redirect("/Login");
 }
+
+// logout route
+app.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).send("Could not log out.");
+    }
+    res.redirect("/Login");
+  });
+});
 
 // ==================================================================
 // any route that needs protection for non-logged in users goes after this line
@@ -637,22 +641,34 @@ app.put("/addUserNotification/:id", async (req, res) => {
   }
 });
 
+// Add completed tutorial to user
+app.put("/addUserTutorial/:id", async (req, res) => {
+  try {
+    const { tutorialName } = req.body;
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $addToSet: {
+          tutorials: tutorialName,
+        },
+      },
+      { new: true },
+    );
+    res.json(updatedUser.tutorials);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+});
+
 //update user
 app.put("/updateUser/:id", async (req, res) => {
   try {
     console.log(req.body);
     const updateFields = {};
 
-    if (req.body?.["tutorials.search"] !== undefined) {
-      updateFields["tutorials.search"] = req.body["tutorials.search"];
-    }
-
-    if (req.body?.["tutorials.create"] !== undefined) {
-      updateFields["tutorials.create"] = req.body["tutorials.create"];
-    }
-
-    if (req.body?.["tutorials.bookmark"] !== undefined) {
-      updateFields["tutorials.bookmark"] = req.body["tutorials.bookmark"];
+    if (req.body?.tutorials !== undefined) {
+      updateFields.tutorials = req.body.tutorials;
     }
 
     if (req.body?.notifications !== undefined) {
@@ -724,18 +740,13 @@ app.post("/removeBookmark/:id", async (req, res) => {
   }
 });
 
-app.get("/tutorial", (req, res) => {
-  res.render("tutorial.ejs");
-});
-
 // ============================================================================================
 // This function extracts only the street name of the listing to show it on the details page
 // to avoid exposing the full address for privacy concerns.
 // this is used in the following route.
 // ============================================================================================
 function extractStreet(location) {
-
-  //recover in case there is no location in the database 
+  //recover in case there is no location in the database
   if (!location) return "Address not provided!";
 
   // split by comma, take the street segment and trim whitespace

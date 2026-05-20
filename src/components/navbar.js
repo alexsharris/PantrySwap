@@ -5,6 +5,7 @@ const buttonIDs = {
   sell: ["sellBtnDesktop", "sellBtnMobile"],
   saved: ["savedBtnDesktop", "savedBtnMobile"],
   account: ["accountBtnDesktop", "accountBtnMobile"],
+  logout: ["logoutBtnDesktop", "logoutBtnMobile"],
 };
 
 class Navbar extends HTMLElement {
@@ -44,6 +45,9 @@ class Navbar extends HTMLElement {
                         <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.account[0]}">
                         Account
                         </button>
+                        <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.logout[0]}">
+                        Logout
+                        </button>
                 
                     </div>
                 </div>
@@ -64,6 +68,9 @@ class Navbar extends HTMLElement {
             <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.account[1]}">
             Account
             </button>
+            <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.logout[1]}">
+            Logout
+            </button>
         </div>
     </nav>
     `;
@@ -75,6 +82,7 @@ class Navbar extends HTMLElement {
       sell: "/sell",
       saved: "/bookmark",
       account: "/account",
+      logout: "/logout",
     };
 
     const navigateIfNeeded = (path) => {
@@ -121,6 +129,7 @@ class Navbar extends HTMLElement {
     if (path.startsWith("/sell")) return "sell";
     if (path.startsWith("/bookmark")) return "saved";
     if (path.startsWith("/account")) return "account";
+    if (path.startsWith("/logout")) return "logout";
 
     return null;
   }

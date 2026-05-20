@@ -20,6 +20,7 @@ displaySellerListings = async function () {
         "default",
         [false, true, true],
         [],
+        undefined,
         newListing.status,
       );
       listingHolder.appendChild(newCard);
