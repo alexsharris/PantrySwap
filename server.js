@@ -4,6 +4,17 @@ const port = process.env.PORT || 5000;
 const db = process.env.MONGO_URI;
 const secret = process.env.SESSION_SECRET;
 
+//setting up dymo for email validation - pulled from dymo documentation
+const DymoAPI = require("dymo-api");
+const dymoClient = new DymoAPI({
+  apiKey: process.env.DYMO_API_KEY,
+  rules: {
+    email: {
+      deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"],
+    },
+  },
+});
+
 // storing sessions in a file
 var session = require("express-session");
 const FileStore = require("session-file-store")(session);
@@ -143,6 +154,13 @@ async function main() {
     });
 }
 
+
+// home route
+app.get("/", (req, res)=>{
+  res.sendFile(__dirname + "/login.html");
+})
+
+
 // Login routes
 
 app.get("/Login", (req, res) => {
@@ -203,14 +221,25 @@ app.post("/SignUp", async (req, res) => {
     return res.status(400).json({ error: "Please fill out all the fields!" });
   }
 
-  const emailExists = await UserModel.findOne({ email: NewUserEmail });
-  if (emailExists)
-    return res
-      .status(400)
-      .json({ error: "There's an account associated with this email!" });
-
   // create a new user in DB
   try {
+    const emailExists = await UserModel.findOne({ email: NewUserEmail });
+    if (emailExists)
+      return res
+        .status(400)
+        .json({ error: "There's an account associated with this email!" });
+    try {
+      // check if the email is valid using dymo api - source : dymo documentation
+      const decision = await dymoClient.isValidEmail(NewUserEmail);
+
+      // allow which is a boolean is the final descision after applying all the deny rules
+      if (!decision.allow) {
+        return res.status(400).json({ error: "Please use a valid email address." });
+      }
+    } catch (error) {
+      // if dymo API itself fails (network/SSL), fail open so valid users aren't blocked
+    }
+
     const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
     const user = await UserModel.create({
       name: NewUserName,
@@ -639,6 +668,33 @@ app.get("/tutorial", (req, res) => {
   res.render("tutorial.ejs");
 });
 
+// ============================================================================================
+// This function extracts only the street name of the listing to show it on the details page
+// to avoid exposing the full address for privacy concerns.
+// this is used in the following route.
+// ============================================================================================
+function extractStreet(location) {
+
+  //recover in case there is no location in the database 
+  if (!location) return "Address not provided!";
+
+  // split by comma, take the street segment and trim whitespace
+  const streetPart = location.split(",")[0].trim();
+
+  // split into words
+  const tokens = streetPart.split(" ");
+
+  // drop the first word/numeric part
+  // isNaN means is not a number
+  const firstIsNumber = !isNaN(Number(tokens[0]));
+
+  //if the first part is true, slice it and join the rest to reform a string
+  const street = firstIsNumber ? tokens.slice(1).join(" ") : streetPart;
+
+  // recover if the extraction leaves us with nothing(null), fall back to full address in worst case scenario
+  return street || location;
+}
+
 // routes for rendering listing details page and loading it dynamically
 app.get("/listingDetails/:id", async (req, res) => {
   try {
@@ -652,7 +708,12 @@ app.get("/listingDetails/:id", async (req, res) => {
       profilePicture: 1,
       phone: 1,
     });
-    res.render("listingDetails", { listing, user });
+
+    res.render("listingDetails", {
+      listing,
+      user,
+      street: extractStreet(listing.location),
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send("Unexpected server error!");
@@ -735,11 +796,13 @@ Ask the user what food items they want to list.
 
 **STEP 2 — COLLECT LOCATION**
 First, check the location field in [Current Form State]:
-- If it already looks like a full valid address (contains a street number, a street name, and a city — e.g., "123 Main St, Vancouver, BC"), confirm it with the user: "I see your address is already filled in as [address]. Does that work for this listing?" Wait for confirmation, then move to STEP 3.
-- If it looks like just a city name or neighbourhood (e.g., "Kelowna", "Vancouver", "Kitsilano") with no street number, say: "I see your city is set to [city] — for pickup listings we need a full street address. Could you provide your street number and street name?" and wait for a valid response.
-- If it is empty, ask: "What is the pickup address for this listing? Please provide it as a single-line address (e.g., 123 Main St, Vancouver, BC)."
-- A valid address MUST contain all three of: a street number (digits), a street name, and a city. Everything on one line, comma-separated.
-- Reject anything missing a street number, just a city or neighbourhood, a postal code alone, or anything vague. Explain the exact format needed and ask again.
+- If it already matches the required format (e.g., "123 Main St, V5K 1A2, Canada"), confirm it with the user: "I see your address is already filled in as [address]. Does that work for this listing?" Wait for confirmation, then move to STEP 3.
+- If it contains enough information to build a valid address (street number, street name, and a Canadian postal code — in any format or order), silently convert it to the required format: "[Street Number] [Street Name], [POSTAL CODE], Canada". Always separate each part with a comma and a space. If a city or province is included, silently omit it. If the user did not include a comma, add it yourself. A Canadian postal code (letter-digit-letter space digit-letter-digit, e.g. V5K 1A2) always implies Canada — never ask the user to confirm the country. Do not mention any of these formatting corrections to the user. Confirm with the user: "I've formatted your address as [converted address] — does that look right?"
+- If it looks like just a city, neighbourhood, or partial address with no postal code, say: "I need a full address to complete the listing. Could you provide your street address and postal code? (e.g., 123 Main St, V5K 1A2)"
+- If it is empty, ask: "What is the pickup address for this listing? Please use this format: 123 Main St, V5K 1A2"
+- A valid address MUST contain: a street number (digits), a street name, and a Canadian postal code (letter-digit-letter space digit-letter-digit, e.g. V5K 1A2).
+- The final stored format is ALWAYS: [Street Number] [Street Name], [POSTAL CODE], Canada — three parts, comma-separated, nothing else. Never store the address without ", Canada" at the end.
+- Reject anything missing a street number or a valid Canadian postal code. Explain the exact format needed and ask again.
 - Do NOT accept suite/unit numbers in place of a street address.
 - Do NOT suggest a price until a valid address is confirmed.
 - Once a valid address is confirmed, move to STEP 3.
@@ -747,8 +810,8 @@ First, check the location field in [Current Form State]:
 **STEP 3 — SUGGEST PRICE**
 Suggest a price in CAD using this logic:
   a) Start from estimated Canadian retail price for each item.
-  b) Apply a 40–60% surplus discount (use 55% as your default).
-  c) Compare the total against local Facebook Marketplace and Kijiji norms for similar surplus bundles.
+  b) Apply a 40–60% surplus discount (use 45% as your default).
+  c) Compare the total against local Facebook Marketplace, too good to go, and Kijiji norms for similar surplus bundles.
   d) Only use $3.99–$7.99 CAD as a sanity check if ALL items are everyday low-value 
    staples (e.g., bread, common produce, a single egg, condiments). Do NOT apply 
    this cap if the bundle contains any of the following: meat, seafood, dairy packs, 

@@ -20,18 +20,6 @@
         <!-- page container S-->
         <div class="site-margins max-w-6xl mx-auto">
             <!-- start of AI -->
-            <!-- The Floating Trigger Button -->
-            <button id="aiToggleButton" class="fixed bottom-6 right-6 z-50 bg-orange text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform active:scale-95 flex items-center justify-center">
-                <!-- A simple Sparkle/Chat Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
-                    <path d="M5 3v4"></path>
-                    <path d="M3 5h4"></path>
-                    <path d="M21 17v4"></path>
-                    <path d="M19 19h4"></path>
-                </svg>
-                <span class="ml-2 font-medium">Ask AI Assistant</span>
-            </button>
 
             <!-- The Sliding Sidebar Container -->
             <div id="aiSidebar" class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-white shadow-xl z-60 transform translate-x-full transition-transform duration-500 ease-in-out flex flex-col border-l border-[#a0756436]">
@@ -73,8 +61,19 @@
 
             <!-- Header -->
             <div id="" class="min-[915px]:flex justify-between pt-16 pb-8 space-y-4">
-                <div id="" class="flex gap-8 max-[915px]:justify-between">
+                <div id="" class="flex gap-8 max-[915px]:justify-between max-[915px]:items-center">
                     <h1 id="" class="">Create Listing</h1>
+                    <!-- AI button: inline next to title on small screens, fixed bottom-right on large screens -->
+                    <button id="aiToggleButton" class="min-[915px]:fixed min-[915px]:bottom-6 min-[915px]:right-6 z-50 bg-orange text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform active:scale-95 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+                            <path d="M5 3v4"></path>
+                            <path d="M3 5h4"></path>
+                            <path d="M21 17v4"></path>
+                            <path d="M19 19h4"></path>
+                        </svg>
+                        <span class="ml-2 font-medium min-[915px]:block hidden">Ask AI Assistant</span>
+                    </button>
                 </div>
             </div>
             <!-- end of header -->
@@ -89,7 +88,6 @@
                     <div id="" class="relative flex flex-col gap-2">
                         <img class="rounded-xl max-h-50 object-cover" src="images\pantry_share_img_13.jpg" alt="" id="listingImg" />
                     <input type="file" id="listingImageUpload" class="border-orange font-bold hover-outline hover-accent-text" />
-                        <input type="file" id="listingImageUpload0" class="" />
                         <button type="button" class="button box-color-5 border border-medium-grey w-fit hover-outline hover-accent-text" id="uploadImgBtn">Upload Photo</button>
                     </div>
                 </div>
@@ -224,6 +222,6 @@
         <!-- page container E -->
 
         <!-- scripts -->
-        <script type="module" src="createListingPage.js"></script>
+        <script type="module" src="/src/scripts/createListingPage.js"></script>
     </body>
 </html>
