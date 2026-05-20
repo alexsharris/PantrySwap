@@ -16,7 +16,7 @@ const popupWindowButtons = [
     label: `<img src="images/closeIcon.png" class="size-3">`,
     color: "box-color-3",
     hover: "hover-bright",
-    onClick: closePopupWindow,
+    onClick: closePopup,
     topButton: true,
     customClasses: ["rounded-full", "p-4"],
   },
@@ -44,18 +44,7 @@ async function getUserTutorialState() {
 // Get the data associated with a tutorial's steps
 const getTutorialData = (name) => tutorialData.find((tut) => tut.name == name);
 
-function nextStepButtonEvent() {
-  currentPage++;
-  if (currentTutorial["steps"].length <= currentPage) closePopupWindow();
-  else renderTutorialPage();
-}
-// =================================================
-// Rendering
-// =================================================
-
-function renderTutorialPage() {
-  tutorialImage.src = currentTutorial["steps"][currentPage].image;
-  tutorialText.textContent = currentTutorial["steps"][currentPage].text;
+function closePopup() {
   //   Set tutorial to completed
   //   const res = await fetch(
   //       `/updateUser/${currentUser._id}`,
@@ -69,21 +58,52 @@ function renderTutorialPage() {
   //         }),
   //       },
   //     );
+  closePopupWindow();
+}
+
+function nextStepButtonEvent() {
+  currentPage++;
+  if (currentTutorial["steps"].length == currentPage) closePopup();
+  else renderTutorialPage();
+}
+// =================================================
+// Rendering
+// =================================================
+
+// render the relevant image, text, and progress the progression bar
+function renderTutorialPage() {
+  tutorialImage.src = currentTutorial["steps"][currentPage].image;
+  tutorialText.textContent = currentTutorial["steps"][currentPage].text;
+
+  for (let i = 0; i < tutorialProgressBar.length; i++) {
+    const element = tutorialProgressBar[i];
+    if (i == currentPage) {
+      element.classList.add("bg-orange");
+      element.classList.remove("bg-light-grey");
+    } else {
+      element.classList.remove("bg-orange");
+      element.classList.add("bg-light-grey");
+    }
+  }
 }
 
 async function callTutorial(tutorialName) {
+  // Check if we've already done the tutorial
   await getUserTutorialState();
   // if (!tutorialState || tutorialState.includes(tutorialName)) return;
 
+  // check if we have the tutorial data
   currentTutorial = getTutorialData(tutorialName);
   if (!currentTutorial) return;
 
+  // define custom window contents
   const tutorialWindowMainContent = `
   <div class="flex flex-col gap-3 items-center justify-center">
-    <img id="tutorial-img" src="${getTutorialData("create")["steps"][1].image}" class="size-50 object-scale-down">
-    <p id="tutorial-text" class="font-semibold">${getTutorialData("create")["steps"][0].text}</p>
+  <img id="tutorial-img" src="${getTutorialData("create")["steps"][1].image}" class="size-50 object-scale-down">
+  <p id="tutorial-text" class="font-semibold">${getTutorialData("create")["steps"][0].text}</p>
   </div>`;
 
+  // display popup
   displayWindow(
     tutorialWindowMainContent,
     popupWindowButtons,
@@ -93,22 +113,27 @@ async function callTutorial(tutorialName) {
     "flex w-full flex-1 pt-5",
   );
 
+  // add tutorial dots
   const popupCard = document.getElementById("popup-card");
+  let tutorialDots = ``;
+  currentTutorial["steps"].forEach(
+    (step) =>
+      (tutorialDots += `<div class="tutorial-dot rounded-full h-2 w-2"></div>`),
+  );
   popupCard.insertAdjacentHTML(
     "beforeend",
-    `<div id = "tutorial-step" class="flex justify-center gap-2 p-4">
-    <div class="bg-[#D9D9D9] rounded-full h-2 w-2"></div>
-    <div class="bg-[#FF6700] rounded-full h-2 w-2"></div>
-    <div class="bg-[#D9D9D9] rounded-full h-2 w-2"></div>
-    <div class="bg-[#D9D9D9] rounded-full h-2 w-2"></div>
+    `<div class="flex justify-center gap-2 p-4">
+    ${tutorialDots}
     </div>`,
   );
 
-  tutorialProgressBar = document.getElementById("popup-card");
+  // assign variables
+  tutorialProgressBar = document.querySelectorAll(".tutorial-dot");
   tutorialImage = document.getElementById("tutorial-img");
   tutorialText = document.getElementById("tutorial-text");
 
-  renderTutorialPage(currentPage);
+  // render first page
+  renderTutorialPage();
 }
 
 document.addEventListener("load", callTutorial("create"));
