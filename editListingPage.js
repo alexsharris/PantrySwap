@@ -99,7 +99,7 @@ function loadFoods(listingRecord) {
                 <!-- minus -->
                 <div id="minusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">-</div>
                 <!-- quant -->
-                <div id="itemQuant" class="py-2 px-8 border-[#9b9b9b] border-solid border-l">${food.quantity}</div>
+                <div id="itemQuant" class="py-2 min-w-16 text-center border-[#9b9b9b] border-solid border-l">${food.quantity}</div>
                 <!-- plus -->
                 <div id="plusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">+</div>
             </div>
@@ -153,7 +153,7 @@ function addFood(listingRecord) {
             <!-- minus -->
             <div id="minusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">-</div>
             <!-- quant -->
-            <div id="itemQuant" class="py-2 px-8 border-[#9b9b9b] border-solid border-l">${formData.get("quantity")}</div>
+            <div id="itemQuant" class="py-2 min-w-16 text-center border-[#9b9b9b] border-solid border-l">${formData.get("quantity")}</div>
             <!-- plus -->
             <div id="plusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">+</div>
         </div>
