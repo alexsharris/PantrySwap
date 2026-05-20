@@ -12,11 +12,11 @@
     <!-- outer container -->
     <div class="flex flex-row justify-center items-stretch">
       <!-- placeholder for the image in big screen -->
-      <div class="md:block md:w-1/2 hidden h-full">
+      <div class="md:block md:w-1/2 hidden sticky top-0 h-screen">
         <img
           src="./images/Rectangle_9.jpg"
           alt=""
-          class="max-h-screen h-full object-cover w-full"
+          class="h-full object-cover w-full"
         />
       </div>
 
@@ -73,7 +73,10 @@
             /><span>Remember Me</span>
           </div>
           <!-- invalid credentials placeholder -->
-          <div id="errorMsg" class="flex items-center gap-2 text-sm text-red hidden">
+          <div
+            id="errorMsg"
+            class="flex items-center gap-2 text-sm text-red hidden"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="red"
@@ -123,28 +126,67 @@
               id="emailSignup"
               class="text-sm border border-gray-300 rounded-lg p-2"
             />
+            <button
+              type="button"
+              id="sendOtpBtn"
+              class="w-fit hover-bright box-color-0 rounded-lg px-3 p-1 mt-1 text-sm cursor-pointer whitespace-nowrap"
+            >
+              Send Code
+            </button>
           </div>
 
-          <div class="flex flex-col space-y-1">
-            <label class="font-bold" for="">Password</label>
+          <!-- OTP — hidden until Send Code is clicked -->
+          <div class="flex flex-col space-y-1 hidden" id="otpSection">
+            <label class="font-bold" for="">Verification Code</label>
             <input
-              type="password"
-              id="passwordSignup"
-              placeholder="Password"
+              type="text"
+              id="OTP"
+              maxlength="6"
+              placeholder="6-digit code"
               class="text-sm border border-gray-300 rounded-lg p-2"
             />
+            <button
+              type="button"
+              id="verifyOtpBtn"
+              class="w-fit hover-bright box-color-0 rounded-lg px-3 p-1 mt-1 text-sm cursor-pointer"
+            >
+              Verify
+            </button>
           </div>
 
-          <div class="flex items-center gap-2">
-            <input
-              class="size-5"
-              type="checkbox"
-              id="RememberSignup"
-              name="Remember Me"
-            /><span>Remember Me</span>
+          <!-- shown after OTP is verified -->
+          <div
+            id="verifiedMsg"
+            class="hidden text-sm text-green-600 font-medium"
+          >
+            Email verified!
           </div>
 
-          <div id="signupErrorMsg" class="flex items-center gap-2 text-sm text-red hidden">
+          <!-- hidden until OTP is verified -->
+          <div id="postVerifySection" class="hidden flex flex-col space-y-4">
+            <div class="flex flex-col space-y-1">
+              <label class="font-bold" for="">Password</label>
+              <input
+                type="password"
+                id="passwordSignup"
+                placeholder="Password"
+                class="text-sm border border-gray-300 rounded-lg p-2"
+              />
+            </div>
+            <div class="flex items-center gap-2">
+              <input
+                class="size-5"
+                type="checkbox"
+                id="RememberSignup"
+                name="Remember Me"
+              /><span>Remember Me</span>
+            </div>
+          </div>
+
+          <div
+            id="signupErrorMsg"
+            class="flex items-center gap-2 text-sm text-red hidden"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="red"
@@ -164,7 +206,7 @@
           <button
             type="submit"
             id="signupBtn"
-            class="hover-bright rounded-lg w-fit p-1 px-4 box-color-0 cursor-pointer"
+            class="hover-bright rounded-lg w-fit p-1 px-4 box-color-0 cursor-pointer hidden"
           >
             Create Account
           </button>
