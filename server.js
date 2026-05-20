@@ -3,13 +3,13 @@ require("dotenv").config();
 const port = process.env.PORT || 5000;
 const db = process.env.MONGO_URI;
 const secret = process.env.SESSION_SECRET;
+
 //setting up dymo for email validation - pulled from dymo documentation
 const DymoAPI = require("dymo-api");
 const dymoClient = new DymoAPI({
   apiKey: process.env.DYMO_API_KEY,
   rules: {
     email: {
-      // Default protections: block fraud, invalid formats, or domains without MX records
       deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"],
     },
   },
