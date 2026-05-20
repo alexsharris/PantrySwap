@@ -14,7 +14,7 @@ function createButtons(functions, autoClose) {
   // If there are no functions provided, create a basic close button
   if (!functions || functions.length === 0) {
     let btn = document.createElement("button");
-    btn.textContent = "OK";
+    btn.innerHTML = "OK";
     formatButton(btn, { color: "box-color-0", hover: "hover-outline" });
     buttons.push(btn);
     btn.addEventListener("click", () => console.log("Confirmed"));
@@ -25,7 +25,7 @@ function createButtons(functions, autoClose) {
   // create the actual button elements
   functions.forEach((fnObj) => {
     let btn = document.createElement("button");
-    btn.textContent = fnObj.label;
+    btn.innerHTML = fnObj.label;
 
     formatButton(btn, fnObj);
 
@@ -75,6 +75,7 @@ export function displayWindow(
 
   // create content card
   const card = document.createElement("div");
+  card.id = "popup-card";
   const messageEl = document.createElement("div");
   if (customCardStle) {
     card.className = customCardStle;
