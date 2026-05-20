@@ -73,6 +73,7 @@ const UserSchema = new mongoose.Schema({
     },
   ],
   tutorials: [String],
+  easterEgg: Boolean,
 });
 
 // schema of listings
@@ -374,6 +375,7 @@ app.put("/ChangeData", async (req, res) => {
     const UserNewPFP = req.body.UserNewPFP;
     const UserNewAddress = req.body.UserNewAddress;
     const UserNewPostalCode = req.body.UserNewPostalCode;
+    const UserEasterEgg = req.body.seenEasterEgg;
 
     // check if the value exists, if so, update the DB
     const UpdatedFields = {};
@@ -385,6 +387,7 @@ app.put("/ChangeData", async (req, res) => {
     if (UserNewPFP) UpdatedFields.profilePicture = UserNewPFP;
     if (UserNewAddress) UpdatedFields.address = UserNewAddress;
     if (UserNewPostalCode) UpdatedFields.postalCode = UserNewPostalCode;
+    if (UserEasterEgg) UpdatedFields.easterEgg = UserEasterEgg;
 
     const user = await UserModel.findByIdAndUpdate(
       { _id: req.session.UserID },
