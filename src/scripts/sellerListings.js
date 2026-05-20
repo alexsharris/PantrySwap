@@ -49,9 +49,13 @@ const checkForEasterEgg = async function () {
         <h1 class="mb-3">You've closed ${totalClosed} listings!</h1>
         <h2>Did you know?</h2>
         <h3>According to a study conducted by the National Zero Waste Council in 2022, 63% of the food Canadians throw away could have been eaten.</h3>
-        <h3 class="mb-3">For the average Canadian household that amounts to 140 kilograms of wasted food per year</h3>
+        <h3 class="mb-3">For the average Canadian household. that amounts to 140 kilograms of wasted food per year.</h3>
         <h1>Thank you for your service to your community and commitment to preventing food waste!</h1>
         `)
+      jsConfetti.addConfetti({
+      emojis: ['🍇', '🍉', '🍊', '🍏', '🥬', '🍞', '🥚'],
+      confettiNumber: 100,
+})  
     }
   }
   catch (error) {
@@ -60,7 +64,10 @@ const checkForEasterEgg = async function () {
 }
 
 displaySellerListings();
+const jsConfetti = new JSConfetti()
 checkForEasterEgg();
+
+
 // displayWindow("<h1>test</h1>", [], true, "w-1/3 card text-center items-center justify-center")
 
 
