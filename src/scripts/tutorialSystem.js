@@ -51,12 +51,15 @@ function callTutorial(tutorialName) {
   );
 
   const popupCard = document.getElementById("popup-card");
-  popupCard.innerHTML += `<div id = "tutorial-step" class="flex justify-center gap-2 p-4">
+  popupCard.insertAdjacentHTML(
+    "beforeend",
+    `<div id = "tutorial-step" class="flex justify-center gap-2 p-4">
                 <div class="bg-[#D9D9D9] rounded-full h-2 w-2"></div>
                 <div class="bg-[#FF6700] rounded-full h-2 w-2"></div>
                 <div class="bg-[#D9D9D9] rounded-full h-2 w-2"></div>
                 <div class="bg-[#D9D9D9] rounded-full h-2 w-2"></div>
-            </div>`;
+            </div>`,
+  );
   //   Set tutorial to completed
   //   const res = await fetch(
   //       `/updateUser/${currentUser._id}`,
