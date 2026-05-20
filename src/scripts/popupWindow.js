@@ -54,7 +54,7 @@ export function displaySimpleWindow(message, functions, autoClose = true) {
 
 export function displayWindow(
   message,
-  functions = "",
+  functions = [],
   autoClose = true,
   customCardStle = "",
   customButtonContainerStyleTop = "",
@@ -104,11 +104,19 @@ export function displayWindow(
   const bottomFunctions = functions.filter(
     (funcObj) => !funcObj.topButton || funcObj.topButton === false,
   );
-  const topButtons =
-    topFunctions.length > 0 ? createButtons(topFunctions, autoClose) : [];
-  const bottomButtons =
-    bottomFunctions.length > 0 ? createButtons(bottomFunctions, autoClose) : [];
 
+  let topButtons = [];
+  let bottomButtons = [];
+  if (!functions || functions.length == 0) {
+    bottomButtons = createButtons([], true);
+  } else {
+    topButtons =
+      topFunctions.length > 0 ? createButtons(topFunctions, autoClose) : [];
+    bottomButtons =
+      bottomFunctions.length > 0
+        ? createButtons(bottomFunctions, autoClose)
+        : [];
+  }
   topButtons.forEach((btn) => topContainer.appendChild(btn));
   bottomButtons.forEach((btn) => bottomContainer.appendChild(btn));
 
