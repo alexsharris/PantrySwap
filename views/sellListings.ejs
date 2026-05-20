@@ -42,28 +42,12 @@
       <!-- for empty sell page -->
       <div
         id="emptyStateBanner"
-        style="display:none"
-        class="flex-col md:flex-row p-10 w-full md:max-h-100 mb-20 text-white rounded-4xl bg-orange md:justify-between"
+        class="hidden p-10 md:w-[80%] mx-auto w-full mb-20 text-white text-center rounded-4xl bg-orange"
       >
-        <!-- Left Side -->
-        <div
-          class="flex flex-1 flex-col justify-center p-8 gap-4 text-center"
-        >
-          <h2 class="text-white">You haven't listed anything yet.</h2>
-          <p class="text-white/80 text-sm">
-            Start sharing your surplus food with your community!
-          </p>
-        </div>
-        <!-- Right Side: h-full gives the img a definite height reference -->
-        <div
-          class="w-full h-66 md:h-full md:w-[60%] -mr-10 -mt-10 -mb-10 rounded-4xl overflow-hidden"
-        >
-          <img
-            src="/images/emptystate.png"
-            alt=""
-            class="w-full h-full object-cover object-center md:object-left rounded-4xl md:scale-190 scale-110 md:origin-center"
-          />
-        </div>
+        <h2 class="text-white">You haven't listed anything yet.</h2>
+        <p class="text-white/80 text-sm mt-2">
+          Start sharing your surplus food with your community!
+        </p>
       </div>
       <div class="card-grid" id="listingsHolder"></div>
     </div>

@@ -31,7 +31,6 @@ displaySellerListings = async function () {
     if (listingHolder.children.length === 0) {
       const banner = document.getElementById("emptyStateBanner");
       banner.classList.remove("hidden");
-      banner.classList.add("flex");
     }
   } catch (error) {
     console.error(error);
