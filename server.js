@@ -62,11 +62,7 @@ const UserSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
     },
   ],
-  tutorials: {
-    create: Boolean,
-    search: Boolean,
-    bookmark: Boolean,
-  },
+  tutorials: [String],
 });
 
 // schema of listings
@@ -154,12 +150,10 @@ async function main() {
     });
 }
 
-
 // home route
-app.get("/", (req, res)=>{
+app.get("/", (req, res) => {
   res.sendFile(__dirname + "/login.html");
-})
-
+});
 
 // Login routes
 
@@ -234,8 +228,7 @@ app.post("/SignUp", async (req, res) => {
 
       // allow which is a boolean is the final descision after applying all the deny rules
       // i created an error manually to force it to jump to catch to print the message on frontend.
-      if (!decision.allow)  throw new Error("Invalid email"); 
-      
+      if (!decision.allow) throw new Error("Invalid email");
     } catch (error) {
       return res
         .status(400)
@@ -247,7 +240,7 @@ app.post("/SignUp", async (req, res) => {
       name: NewUserName,
       password: HashedPassword,
       email: NewUserEmail,
-      tutorials: { create: false, bookmark: false, search: false },
+      tutorials: [],
     });
 
     // setting up the session for the new user
@@ -585,16 +578,8 @@ app.put("/updateUser/:id", async (req, res) => {
     console.log(req.body);
     const updateFields = {};
 
-    if (req.body?.["tutorials.search"] !== undefined) {
-      updateFields["tutorials.search"] = req.body["tutorials.search"];
-    }
-
-    if (req.body?.["tutorials.create"] !== undefined) {
-      updateFields["tutorials.create"] = req.body["tutorials.create"];
-    }
-
-    if (req.body?.["tutorials.bookmark"] !== undefined) {
-      updateFields["tutorials.bookmark"] = req.body["tutorials.bookmark"];
+    if (req.body?.tutorials !== undefined) {
+      updateFields.tutorials = req.body.tutorials;
     }
 
     if (req.body?.notifications !== undefined) {
@@ -666,18 +651,13 @@ app.post("/removeBookmark/:id", async (req, res) => {
   }
 });
 
-app.get("/tutorial", (req, res) => {
-  res.render("tutorial.ejs");
-});
-
 // ============================================================================================
 // This function extracts only the street name of the listing to show it on the details page
 // to avoid exposing the full address for privacy concerns.
 // this is used in the following route.
 // ============================================================================================
 function extractStreet(location) {
-
-  //recover in case there is no location in the database 
+  //recover in case there is no location in the database
   if (!location) return "Address not provided!";
 
   // split by comma, take the street segment and trim whitespace
