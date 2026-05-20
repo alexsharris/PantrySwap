@@ -233,13 +233,11 @@ app.post("/SignUp", async (req, res) => {
       const decision = await dymoClient.isValidEmail(NewUserEmail);
 
       // allow which is a boolean is the final descision after applying all the deny rules
-      // i created an error manually to force it to jump to catch to print the message on frontend.
-      if (!decision.allow)  throw new Error("Invalid email"); 
-      
+      if (!decision.allow) {
+        return res.status(400).json({ error: "Please use a valid email address." });
+      }
     } catch (error) {
-      return res
-        .status(400)
-        .json({ error: "Please use a valid email address." });
+      // if dymo API itself fails (network/SSL), fail open so valid users aren't blocked
     }
 
     const HashedPassword = await bcrypt.hash(NewUserPassword, SALT_ROUNDS);
