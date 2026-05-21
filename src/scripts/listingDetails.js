@@ -30,6 +30,26 @@ async function renderBookmarkButton() {
 }
 
 renderBookmarkButton();
+
+
+//=======================================================================================
+// This function fetches the current user and compares their ID to the seller ID stored on the button.
+// If they match, the button is disabled and grayed out to prevent self-reviews.
+//=======================================================================================
+async function disableReviewBtnIfSeller() {
+  const btn = document.getElementById("leaveReviewBtn");
+  const currentUser = await (await fetch("/user")).json();
+  if (btn.dataset.sellerId === currentUser._id) {
+    btn.disabled = true;
+    btn.classList.remove("hover-bright", "text-orange");
+    // change the cursor to a blocked symbol symbol with 'cursor-not-allowed'
+    btn.classList.add("text-light-grey", "cursor-not-allowed");
+    // display a message when user hovers over the button so they understand why its not working
+    btn.title = "You cannot review your own listing";
+  }
+}
+disableReviewBtnIfSeller();
+
 //=======================================================================================
 //This function gets all the reviews submitted for a seller and displays them dynamically
 //=======================================================================================
