@@ -204,7 +204,6 @@ app.post("/Login", async (req, res) => {
     // if user email doesnt exist in the DB
     else res.status(401).json({ error: "Invalid credentials" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Login failed" });
   }
 });
@@ -245,7 +244,6 @@ app.post("/send-otp", async (req, res) => {
     });
     res.json({ success: true });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Failed to send verification email." });
   }
 });
@@ -315,7 +313,6 @@ app.post("/SignUp", async (req, res) => {
 
     req.session.save(() => res.redirect("/buy"));
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "registration failed" });
   }
 });
@@ -332,7 +329,6 @@ function isAuthenticated(req, res, next) {
 app.get("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      console.log(err);
       return res.status(500).send("Could not log out.");
     }
     res.redirect("/Login");
@@ -350,7 +346,6 @@ app.get("/Account", async (req, res) => {
   try {
     res.sendFile(__dirname + "/account.html");
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Internal Server Error!" });
   }
 });
@@ -360,7 +355,6 @@ app.get("/AccountData", async (req, res) => {
     const Data = await UserModel.findById({ _id: req.session.UserID });
     res.json(Data);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Internal Server Error!" });
   }
 });
@@ -405,7 +399,6 @@ app.delete("/DeleteAccount", async (req, res) => {
     await UserModel.findByIdAndDelete({ _id: req.session.UserID });
     req.session.destroy(() => res.send("Account deleted!"));
   } catch (error) {
-    console.log(error);
     res.status(500).send("Delete failed!");
   }
 });
@@ -425,7 +418,6 @@ app.get("/LoadListing/:listingID", async (req, res) => {
     const listingRecord = await ListingModel.findOne({ _id: listingID });
     res.status(200).send(listingRecord);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Could not load listing");
   }
 });
@@ -433,7 +425,6 @@ app.get("/LoadListing/:listingID", async (req, res) => {
 //Save Listing route
 app.put("/EditListing/:listingID", async (req, res) => {
   const listingID = req.params.listingID;
-  console.log("This is the req.body:", req.body);
   const {
     updatedImage,
     updatedTitle,
@@ -464,7 +455,6 @@ app.put("/EditListing/:listingID", async (req, res) => {
     await listingRecord.save();
     res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Edit listing form could not be saved.");
   }
 });
@@ -478,7 +468,6 @@ app.put("/DeleteListing/:listingID", async (req, res) => {
     await listingRecord.save();
     res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Listing could not be deleted.");
   }
 });
@@ -500,7 +489,6 @@ app.put("/UpdateListingStatus/:listingID", async (req, res) => {
       res.sendStatus(200);
     }
   } catch (error) {
-    console.log(error);
     res.status(500).send("Could not update listing status");
   }
 });
@@ -550,7 +538,6 @@ app.post("/CreateListing", async (req, res) => {
     );
     res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Create listing form could not be saved.");
   }
 });
@@ -565,11 +552,9 @@ app.get("/buy", (req, res) => {
 
 app.get("/sellerListings", async (req, res) => {
   try {
-    console.log(req.session.UserID);
     const listings = await ListingModel.find({ seller: req.session.UserID });
     res.json(listings);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -581,15 +566,12 @@ app.get("/loadListings", async (req, res) => {
     if (listings.length == 0) return res.status(404).send("No listings found.");
     res.send(listings);
   } catch (error) {
-    console.log(error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
 //get current user info
 app.get("/user", async (req, res) => {
-  // console.log("USER ROUTE HIT");
-  // console.log(req.session);
-
   try {
     if (!req.session.UserID) {
       return res.status(401).json({
@@ -607,8 +589,6 @@ app.get("/user", async (req, res) => {
 
     res.json(currentUser);
   } catch (error) {
-    console.log(error);
-
     res.status(500).json({
       error: error.message,
     });
@@ -620,8 +600,6 @@ app.get("/allUsers", async (req, res) => {
     const allUsers = await UserModel.find({});
     res.json(allUsers);
   } catch (error) {
-    console.log(error);
-
     res.status(500).json({
       error: error.message,
     });
@@ -631,7 +609,6 @@ app.get("/allUsers", async (req, res) => {
 app.put("/addUserNotification/:id", async (req, res) => {
   try {
     const reciever = req.params.id;
-    console.log(reciever);
     const updatedUserInfo = await UserModel.findByIdAndUpdate(
       { _id: reciever },
       { $addToSet: { notifications: req.body.newNotif } },
@@ -639,7 +616,6 @@ app.put("/addUserNotification/:id", async (req, res) => {
     );
     res.json(updatedUserInfo.notifications);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Unexpected server error!");
   }
 });
@@ -659,7 +635,6 @@ app.put("/addUserTutorial/:id", async (req, res) => {
     );
     res.json(updatedUser.tutorials);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Unexpected server error!");
   }
 });
@@ -667,7 +642,6 @@ app.put("/addUserTutorial/:id", async (req, res) => {
 //update user
 app.put("/updateUser/:id", async (req, res) => {
   try {
-    console.log(req.body);
     const updateFields = {};
 
     if (req.body?.tutorials !== undefined) {
@@ -697,8 +671,6 @@ app.put("/updateUser/:id", async (req, res) => {
 
     res.json(updated);
   } catch (err) {
-    console.log(err);
-
     res.status(500).json({
       error: err.message,
     });
@@ -722,7 +694,6 @@ app.post("/bookmarkListing/:id", async (req, res) => {
     );
     res.json(updatedUserInfo.savedItems);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Unexpected server error!");
   }
 });
@@ -738,7 +709,6 @@ app.post("/removeBookmark/:id", async (req, res) => {
     );
     res.json(updatedUserInfo.savedItems);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Unexpected server error!");
   }
 });
@@ -789,7 +759,6 @@ app.get("/listingDetails/:id", async (req, res) => {
       street: extractStreet(listing.location),
     });
   } catch (error) {
-    console.log(error);
     res.status(500).send("Unexpected server error!");
   }
 });
@@ -812,7 +781,6 @@ app.post("/reviews/:id", async (req, res) => {
     });
     res.send("Review added successfully!");
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Could not save review" });
   }
 });
@@ -824,7 +792,6 @@ app.get("/sellerReviews/:id", async (req, res) => {
     const sellerReviews = await ReviewModel.find({ seller: listing.seller });
     res.json(sellerReviews);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Could not get reviews" });
   }
 });
@@ -1015,7 +982,6 @@ Once the form has been pre-filled, the strict step flow is suspended. Stay in Ed
     const result = await chat.sendMessage(contextMessage);
     const responseText = result.response.text(); //Extracts plain text from gemini response
 
-    console.log("Gemini Success:", responseText);
     res.json({ text: responseText });
   } catch (error) {
     console.error("AI Error Detailed:", error);

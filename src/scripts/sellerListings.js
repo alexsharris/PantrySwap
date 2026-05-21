@@ -8,7 +8,6 @@ const displaySellerListings = async function () {
 
     const listingHolder = document.getElementById("listingsHolder");
 
-    console.log(data);
     data.reverse().forEach((newListing) => {
       if (!newListing || newListing.status === "deleted") return;
 
@@ -47,10 +46,7 @@ const checkForEasterEgg = async function () {
     const data = await res.json();
     const accRes = await fetch("/AccountData");
     const accData = await accRes.json();
-    console.log(accData)
-    console.log(accData.easterEgg)
     data.forEach((listing)=>{
-      console.log(listing.status)
       if(listing.status == "deleted" || listing.status == "unlisted"){
         totalClosed++
       }

@@ -241,12 +241,10 @@ let foodArray = [];
 async function loadUserData() {
     const response = await fetch("/user");
     const userData = await response.json();
-    console.log(userData);
     return userData;
 }
 
 function prefillForm(userRecord) {
-  console.log(userRecord);
   const fullAddress = `${userRecord.address}, ${userRecord.postalCode}, Canada`
   document.getElementById("editLocation").value = fullAddress || "";
   document.getElementById("editContact").value = userRecord.phone || "";
@@ -290,12 +288,9 @@ function addFood() {
     const foodForm = document.getElementById("food-form");
     const formData = new FormData(foodForm);
 
-    console.log("form data: ", formData.entries);
-
     let isValid = true;
 
     for (const [key, value] of formData.entries()) {
-        console.log(`key: ${key}, value: ${value}`); //must use fieldData.get('key') to access the values - cannot use fieldData.key
         if (!value.trim()) isValid = false;
     }
 
@@ -387,11 +382,8 @@ let currentImg;
 // upload image button
 const uploadImgBtn = document.getElementById("uploadImgBtn");
 uploadImgBtn.addEventListener("click", async () => {
-    console.log("pressed btn");
     const listingImg = document.getElementById("listingImageUpload").files[0];
-    console.log(listingImg);
     const encodedImg = await readImageAsBase64(listingImg);
-    console.log(encodedImg);
     currentImg = encodedImg;
     document.getElementById("listingImg").src = currentImg;
 });

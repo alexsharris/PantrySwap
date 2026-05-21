@@ -15,7 +15,6 @@ async function GetDefaultInformation() {
   document.getElementById("UserNewName").placeholder = ServerResponseJson.name;
   document.getElementById("UserNewEmail").placeholder =
     ServerResponseJson.email;
-  console.log(ServerResponseJson.profilePicture);
 
   // some of the info could not exist if they user is recently signed up
   if (ServerResponseJson.phone) {
@@ -84,11 +83,8 @@ let currentPFP;
 
 const uploadImgBtn = document.getElementById("profilePicBtn");
 uploadImgBtn.addEventListener("click", async () => {
-  console.log("pressed btn");
   const PFP = document.getElementById("userProfilePic").files[0];
-  console.log(PFP);
   const encodedImg = await readImageAsBase64(PFP);
-  console.log(encodedImg);
   currentPFP = encodedImg;
   document.getElementById("userPFP").src = currentPFP;
   document.getElementById("userPFP").classList.remove("hidden");
@@ -168,7 +164,7 @@ const buttons = [
     label: "No, cancel",
     color: "box-color-1",
     hover: "hover-outline",
-    onClick: () => console.log("Cancelled"),
+    onClick: () => console.log(""),
   },
 ];
 

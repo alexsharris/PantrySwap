@@ -11,8 +11,6 @@ import {
 //GRAB THE ID FROM THE URL
 const params = new URLSearchParams(window.location.search);
 const listingID = window.location.pathname.split("/").pop();
-// const listingID = params.get('id') // this should be passed in to the url once a user clicks on edit a listing from the my listing page
-// const listingID = '69fa70e043a7f4dbfc8616fa' //hard coding the listing ID for now until later
 
 let data = null;
 
@@ -20,13 +18,10 @@ async function loadListingData() {
   //fetch foods
   const response = await fetch(`/LoadListing/${listingID}`);
   const listingRecord = await response.json();
-  // console.log(listingRecord);
   return listingRecord;
 }
 
 function prefillForm(listingRecord) {
-  // console.log(listingRecord);
-  // console.log(listingRecord.category);
   document.getElementById("editTitle").value = listingRecord.title;
   document.getElementById("editLocation").value = listingRecord.location;
   document.getElementById("editPrice").value = listingRecord.price;
@@ -70,11 +65,8 @@ let currentImg;
 // upload image button
 const uploadImgBtn = document.getElementById("uploadImgBtn");
 uploadImgBtn.addEventListener("click", async () => {
-  console.log("pressed btn");
   const listingImg = document.getElementById("listingImageUpload").files[0];
-  console.log(listingImg);
   const encodedImg = await readImageAsBase64(listingImg);
-  console.log(encodedImg);
   currentImg = encodedImg;
   document.getElementById("listingImg").src = currentImg;
 });
@@ -106,7 +98,6 @@ function loadFoods(listingRecord) {
         `;
     foodBar.querySelector("#minusQuant").addEventListener("click", () => {
       if (food.quantity > 0) food.quantity -= 1;
-      console.log("food array: ", foodArray);
       if (food.quantity == 0) {
         const index = foodArray.indexOf(food);
         foodArray.splice(index, 1);
@@ -126,17 +117,13 @@ function loadFoods(listingRecord) {
 //ADD FOOD FUNCTION
 function addFood(listingRecord) {
   let foodArray = listingRecord.foods;
-  console.log("foodsArray:", foodArray);
 
   const foodForm = document.getElementById("food-form");
   const formData = new FormData(foodForm);
 
-  console.log("form data: ", formData.entries);
-
   let isValid = true;
 
   for (const [key, value] of formData.entries()) {
-    console.log(`key: ${key}, value: ${value}`); //must use fieldData.get('key') to access the values - cannot use fieldData.key
     if (!value.trim()) isValid = false;
   }
 
@@ -172,7 +159,6 @@ function addFood(listingRecord) {
         // itemQuant.textContent = quantity
         foodArray[index].quantity = quantity;
         loadFoods(listingRecord);
-        console.log("foodArray:", foodArray);
         if (foodArray[index].quantity == 0) {
           foodArray.splice(index, 1);
           foodBar.remove();
@@ -185,7 +171,6 @@ function addFood(listingRecord) {
         // itemQuant.textContent = quantity
         foodArray[index].quantity = quantity;
         loadFoods(listingRecord);
-        console.log("foodArray:", foodArray);
       }
     });
     foodsList.appendChild(foodBar);
@@ -244,7 +229,6 @@ async function initializePage() {
     color: "box-color-0",
     hover: "hover-outline",
     onClick: async () => {
-      // console.log("Deleted")
       const response = await fetch(`/DeleteListing/${listingID}`, {
         method: "PUT",
       }); //soft delete
@@ -260,7 +244,7 @@ async function initializePage() {
     label: "no, cancel",
     color: "box-color-1",
     hover: "hover-outline",
-    onClick: () => console.log("Cancelled"),
+    onClick: () => console.log(""),
   },
 ];
 
@@ -302,7 +286,6 @@ document
   .addEventListener("click", async () => {
     const listingStatusButton = document.getElementById("listingStatusButton");
     const buttonValue = listingStatusButton.innerText;
-    console.log(buttonValue);
     const response = await fetch(`/UpdateListingStatus/${listingID}`, {
       method: "PUT",
       headers: { "content-type": "application/json" },
@@ -363,7 +346,6 @@ document.querySelector("form").addEventListener("submit", async (event) => {
   event.preventDefault();
 
   if (!data) {
-    console.log("data not loaded yet");
     return;
   }
 

@@ -63,7 +63,6 @@ async function closePopup() {
   try {
     const response = await fetch("/user");
     const currentUser = await response.json();
-    console.log(currentUser);
     const res = await fetch(`/addUserTutorial/${currentUser._id}`, {
       method: "PUT",
       headers: {
@@ -75,7 +74,6 @@ async function closePopup() {
     });
 
     const resData = await response.res;
-    console.log(resData);
   } catch (e) {
     console.log(e);
   }
