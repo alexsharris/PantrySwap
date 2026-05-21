@@ -30,5 +30,9 @@ async function displaySavedListings() {
     );
     listingHolder.appendChild(newCard);
   });
+
+  if (listingHolder.children.length === 0) {
+    document.getElementById("emptyStateBanner").classList.remove("hidden");
+  }
 }
 displaySavedListings();
