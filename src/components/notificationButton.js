@@ -125,11 +125,9 @@ async function notificationItems(notifications) {
 
             if (res.ok) {
               listing = await res.json();
-            } else {
-              console.log("Failed to load listing:", notif.listing, res.status);
-            }
+            } 
           } catch (err) {
-            console.log("Network error loading listing:", notif.listing);
+            console.error("Network error loading listing:", notif.listing);
           }
         }
 
@@ -150,7 +148,7 @@ async function showWindow(notifications) {
         label: "Close",
         color: "box-color-0",
         hover: "hover-outline",
-        onClick: () => console.log("Close"),
+        onClick: () => console.log(""),
       },
     ],
     true,
@@ -177,7 +175,6 @@ class NotificationButton extends HTMLElement {
     try {
       const response = await fetch("/user");
       if (!response.ok) {
-        console.log("No user found for this session");
         return;
       }
       const data = await response.json();
@@ -185,7 +182,7 @@ class NotificationButton extends HTMLElement {
       this.userId = this.user._id;
       this.notifications = data.notifications;
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -218,7 +215,6 @@ class NotificationButton extends HTMLElement {
   async seedNewNotifications() {
     if (!this.userId) return;
 
-    console.log(seedNotifications);
     await fetch(`/updateUser/${this.userId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -230,7 +226,6 @@ class NotificationButton extends HTMLElement {
 
     this.user = refreshedData;
     this.notifications = refreshedData.notifications;
-    console.log(this.user);
   }
   // ======================
   // RENDER LOGIC

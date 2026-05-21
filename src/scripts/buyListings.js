@@ -41,9 +41,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Store data
       localStorage.setItem("Client Latitude", latitude);
       localStorage.setItem("Client Longitude", longitude);
-
-      // console.log("User latitude:", localStorage.getItem("Client Latitude"));
-      // console.log("User longitude:", localStorage.getItem("Client Longitude"));
     },
     (error) => {
       console.error("Error getting location:", error.message);
@@ -99,8 +96,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectedDistance = parseInt(
       document.querySelector('input[name="distance"]:checked')?.value,
     );
-    // console.log(selectedCategories);
-    // console.log(selectedDistance);
 
     selectedText.textContent =
       selectedCategories.length > 0
