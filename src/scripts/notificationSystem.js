@@ -29,7 +29,6 @@ export async function newNotifForConnectedUsers(listingID, type) {
   try {
     const res = await fetch("/allUsers");
     if (!res.ok) {
-      console.log("Failed to load users:", res.status);
       return;
     }
     const userData = await res.json();
@@ -42,7 +41,7 @@ export async function newNotifForConnectedUsers(listingID, type) {
       }
     }
   } catch (err) {
-    console.log("Network error loading users:", err);
+    console.error("Network error loading users:", err);
   }
 }
 
@@ -54,18 +53,15 @@ export async function newNotificationWithGetReciever(listingID, type) {
     if (res.ok) {
       listing = await res.json();
       newNotification(listing.seller, listingID, type);
-    } else {
-      console.log("Failed to load listing:", listingID, res.status);
     }
   } catch (err) {
-    console.log("Network error loading listing:", listingID);
+    console.error("Network error loading listing:", listingID);
   }
 }
 
 // Generic new notif function. Sends a notification of the type and listing to the reciever
 export async function newNotification(receiverID, listingID, type) {
   if (!listingID || !receiverID) {
-    console.log("No listing or reciever provided");
     return;
   }
 
@@ -85,8 +81,7 @@ export async function newNotification(receiverID, listingID, type) {
       }),
     });
     const data = await res.json();
-    console.log(data);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }

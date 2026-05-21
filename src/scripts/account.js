@@ -15,7 +15,6 @@ async function GetDefaultInformation() {
   document.getElementById("UserNewName").placeholder = ServerResponseJson.name;
   document.getElementById("UserNewEmail").placeholder =
     ServerResponseJson.email;
-  console.log(ServerResponseJson.profilePicture);
 
   // some of the info could not exist if they user is recently signed up
   if (ServerResponseJson.phone) {
@@ -28,7 +27,18 @@ async function GetDefaultInformation() {
   }
   if (ServerResponseJson.profilePicture) {
     document.getElementById("userPFP").src = ServerResponseJson.profilePicture;
-    console.log("pfp found");
+    document.getElementById("userPFP").classList.remove("hidden");
+    document.getElementById("userPFPInitial").classList.add("hidden");
+  } else {
+    document.getElementById("userPFPInitial").textContent = ServerResponseJson.name.charAt(0).toUpperCase();
+  }
+  if (ServerResponseJson.address) {
+    document.getElementById("UserNewAddress").placeholder =
+      ServerResponseJson.address;
+  }
+  if (ServerResponseJson.postalCode) {
+    document.getElementById("UserNewPostalCode").placeholder =
+      ServerResponseJson.postalCode;
   }
 }
 GetDefaultInformation();
@@ -73,13 +83,12 @@ let currentPFP;
 
 const uploadImgBtn = document.getElementById("profilePicBtn");
 uploadImgBtn.addEventListener("click", async () => {
-  console.log("pressed btn");
   const PFP = document.getElementById("userProfilePic").files[0];
-  console.log(PFP);
   const encodedImg = await readImageAsBase64(PFP);
-  console.log(encodedImg);
   currentPFP = encodedImg;
   document.getElementById("userPFP").src = currentPFP;
+  document.getElementById("userPFP").classList.remove("hidden");
+  document.getElementById("userPFPInitial").classList.add("hidden");
 });
 
 async function changeData() {
@@ -87,9 +96,11 @@ async function changeData() {
   const Email = document.getElementById("UserNewEmail").value;
   const Phone = document.getElementById("UserNewphone").value;
   const City = document.getElementById("UserNewCity").value;
+  const Address = document.getElementById("UserNewAddress").value;
+  const PostalCode = document.getElementById("UserNewPostalCode").value;
 
   // should be defined outside if statements to be accessible
-  let UserNewName, UserNewEmail, UserNewphone, UserNewCity, UserNewPFP;
+  let UserNewName, UserNewEmail, UserNewphone, UserNewCity, UserNewPFP, UserNewAddress, UserNewPostalCode
 
   // only send the fields that are actually updated (not falsey or empty)
   if (Name) {
@@ -107,6 +118,12 @@ async function changeData() {
   if (currentPFP) {
     UserNewPFP = currentPFP;
   }
+  if (Address){
+    UserNewAddress = Address
+  }
+  if (PostalCode){
+    UserNewPostalCode = PostalCode
+  }
 
   const Response = await fetch("/ChangeData", {
     method: "PUT",
@@ -118,6 +135,8 @@ async function changeData() {
       UserNewphone,
       UserNewCity,
       UserNewPFP,
+      UserNewAddress,
+      UserNewPostalCode
     }),
   });
   await GetDefaultInformation();
@@ -145,7 +164,7 @@ const buttons = [
     label: "No, cancel",
     color: "box-color-1",
     hover: "hover-outline",
-    onClick: () => console.log("Cancelled"),
+    onClick: () => console.log(""),
   },
 ];
 

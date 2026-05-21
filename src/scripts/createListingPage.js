@@ -1,5 +1,8 @@
-import { displaySimpleWindow, closePopupWindow, displayWindow } from "../scripts/popupWindow.js";
-
+import {
+  displaySimpleWindow,
+  closePopupWindow,
+  displayWindow,
+} from "../scripts/popupWindow.js";
 //==================================================================================
 // start of AI chatbot
 //==================================================================================
@@ -238,14 +241,13 @@ let foodArray = [];
 async function loadUserData() {
     const response = await fetch("/user");
     const userData = await response.json();
-    console.log(userData);
     return userData;
 }
 
 function prefillForm(userRecord) {
-    console.log(userRecord);
-    document.getElementById("editLocation").value = userRecord.city || "";
-    document.getElementById("editContact").value = userRecord.phone || "";
+  const fullAddress = `${userRecord.address}, ${userRecord.postalCode}, Canada`
+  document.getElementById("editLocation").value = fullAddress || "";
+  document.getElementById("editContact").value = userRecord.phone || "";
 }
 
 async function initializePage() {
@@ -286,12 +288,9 @@ function addFood() {
     const foodForm = document.getElementById("food-form");
     const formData = new FormData(foodForm);
 
-    console.log("form data: ", formData.entries);
-
     let isValid = true;
 
     for (const [key, value] of formData.entries()) {
-        console.log(`key: ${key}, value: ${value}`); //must use fieldData.get('key') to access the values - cannot use fieldData.key
         if (!value.trim()) isValid = false;
     }
 
@@ -308,7 +307,7 @@ function addFood() {
             <!-- minus -->
             <div id="minusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">-</div>
             <!-- quant -->
-            <div id="itemQuant" class="py-2 px-8 border-[#9b9b9b] border-solid border-l">${formData.get("quantity")}</div>
+            <div id="itemQuant" class="py-2 min-w-16 text-center border-[#9b9b9b] border-solid border-l">${formData.get("quantity")}</div>
             <!-- plus -->
             <div id="plusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">+</div>
         </div>
@@ -383,14 +382,41 @@ let currentImg;
 // upload image button
 const uploadImgBtn = document.getElementById("uploadImgBtn");
 uploadImgBtn.addEventListener("click", async () => {
-    console.log("pressed btn");
     const listingImg = document.getElementById("listingImageUpload").files[0];
-    console.log(listingImg);
     const encodedImg = await readImageAsBase64(listingImg);
-    console.log(encodedImg);
     currentImg = encodedImg;
     document.getElementById("listingImg").src = currentImg;
 });
+
+async function getCoordsFromAddress(userAddress){
+  const apiKey = `a55530eef54342eea72f8d09fc6f365a`
+  const url =
+      `https://api.geoapify.com/v1/geocode/search` +
+      `?text=${encodeURIComponent(userAddress)}` +
+      `&filter=countrycode:ca` +
+      `&apiKey=${encodeURIComponent(apiKey)}`;
+  const response = await fetch(url)
+  const data = await response.json()
+  if (data.error) {
+      throw new Error(
+        `Geocoding failed: ${data.statusCode || ""} ${data.error} - ${data.message || ""}`,
+      );
+    }
+
+    if (!data.features || !data.features.length) {
+      throw new Error(
+        `Geocoding failed: no results found for "${fullAddress}"`,
+      );
+    }
+  const result = data.features[0];
+  const lat = result.properties.lat;
+  const lng = result.properties.lon;
+  const newObj = {
+    lat: lat,
+    lng: lng,
+  }
+  return newObj
+}
 
 //create button
 document.querySelector("form").addEventListener("submit", async (event) => {
@@ -408,11 +434,15 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     const updatedCookedMeals = document.getElementById("editCookedMeals").checked;
     const updatedImage = currentImg;
 
-    // //validate required fields not left blank
-    if (foodArray.length == 0) {
-        alert("Please add a food item.");
-        return;
-    }
+  const addressData = await getCoordsFromAddress(updatedLocation)
+  const updatedLat = addressData.lat
+  const updatedLng = addressData.lng
+
+  // //validate required fields not left blank
+  if (foodArray.length == 0) {
+    alert("Please add a food item.");
+    return;
+  }
 
     let updatedCategory = [];
     updatedProduce == true ? updatedCategory.push("Produce") : undefined;
@@ -421,23 +451,25 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     updatedBakedGoods == true ? updatedCategory.push("Baked Goods") : undefined;
     updatedCookedMeals == true ? updatedCategory.push("Cooked Meals") : undefined;
 
-    const response = await fetch(`/CreateListing`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-            //seller is added in on the server.js
-            title: updatedTitle,
-            location: updatedLocation,
-            price: updatedPrice,
-            contact: updatedContact,
-            description: updatedDescription,
-            category: updatedCategory,
-            foods: foodArray,
-            image: updatedImage,
-        }),
-    });
-    if (response.ok) {
-        alert("Listing created!");
-        window.location.href = "/sell";
-    }
+  const response = await fetch(`/CreateListing`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      //seller is added in on the server.js
+      title: updatedTitle,
+      location: updatedLocation,
+      price: updatedPrice,
+      contact: updatedContact,
+      description: updatedDescription,
+      category: updatedCategory,
+      foods: foodArray,
+      image: updatedImage,
+      lat: updatedLat,
+      lng: updatedLng,
+    }),
+  });
+  if (response.ok) {
+    alert("Listing created!");
+    window.location.href = "/sell";
+  }
 });

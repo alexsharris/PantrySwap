@@ -12,6 +12,25 @@ import "../components/bookmarkButton.js";
 // get the id of the document from the url
 const id = window.location.pathname.split("/").pop();
 
+const starSVG = (id, starValueDB) => `<svg data-value="${id}"
+                class="size-6 ${id <= starValueDB ? "text-orange" : "text-light-grey"}"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
+                />
+              </svg>`;
+
+//=======================================================================================
+// Fetches the current user's saved items and injects the bookmark button component,
+// passing whether this listing is already saved so the button renders the correct state.
+//=======================================================================================
 async function renderBookmarkButton() {
   const bookmarkButtonDiv = document.getElementById("save-button-div");
   const currentUser = await (await fetch("/user")).json();
@@ -26,112 +45,81 @@ async function renderBookmarkButton() {
 }
 
 renderBookmarkButton();
+
+//=======================================================================================
+// This function fetches the current user and compares their ID to the seller ID stored on the button.
+// If they match, the button is disabled and grayed out to prevent self-reviews.
+//=======================================================================================
+async function disableReviewBtnIfSeller() {
+  const btn = document.getElementById("leaveReviewBtn");
+  const currentUser = await (await fetch("/user")).json();
+  if (btn.dataset.sellerId === currentUser._id) {
+    btn.disabled = true;
+    btn.classList.remove("hover-bright", "text-orange");
+    // change the cursor to a blocked symbol symbol with 'cursor-not-allowed'
+    btn.classList.add("text-light-grey", "cursor-not-allowed");
+    // display a message when user hovers over the button so they understand why its not working
+    btn.title = "You cannot review your own listing";
+  }
+}
+disableReviewBtnIfSeller();
+
 //=======================================================================================
 //This function gets all the reviews submitted for a seller and displays them dynamically
 //=======================================================================================
 async function displayReviews(id) {
+  //array for store all the ratings for the seller to calculate average
+  let allRatings = [];
   const reviewsResponse = await (await fetch(`/sellerReviews/${id}`)).json(); // this would be an array
   const reviewContainer = document.getElementById("reviewsContainer");
   reviewContainer.innerHTML = "";
   let ratings = 0;
-  reviewsResponse.forEach((review) => {
-    ratings++;
-    const element = document.createElement("div");
-    element.innerHTML = `<div class="flex flex-col gap-3">
+  if (reviewsResponse.length === 0) {
+    reviewContainer.classList.add("text-sm");
+    reviewContainer.innerHTML = "This seller has no reviews yet.";
+  } else {
+    reviewsResponse.forEach((review) => {
+      const starValueDB = review.rating;
+      ratings++;
+      allRatings.push(Number(review.rating));
+      const element = document.createElement("div");
+      element.innerHTML = `<div class="flex flex-col gap-3">
             <h2 id="reviewTitle">${review.title}</h2>
             <!-- container of stars -->
             <div id="starContainer" class="flex flex-row gap-1 items-center">
-              <svg data-value="1"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6 text-light-grey"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
-                />
-              </svg>
-              <svg data-value="2"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6 text-light-grey"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
-                />
-              </svg>
-              <svg data-value="3"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6 text-light-grey"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
-                />
-              </svg>
-              <svg data-value="4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6 text-light-grey"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
-                />
-              </svg>
-              <svg data-value="5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6 text-light-grey"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
-                />
-              </svg>
+              ${starSVG(1, starValueDB)}
+              ${starSVG(2, starValueDB)}
+              ${starSVG(3, starValueDB)}
+              ${starSVG(4, starValueDB)}
+              ${starSVG(5, starValueDB)}
             </div>
             <p  class="py-5">${review.description}</p>
             <p  class="font-bold pb-4">${review.reviewerName}</p>
             <hr class="border-light-grey">
           </div>`;
-    reviewContainer.appendChild(element);
-    //handle the stars in each review
-    const starValueDB = review.rating;
-    document.querySelectorAll("#starContainer svg").forEach((star) => {
-      if (star.dataset.value <= starValueDB) {
-        star.classList.add("text-orange");
-        star.classList.remove("text-light-grey");
-      } else {
-        star.classList.remove("text-orange");
-        star.classList.add("text-light-grey");
-      }
+      reviewContainer.appendChild(element);
     });
-  });
+  }
 
   // display total number of reviews seller has
   document.getElementById("numberReviews").innerHTML = ratings;
+
+  // display rating average for the seller
+
+  let sum = 0;
+  for (let i = 0; i < allRatings.length; i++) {
+    sum += allRatings[i];
+  }
+
+  // show whole number for a single review or no reviews, one decimal for multiple
+  const average =
+    allRatings.length === 0
+      ? "0"
+      : allRatings.length === 1
+        ? String(allRatings[0])
+        : (sum / allRatings.length).toFixed(1);
+
+  document.getElementById("average").innerHTML = average;
 }
 displayReviews(id);
 //======================================================================================

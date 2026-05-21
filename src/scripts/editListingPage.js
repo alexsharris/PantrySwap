@@ -11,8 +11,6 @@ import {
 //GRAB THE ID FROM THE URL
 const params = new URLSearchParams(window.location.search);
 const listingID = window.location.pathname.split("/").pop();
-// const listingID = params.get('id') // this should be passed in to the url once a user clicks on edit a listing from the my listing page
-// const listingID = '69fa70e043a7f4dbfc8616fa' //hard coding the listing ID for now until later
 
 let data = null;
 
@@ -20,13 +18,10 @@ async function loadListingData() {
   //fetch foods
   const response = await fetch(`/LoadListing/${listingID}`);
   const listingRecord = await response.json();
-  // console.log(listingRecord);
   return listingRecord;
 }
 
 function prefillForm(listingRecord) {
-  // console.log(listingRecord);
-  // console.log(listingRecord.category);
   document.getElementById("editTitle").value = listingRecord.title;
   document.getElementById("editLocation").value = listingRecord.location;
   document.getElementById("editPrice").value = listingRecord.price;
@@ -70,11 +65,8 @@ let currentImg;
 // upload image button
 const uploadImgBtn = document.getElementById("uploadImgBtn");
 uploadImgBtn.addEventListener("click", async () => {
-  console.log("pressed btn");
   const listingImg = document.getElementById("listingImageUpload").files[0];
-  console.log(listingImg);
   const encodedImg = await readImageAsBase64(listingImg);
-  console.log(encodedImg);
   currentImg = encodedImg;
   document.getElementById("listingImg").src = currentImg;
 });
@@ -99,14 +91,13 @@ function loadFoods(listingRecord) {
                 <!-- minus -->
                 <div id="minusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">-</div>
                 <!-- quant -->
-                <div id="itemQuant" class="py-2 px-8 border-[#9b9b9b] border-solid border-l">${food.quantity}</div>
+                <div id="itemQuant" class="py-2 min-w-16 text-center border-[#9b9b9b] border-solid border-l">${food.quantity}</div>
                 <!-- plus -->
                 <div id="plusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">+</div>
             </div>
         `;
     foodBar.querySelector("#minusQuant").addEventListener("click", () => {
       if (food.quantity > 0) food.quantity -= 1;
-      console.log("food array: ", foodArray);
       if (food.quantity == 0) {
         const index = foodArray.indexOf(food);
         foodArray.splice(index, 1);
@@ -126,17 +117,13 @@ function loadFoods(listingRecord) {
 //ADD FOOD FUNCTION
 function addFood(listingRecord) {
   let foodArray = listingRecord.foods;
-  console.log("foodsArray:", foodArray);
 
   const foodForm = document.getElementById("food-form");
   const formData = new FormData(foodForm);
 
-  console.log("form data: ", formData.entries);
-
   let isValid = true;
 
   for (const [key, value] of formData.entries()) {
-    console.log(`key: ${key}, value: ${value}`); //must use fieldData.get('key') to access the values - cannot use fieldData.key
     if (!value.trim()) isValid = false;
   }
 
@@ -153,7 +140,7 @@ function addFood(listingRecord) {
             <!-- minus -->
             <div id="minusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">-</div>
             <!-- quant -->
-            <div id="itemQuant" class="py-2 px-8 border-[#9b9b9b] border-solid border-l">${formData.get("quantity")}</div>
+            <div id="itemQuant" class="py-2 min-w-16 text-center border-[#9b9b9b] border-solid border-l">${formData.get("quantity")}</div>
             <!-- plus -->
             <div id="plusQuant" class="py-2 px-6 border-[#9b9b9b] border-solid border-l">+</div>
         </div>
@@ -172,7 +159,6 @@ function addFood(listingRecord) {
         // itemQuant.textContent = quantity
         foodArray[index].quantity = quantity;
         loadFoods(listingRecord);
-        console.log("foodArray:", foodArray);
         if (foodArray[index].quantity == 0) {
           foodArray.splice(index, 1);
           foodBar.remove();
@@ -185,7 +171,6 @@ function addFood(listingRecord) {
         // itemQuant.textContent = quantity
         foodArray[index].quantity = quantity;
         loadFoods(listingRecord);
-        console.log("foodArray:", foodArray);
       }
     });
     foodsList.appendChild(foodBar);
@@ -209,11 +194,11 @@ function listingStatus(listingRecord) {
 
   if (listingRecord.status == "unlisted") {
     statusCircle.classList.remove("bg-green-500");
-    statusCircle.classList.add("bg-gray-500");
+    statusCircle.classList.add("bg-red");
     statusLabel.innerText = "Unlisted";
     listingStatusButton.innerText = "Re-list";
   } else if (listingRecord.status == "listed") {
-    statusCircle.classList.remove("bg-gray-500");
+    statusCircle.classList.remove("bg-red");
     statusCircle.classList.add("bg-green-500");
     statusLabel.innerText = "Listed";
     listingStatusButton.innerText = "Unlist";
@@ -238,6 +223,32 @@ async function initializePage() {
     </div>
     </form>`;
 
+  const deleteConfirmButton = [
+  {
+    label: "yes, delete",
+    color: "box-color-0",
+    hover: "hover-outline",
+    onClick: async () => {
+      const response = await fetch(`/DeleteListing/${listingID}`, {
+        method: "PUT",
+      }); //soft delete
+
+      if (response.ok) {
+        newNotifForConnectedUsers(listingID, NotifTypes.DELETED);
+        displaySimpleWindow("Deleted!");
+        window.location.href = "/sell"
+  }
+      },
+  },
+  {
+    label: "no, cancel",
+    color: "box-color-1",
+    hover: "hover-outline",
+    onClick: () => console.log(""),
+  },
+];
+
+
   const buttons = [
     {
       label: "Add food",
@@ -257,21 +268,17 @@ async function initializePage() {
   document.getElementById("addFoodButton").addEventListener("click", () => {
     displaySimpleWindow("Add food" + form, buttons, false);
   });
+
+  //delete button
+  document.getElementById("deleteButton").addEventListener("click", async () => {
+    displaySimpleWindow("Are you sure you want to delete this listing?", deleteConfirmButton);
+  });
+
 }
 
 initializePage();
 
-//delete button
-document.getElementById("deleteButton").addEventListener("click", async () => {
-  const response = await fetch(`/DeleteListing/${listingID}`, {
-    method: "PUT",
-  }); //soft delete
 
-  if (response.ok) {
-    newNotifForConnectedUsers(listingID, NotifTypes.DELETED);
-    alert("Listing Deleted!");
-  }
-});
 
 //Unlist or Re-list button
 document
@@ -279,7 +286,6 @@ document
   .addEventListener("click", async () => {
     const listingStatusButton = document.getElementById("listingStatusButton");
     const buttonValue = listingStatusButton.innerText;
-    console.log(buttonValue);
     const response = await fetch(`/UpdateListingStatus/${listingID}`, {
       method: "PUT",
       headers: { "content-type": "application/json" },
@@ -303,12 +309,43 @@ document.getElementById("cancelButton").addEventListener("click", () => {
   window.location.href = "/sell";
 });
 
+
+async function getCoordsFromAddress(userAddress){
+  const apiKey = `a55530eef54342eea72f8d09fc6f365a`
+  const url =
+      `https://api.geoapify.com/v1/geocode/search` +
+      `?text=${encodeURIComponent(userAddress)}` +
+      `&filter=countrycode:ca` +
+      `&apiKey=${encodeURIComponent(apiKey)}`;
+  const response = await fetch(url)
+  const data = await response.json()
+  if (data.error) {
+      throw new Error(
+        `Geocoding failed: ${data.statusCode || ""} ${data.error} - ${data.message || ""}`,
+      );
+    }
+
+    if (!data.features || !data.features.length) {
+      throw new Error(
+        `Geocoding failed: no results found for "${fullAddress}"`,
+      );
+    }
+  const result = data.features[0];
+  const lat = result.properties.lat;
+  const lng = result.properties.lon;
+  const newObj = {
+    lat: lat,
+    lng: lng,
+  }
+  return newObj
+}
+
+
 //save button
 document.querySelector("form").addEventListener("submit", async (event) => {
   event.preventDefault();
 
   if (!data) {
-    console.log("data not loaded yet");
     return;
   }
 
@@ -324,6 +361,10 @@ document.querySelector("form").addEventListener("submit", async (event) => {
   const updatedBakedGoods = document.getElementById("editBakedGoods").checked;
   const updatedCookedMeals = document.getElementById("editCookedMeals").checked;
   const updatedImage = currentImg;
+
+  const addressData = await getCoordsFromAddress(updatedLocation)
+  const updatedLat = addressData.lat
+  const updatedLng = addressData.lng
 
   let updatedCategory = [];
   updatedProduce == true ? updatedCategory.push("Produce") : undefined;
@@ -345,10 +386,13 @@ document.querySelector("form").addEventListener("submit", async (event) => {
       updatedCategory: updatedCategory,
       updatedFoods: data.foods,
       updatedImage: updatedImage,
+      lat: updatedLat,
+      lng: updatedLng,
     }),
   });
   if (response.ok) {
-    alert("Listing saved!");
+    // alert("Listing saved!");
+    displaySimpleWindow("Saved!")
     initializePage();
   }
 });

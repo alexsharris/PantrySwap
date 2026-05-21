@@ -5,6 +5,7 @@ const buttonIDs = {
   sell: ["sellBtnDesktop", "sellBtnMobile"],
   saved: ["savedBtnDesktop", "savedBtnMobile"],
   account: ["accountBtnDesktop", "accountBtnMobile"],
+  logout: ["logoutBtnDesktop", "logoutBtnMobile"],
 };
 
 class Navbar extends HTMLElement {
@@ -31,7 +32,7 @@ class Navbar extends HTMLElement {
             </button>
             <div class="flex justify-end gap-3 items-center">
                 <div class="flex gap-12 self-center">
-                    <div class="flex gap-6 md:visible md:w-auto w-0 invisible">
+                    <div class="flex gap-6 md:visible md:w-auto w-0 invisible overflow-hidden">
                         <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.buy[0]}">
                         Buy
                         </button>
@@ -44,6 +45,9 @@ class Navbar extends HTMLElement {
                         <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.account[0]}">
                         Account
                         </button>
+                        <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.logout[0]}">
+                        Logout
+                        </button>
                 
                     </div>
                 </div>
@@ -51,18 +55,21 @@ class Navbar extends HTMLElement {
             </div>
         </div>
 
-        <div class="flex w-screen justify-between gap-2 visible md:hidden fixed inset-x-0 bottom-0 right-0 left-0 bg-white md:relative h-16 p-2 ">
-            <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.buy[1]}">
+        <div class="flex gap-2 visible md:hidden fixed inset-x-0 bottom-0 bg-white h-16 p-2 z-50">
+            <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.buy[1]}">
             Buy
             </button>
-            <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.sell[1]}">
+            <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.sell[1]}">
             Sell
             </button>
-            <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.saved[1]}">
+            <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.saved[1]}">
             Saved
             </button>
-            <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.account[1]}">
+            <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.account[1]}">
             Account
+            </button>
+            <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.logout[1]}">
+            Logout
             </button>
         </div>
     </nav>
@@ -75,6 +82,7 @@ class Navbar extends HTMLElement {
       sell: "/sell",
       saved: "/bookmark",
       account: "/account",
+      logout: "/logout",
     };
 
     const navigateIfNeeded = (path) => {
@@ -121,6 +129,7 @@ class Navbar extends HTMLElement {
     if (path.startsWith("/sell")) return "sell";
     if (path.startsWith("/bookmark")) return "saved";
     if (path.startsWith("/account")) return "account";
+    if (path.startsWith("/logout")) return "logout";
 
     return null;
   }

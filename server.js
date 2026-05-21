@@ -4,6 +4,27 @@ const port = process.env.PORT || 5000;
 const db = process.env.MONGO_URI;
 const secret = process.env.SESSION_SECRET;
 
+// nodemailer for sending OTP emails via Gmail
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+//setting up dymo for email validation - pulled from dymo documentation
+const DymoAPI = require("dymo-api");
+const dymoClient = new DymoAPI({
+  apiKey: process.env.DYMO_API_KEY,
+  rules: {
+    email: {
+      deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"],
+    },
+  },
+});
+
 // storing sessions in a file
 var session = require("express-session");
 const FileStore = require("session-file-store")(session);
@@ -38,6 +59,8 @@ const UserSchema = new mongoose.Schema({
   phone: String,
   password: String,
   city: String,
+  address: String,
+  postalCode: String,
   profilePicture: String,
   savedItems: [String], // the idea is to store _id of documents in listedItems here
   listedItems: [String], // the idea is to store _id of documents in listedItems here
@@ -49,11 +72,8 @@ const UserSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now }, // create a timestamp like (X hours ago)
     },
   ],
-  tutorials: {
-    create: Boolean,
-    search: Boolean,
-    bookmark: Boolean,
-  },
+  tutorials: [String],
+  easterEgg: Boolean,
 });
 
 // schema of listings
@@ -63,6 +83,8 @@ const ListingsSchema = new mongoose.Schema({
   title: String,
   price: Number,
   location: String,
+  lat: Number,
+  lng: Number,
   contact: String,
   description: String,
   category: {
@@ -130,7 +152,7 @@ async function main() {
     .connect(db)
     .then(() => {
       console.log("Connected to MongoDB");
-      app.listen(3000, () => {
+      app.listen(port, () => {
         console.log("Server running on port 3000");
       });
     })
@@ -138,6 +160,11 @@ async function main() {
       console.error("MongoDB connection failed:", err);
     });
 }
+
+// home route
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/login.html");
+});
 
 // Login routes
 
@@ -177,9 +204,65 @@ app.post("/Login", async (req, res) => {
     // if user email doesnt exist in the DB
     else res.status(401).json({ error: "Invalid credentials" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Login failed" });
   }
+});
+
+// send OTP route — used by signup form
+app.post("/send-otp", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || !email.trim())
+    return res.status(400).json({ error: "Email is required." });
+
+  // check if email is already registered before sending OTP
+  const emailExists = await UserModel.findOne({ email });
+  if (emailExists)
+    return res.status(400).json({ error: "There's an account associated with this email!" });
+
+  // validate email with dymo before sending
+  try {
+    const decision = await dymoClient.isValidEmail(email);
+    if (!decision.allow)
+      return res.status(400).json({ error: "Please use a valid email address." });
+  } catch (error) {
+    // dymo API failed, fail open
+  }
+
+  // generate a 6-digit OTP and save it to session with a 2-minute expiry
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  //sessions work for non logged in users as well
+  req.session.otp = { code: otp, expiry: Date.now() + 2 * 60 * 1000, email };
+
+  // send the OTP email via Gmail
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your Pantry Swap verification code",
+      html: `<p>Your verification code is <strong>${otp}</strong>. It expires in 2 minutes.</p>`,
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to send verification email." });
+  }
+});
+
+// verify OTP route — checks the code and sets a verified flag in session
+app.post("/verify-otp", (req, res) => {
+  const { email, otp } = req.body;
+  const sessionOtp = req.session.otp;
+
+  if (!sessionOtp) return res.status(400).json({ error: "Please request a verification code first." });
+  if (Date.now() > sessionOtp.expiry) return res.status(400).json({ error: "Verification code has expired." });
+  if (sessionOtp.email !== email) return res.status(400).json({ error: "Email does not match the one the code was sent to." });
+  if (sessionOtp.code !== otp) return res.status(400).json({ error: "Incorrect verification code." });
+
+  // mark email as verified in session and clear the OTP
+  req.session.otpVerified = email;
+  delete req.session.otp;
+
+  res.json({ success: true });
 });
 
 // signup route
@@ -188,6 +271,7 @@ app.post("/SignUp", async (req, res) => {
   const NewUserEmail = req.body.emailSignup;
   const NewUserName = req.body.name;
   const NewUserPassword = req.body.passwordSignup;
+
   if (
     !NewUserPassword ||
     !NewUserPassword.trim() ||
@@ -199,11 +283,11 @@ app.post("/SignUp", async (req, res) => {
     return res.status(400).json({ error: "Please fill out all the fields!" });
   }
 
-  const emailExists = await UserModel.findOne({ email: NewUserEmail });
-  if (emailExists)
-    return res
-      .status(400)
-      .json({ error: "There's an account associated with this email!" });
+  // check that this email was verified via OTP before allowing signup
+  if (req.session.otpVerified !== NewUserEmail)
+    return res.status(400).json({ error: "Please verify your email first." });
+
+  delete req.session.otpVerified;
 
   // create a new user in DB
   try {
@@ -212,7 +296,7 @@ app.post("/SignUp", async (req, res) => {
       name: NewUserName,
       password: HashedPassword,
       email: NewUserEmail,
-      tutorials: { create: false, bookmark: false, search: false },
+      tutorials: [],
     });
 
     // setting up the session for the new user
@@ -229,10 +313,10 @@ app.post("/SignUp", async (req, res) => {
 
     req.session.save(() => res.redirect("/buy"));
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "registration failed" });
   }
 });
+
 
 // setting up a middleware to protect the following routes for non-logged in users
 
@@ -240,6 +324,16 @@ function isAuthenticated(req, res, next) {
   if (req.session.UserID) next();
   else res.redirect("/Login");
 }
+
+// logout route
+app.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send("Could not log out.");
+    }
+    res.redirect("/Login");
+  });
+});
 
 // ==================================================================
 // any route that needs protection for non-logged in users goes after this line
@@ -252,7 +346,6 @@ app.get("/Account", async (req, res) => {
   try {
     res.sendFile(__dirname + "/account.html");
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Internal Server Error!" });
   }
 });
@@ -262,7 +355,6 @@ app.get("/AccountData", async (req, res) => {
     const Data = await UserModel.findById({ _id: req.session.UserID });
     res.json(Data);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Internal Server Error!" });
   }
 });
@@ -275,7 +367,9 @@ app.put("/ChangeData", async (req, res) => {
     const UserNewphone = req.body.UserNewphone;
     const UserNewCity = req.body.UserNewCity;
     const UserNewPFP = req.body.UserNewPFP;
-    console.log(UserNewPFP);
+    const UserNewAddress = req.body.UserNewAddress;
+    const UserNewPostalCode = req.body.UserNewPostalCode;
+    const UserEasterEgg = req.body.seenEasterEgg;
 
     // check if the value exists, if so, update the DB
     const UpdatedFields = {};
@@ -285,6 +379,9 @@ app.put("/ChangeData", async (req, res) => {
     if (UserNewphone) UpdatedFields.phone = UserNewphone;
     if (UserNewCity) UpdatedFields.city = UserNewCity;
     if (UserNewPFP) UpdatedFields.profilePicture = UserNewPFP;
+    if (UserNewAddress) UpdatedFields.address = UserNewAddress;
+    if (UserNewPostalCode) UpdatedFields.postalCode = UserNewPostalCode;
+    if (UserEasterEgg) UpdatedFields.easterEgg = UserEasterEgg;
 
     const user = await UserModel.findByIdAndUpdate(
       { _id: req.session.UserID },
@@ -302,7 +399,6 @@ app.delete("/DeleteAccount", async (req, res) => {
     await UserModel.findByIdAndDelete({ _id: req.session.UserID });
     req.session.destroy(() => res.send("Account deleted!"));
   } catch (error) {
-    console.log(error);
     res.status(500).send("Delete failed!");
   }
 });
@@ -322,7 +418,6 @@ app.get("/LoadListing/:listingID", async (req, res) => {
     const listingRecord = await ListingModel.findOne({ _id: listingID });
     res.status(200).send(listingRecord);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Could not load listing");
   }
 });
@@ -330,7 +425,6 @@ app.get("/LoadListing/:listingID", async (req, res) => {
 //Save Listing route
 app.put("/EditListing/:listingID", async (req, res) => {
   const listingID = req.params.listingID;
-  console.log("This is the req.body:", req.body);
   const {
     updatedImage,
     updatedTitle,
@@ -340,6 +434,8 @@ app.put("/EditListing/:listingID", async (req, res) => {
     updatedDescription,
     updatedCategory,
     updatedFoods,
+    updatedLat,
+    updatedLng,
   } = req.body;
   try {
     const listingRecord = await ListingModel.findOne({ _id: listingID });
@@ -353,11 +449,12 @@ app.put("/EditListing/:listingID", async (req, res) => {
     if (updatedCategory) listingRecord.category = updatedCategory;
     if (updatedFoods) listingRecord.foods = updatedFoods;
     if (updatedImage) listingRecord.image = updatedImage;
+    if (updatedLat) listingRecord.lat = updatedLat;
+    if (updatedLng) listingRecord.lng = updateLng;
 
     await listingRecord.save();
     res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Edit listing form could not be saved.");
   }
 });
@@ -371,7 +468,6 @@ app.put("/DeleteListing/:listingID", async (req, res) => {
     await listingRecord.save();
     res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Listing could not be deleted.");
   }
 });
@@ -393,7 +489,6 @@ app.put("/UpdateListingStatus/:listingID", async (req, res) => {
       res.sendStatus(200);
     }
   } catch (error) {
-    console.log(error);
     res.status(500).send("Could not update listing status");
   }
 });
@@ -418,6 +513,8 @@ app.post("/CreateListing", async (req, res) => {
     description,
     category,
     foods,
+    lat,
+    lng,
   } = req.body;
   try {
     const newListing = await ListingModel.create({
@@ -430,6 +527,8 @@ app.post("/CreateListing", async (req, res) => {
       description: description,
       category: category,
       foods: foods,
+      lat: lat,
+      lng: lng,
     });
 
     await UserModel.findByIdAndUpdate(
@@ -439,7 +538,6 @@ app.post("/CreateListing", async (req, res) => {
     );
     res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Create listing form could not be saved.");
   }
 });
@@ -454,11 +552,9 @@ app.get("/buy", (req, res) => {
 
 app.get("/sellerListings", async (req, res) => {
   try {
-    console.log(req.session.UserID);
     const listings = await ListingModel.find({ seller: req.session.UserID });
     res.json(listings);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -470,15 +566,12 @@ app.get("/loadListings", async (req, res) => {
     if (listings.length == 0) return res.status(404).send("No listings found.");
     res.send(listings);
   } catch (error) {
-    console.log(error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
 //get current user info
 app.get("/user", async (req, res) => {
-  // console.log("USER ROUTE HIT");
-  // console.log(req.session);
-
   try {
     if (!req.session.UserID) {
       return res.status(401).json({
@@ -496,8 +589,6 @@ app.get("/user", async (req, res) => {
 
     res.json(currentUser);
   } catch (error) {
-    console.log(error);
-
     res.status(500).json({
       error: error.message,
     });
@@ -509,8 +600,6 @@ app.get("/allUsers", async (req, res) => {
     const allUsers = await UserModel.find({});
     res.json(allUsers);
   } catch (error) {
-    console.log(error);
-
     res.status(500).json({
       error: error.message,
     });
@@ -520,7 +609,6 @@ app.get("/allUsers", async (req, res) => {
 app.put("/addUserNotification/:id", async (req, res) => {
   try {
     const reciever = req.params.id;
-    console.log(reciever);
     const updatedUserInfo = await UserModel.findByIdAndUpdate(
       { _id: reciever },
       { $addToSet: { notifications: req.body.newNotif } },
@@ -528,7 +616,25 @@ app.put("/addUserNotification/:id", async (req, res) => {
     );
     res.json(updatedUserInfo.notifications);
   } catch (error) {
-    console.log(error);
+    res.status(500).send("Unexpected server error!");
+  }
+});
+
+// Add completed tutorial to user
+app.put("/addUserTutorial/:id", async (req, res) => {
+  try {
+    const { tutorialName } = req.body;
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $addToSet: {
+          tutorials: tutorialName,
+        },
+      },
+      { new: true },
+    );
+    res.json(updatedUser.tutorials);
+  } catch (error) {
     res.status(500).send("Unexpected server error!");
   }
 });
@@ -536,19 +642,10 @@ app.put("/addUserNotification/:id", async (req, res) => {
 //update user
 app.put("/updateUser/:id", async (req, res) => {
   try {
-    console.log(req.body);
     const updateFields = {};
 
-    if (req.body?.["tutorials.search"] !== undefined) {
-      updateFields["tutorials.search"] = req.body["tutorials.search"];
-    }
-
-    if (req.body?.["tutorials.create"] !== undefined) {
-      updateFields["tutorials.create"] = req.body["tutorials.create"];
-    }
-
-    if (req.body?.["tutorials.bookmark"] !== undefined) {
-      updateFields["tutorials.bookmark"] = req.body["tutorials.bookmark"];
+    if (req.body?.tutorials !== undefined) {
+      updateFields.tutorials = req.body.tutorials;
     }
 
     if (req.body?.notifications !== undefined) {
@@ -574,8 +671,6 @@ app.put("/updateUser/:id", async (req, res) => {
 
     res.json(updated);
   } catch (err) {
-    console.log(err);
-
     res.status(500).json({
       error: err.message,
     });
@@ -599,7 +694,6 @@ app.post("/bookmarkListing/:id", async (req, res) => {
     );
     res.json(updatedUserInfo.savedItems);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Unexpected server error!");
   }
 });
@@ -615,14 +709,35 @@ app.post("/removeBookmark/:id", async (req, res) => {
     );
     res.json(updatedUserInfo.savedItems);
   } catch (error) {
-    console.log(error);
     res.status(500).send("Unexpected server error!");
   }
 });
 
-app.get("/tutorial", (req, res) => {
-  res.render("tutorial.ejs");
-});
+// ============================================================================================
+// This function extracts only the street name of the listing to show it on the details page
+// to avoid exposing the full address for privacy concerns.
+// this is used in the following route.
+// ============================================================================================
+function extractStreet(location) {
+  //recover in case there is no location in the database
+  if (!location) return "Address not provided!";
+
+  // split by comma, take the street segment and trim whitespace
+  const streetPart = location.split(",")[0].trim();
+
+  // split into words
+  const tokens = streetPart.split(" ");
+
+  // drop the first word/numeric part
+  // isNaN means is not a number
+  const firstIsNumber = !isNaN(Number(tokens[0]));
+
+  //if the first part is true, slice it and join the rest to reform a string
+  const street = firstIsNumber ? tokens.slice(1).join(" ") : streetPart;
+
+  // recover if the extraction leaves us with nothing(null), fall back to full address in worst case scenario
+  return street || location;
+}
 
 // routes for rendering listing details page and loading it dynamically
 app.get("/listingDetails/:id", async (req, res) => {
@@ -637,9 +752,13 @@ app.get("/listingDetails/:id", async (req, res) => {
       profilePicture: 1,
       phone: 1,
     });
-    res.render("listingDetails", { listing, user });
+
+    res.render("listingDetails", {
+      listing,
+      user,
+      street: extractStreet(listing.location),
+    });
   } catch (error) {
-    console.log(error);
     res.status(500).send("Unexpected server error!");
   }
 });
@@ -662,7 +781,6 @@ app.post("/reviews/:id", async (req, res) => {
     });
     res.send("Review added successfully!");
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Could not save review" });
   }
 });
@@ -674,7 +792,6 @@ app.get("/sellerReviews/:id", async (req, res) => {
     const sellerReviews = await ReviewModel.find({ seller: listing.seller });
     res.json(sellerReviews);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Could not get reviews" });
   }
 });
@@ -720,11 +837,13 @@ Ask the user what food items they want to list.
 
 **STEP 2 — COLLECT LOCATION**
 First, check the location field in [Current Form State]:
-- If it already looks like a full valid address (contains a street number, a street name, and a city — e.g., "123 Main St, Vancouver, BC"), confirm it with the user: "I see your address is already filled in as [address]. Does that work for this listing?" Wait for confirmation, then move to STEP 3.
-- If it looks like just a city name or neighbourhood (e.g., "Kelowna", "Vancouver", "Kitsilano") with no street number, say: "I see your city is set to [city] — for pickup listings we need a full street address. Could you provide your street number and street name?" and wait for a valid response.
-- If it is empty, ask: "What is the pickup address for this listing? Please provide it as a single-line address (e.g., 123 Main St, Vancouver, BC)."
-- A valid address MUST contain all three of: a street number (digits), a street name, and a city. Everything on one line, comma-separated.
-- Reject anything missing a street number, just a city or neighbourhood, a postal code alone, or anything vague. Explain the exact format needed and ask again.
+- If it already matches the required format (e.g., "123 Main St, V5K 1A2, Canada"), confirm it with the user: "I see your address is already filled in as [address]. Does that work for this listing?" Wait for confirmation, then move to STEP 3.
+- If it contains enough information to build a valid address (street number, street name, and a Canadian postal code — in any format or order), silently convert it to the required format: "[Street Number] [Street Name], [POSTAL CODE], Canada". Always separate each part with a comma and a space. If a city or province is included, silently omit it. If the user did not include a comma, add it yourself. A Canadian postal code (letter-digit-letter space digit-letter-digit, e.g. V5K 1A2) always implies Canada — never ask the user to confirm the country. Do not mention any of these formatting corrections to the user. Confirm with the user: "I've formatted your address as [converted address] — does that look right?"
+- If it looks like just a city, neighbourhood, or partial address with no postal code, say: "I need a full address to complete the listing. Could you provide your street address and postal code? (e.g., 123 Main St, V5K 1A2)"
+- If it is empty, ask: "What is the pickup address for this listing? Please use this format: 123 Main St, V5K 1A2"
+- A valid address MUST contain: a street number (digits), a street name, and a Canadian postal code (letter-digit-letter space digit-letter-digit, e.g. V5K 1A2).
+- The final stored format is ALWAYS: [Street Number] [Street Name], [POSTAL CODE], Canada — three parts, comma-separated, nothing else. Never store the address without ", Canada" at the end.
+- Reject anything missing a street number or a valid Canadian postal code. Explain the exact format needed and ask again.
 - Do NOT accept suite/unit numbers in place of a street address.
 - Do NOT suggest a price until a valid address is confirmed.
 - Once a valid address is confirmed, move to STEP 3.
@@ -732,8 +851,8 @@ First, check the location field in [Current Form State]:
 **STEP 3 — SUGGEST PRICE**
 Suggest a price in CAD using this logic:
   a) Start from estimated Canadian retail price for each item.
-  b) Apply a 40–60% surplus discount (use 55% as your default).
-  c) Compare the total against local Facebook Marketplace and Kijiji norms for similar surplus bundles.
+  b) Apply a 40–60% surplus discount (use 45% as your default).
+  c) Compare the total against local Facebook Marketplace, too good to go, and Kijiji norms for similar surplus bundles.
   d) Only use $3.99–$7.99 CAD as a sanity check if ALL items are everyday low-value 
    staples (e.g., bread, common produce, a single egg, condiments). Do NOT apply 
    this cap if the bundle contains any of the following: meat, seafood, dairy packs, 
@@ -863,7 +982,6 @@ Once the form has been pre-filled, the strict step flow is suspended. Stay in Ed
     const result = await chat.sendMessage(contextMessage);
     const responseText = result.response.text(); //Extracts plain text from gemini response
 
-    console.log("Gemini Success:", responseText);
     res.json({ text: responseText });
   } catch (error) {
     console.error("AI Error Detailed:", error);

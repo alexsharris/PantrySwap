@@ -13,7 +13,8 @@
     />
     <!--CSS-->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="/scripts/sellerListings.js" defer></script>
+    <script type="module" src="/scripts/sellerListings.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
 
     <!--Tailwind-->
     <link
@@ -27,7 +28,7 @@
   <body class="min-h-screen flex flex-col">
     <site-navbar></site-navbar>
 
-    <div class="site-margins">
+    <div class="site-margins mx-auto w-full">
       <!--Heading and create button-->
       <div class="flex flex-col sm:flex-row justify-between mb-3">
         <h1 class="mb-4">Your listings</h1>
@@ -39,7 +40,16 @@
           Create new
         </button>
       </div>
-
+      <!-- for empty sell page -->
+      <div
+        id="emptyStateBanner"
+        class="hidden p-10 md:w-[80%] mx-auto w-full mb-20 text-white text-center rounded-4xl bg-orange"
+      >
+        <h2 class="text-white">You haven't listed anything yet.</h2>
+        <p class="text-white/80 text-sm mt-2">
+          Start sharing your surplus food with your community!
+        </p>
+      </div>
       <div class="card-grid" id="listingsHolder"></div>
     </div>
   </body>

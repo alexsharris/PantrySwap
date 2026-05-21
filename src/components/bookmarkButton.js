@@ -61,7 +61,6 @@ class bookmarkButton extends HTMLElement {
     try {
       const response = await fetch("/user");
       if (!response.ok) {
-        console.log("No user found for this session");
         return;
       }
       const data = await response.json();
@@ -69,7 +68,7 @@ class bookmarkButton extends HTMLElement {
       this.userId = this.user._id;
       this.notifications = data.notifications;
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -106,7 +105,6 @@ class bookmarkButton extends HTMLElement {
         ).json();
       }
       this.isBookmarked = !this.isBookmarked;
-      // console.log(data);
     } catch (err) {
       console.error("Bookmark request failed:", err);
     }

@@ -47,6 +47,62 @@ const LoginForm = document
     }
   });
 
+//================================================================================================
+// This function sends a verification code to the entered email and reveals the OTP input section
+// and displays any error messages comes back from server
+//================================================================================================
+async function sendOtp() {
+  const email = document.getElementById("emailSignup").value;
+  const errorMsg = document.getElementById("signupErrorMsg");
+  const errorText = document.getElementById("signupErrorText");
+
+  const response = await fetch("/send-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (response.ok) {
+    document.getElementById("otpSection").classList.remove("hidden");
+    errorMsg.classList.add("hidden");
+    document.getElementById("sendOtpBtn").textContent = "Re-send Code";
+  } else {
+    const data = await response.json();
+    errorText.textContent = data.error;
+    errorMsg.classList.remove("hidden");
+  }
+}
+
+document.getElementById("sendOtpBtn").addEventListener("click", sendOtp);
+
+// verify OTP button — verify-otp, shows green message and reveals password section on success
+
+document.getElementById("verifyOtpBtn").addEventListener("click", async () => {
+  const email = document.getElementById("emailSignup").value;
+  const otp = document.getElementById("OTP").value;
+  const errorMsg = document.getElementById("signupErrorMsg");
+  const errorText = document.getElementById("signupErrorText");
+
+  const response = await fetch("/verify-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, otp }),
+  });
+
+  if (response.ok) {
+    errorMsg.classList.add("hidden");
+    document.getElementById("otpSection").classList.add("hidden");
+    document.getElementById("sendOtpBtn").classList.add("hidden");
+    document.getElementById("verifiedMsg").classList.remove("hidden");
+    document.getElementById("postVerifySection").classList.remove("hidden");
+    document.getElementById("signupBtn").classList.remove("hidden");
+  } else {
+    const data = await response.json();
+    errorText.textContent = data.error;
+    errorMsg.classList.remove("hidden");
+  }
+});
+
 // submitting the signup form
 
 const SignUpForm = document
@@ -65,7 +121,7 @@ const SignUpForm = document
       method: "POST",
       redirect: "follow",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, emailSignup, passwordSignup, RememberSignup  }),
+      body: JSON.stringify({ name, emailSignup, passwordSignup, RememberSignup }),
     });
 
     // redirecting them to home when signed up successfully
