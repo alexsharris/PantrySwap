@@ -28,7 +28,10 @@ async function GetDefaultInformation() {
   }
   if (ServerResponseJson.profilePicture) {
     document.getElementById("userPFP").src = ServerResponseJson.profilePicture;
-    console.log("pfp found");
+    document.getElementById("userPFP").classList.remove("hidden");
+    document.getElementById("userPFPInitial").classList.add("hidden");
+  } else {
+    document.getElementById("userPFPInitial").textContent = ServerResponseJson.name.charAt(0).toUpperCase();
   }
   if (ServerResponseJson.address) {
     document.getElementById("UserNewAddress").placeholder =
@@ -88,6 +91,8 @@ uploadImgBtn.addEventListener("click", async () => {
   console.log(encodedImg);
   currentPFP = encodedImg;
   document.getElementById("userPFP").src = currentPFP;
+  document.getElementById("userPFP").classList.remove("hidden");
+  document.getElementById("userPFPInitial").classList.add("hidden");
 });
 
 async function changeData() {
