@@ -12,6 +12,9 @@ import "../components/bookmarkButton.js";
 // get the id of the document from the url
 const id = window.location.pathname.split("/").pop();
 
+//========================================================================================================================
+// This arrow function returns an SVG star icon colored orange if its position (id) is within the rating, grey otherwise
+//========================================================================================================================
 const starSVG = (id, starValueDB) => `<svg data-value="${id}"
                 class="size-6 ${id <= starValueDB ? "text-orange" : "text-light-grey"}"
                 xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +146,7 @@ async function submitReview() {
   }
 
   if (isValid) {
-    const Response = await fetch(`/reviews/${id}`, {
+    const response = await fetch(`/reviews/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -154,7 +157,7 @@ async function submitReview() {
         rating: Number(formData.get("rating")),
       }),
     });
-    if (Response.ok) {
+    if (response.ok) {
       closePopupWindow();
       displayReviews(id);
     }
@@ -214,6 +217,7 @@ const buttons = [
 
 let starValue = undefined;
 
+// opens the review submission popup and wires up interactive star rating
 document.getElementById("leaveReviewBtn").addEventListener("click", () => {
   displaySimpleWindow("Submit" + form, buttons, false);
 
