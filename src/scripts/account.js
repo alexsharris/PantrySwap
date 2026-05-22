@@ -1,47 +1,49 @@
 import { displaySimpleWindow, displayWindow } from "./popupWindow.js";
 
+//======================================================================================================
 // this function will fetch informtaion from DB to present as the default placeholders in the form
-async function GetDefaultInformation() {
-  const ServerResponse = await fetch("/AccountData");
-  const ServerResponseJson = await ServerResponse.json();
+//======================================================================================================
+async function getDefaultInformation() {
+  const serverResponse = await fetch("/AccountData");
+  const serverResponseJson = await serverResponse.json();
 
   // assign user's name and city
   document.getElementById("UserCurrentName").innerHTML =
-    ServerResponseJson.name;
+    serverResponseJson.name;
   document.getElementById("Usercity").innerHTML =
-    ServerResponseJson.city || "Unknown";
+    serverResponseJson.city || "Unknown";
 
   // assign the information retrieved to each placeholder
-  document.getElementById("UserNewName").placeholder = ServerResponseJson.name;
+  document.getElementById("UserNewName").placeholder = serverResponseJson.name;
   document.getElementById("UserNewEmail").placeholder =
-    ServerResponseJson.email;
+    serverResponseJson.email;
 
   // some of the info could not exist if they user is recently signed up
-  if (ServerResponseJson.phone) {
+  if (serverResponseJson.phone) {
     document.getElementById("UserNewphone").placeholder =
-      ServerResponseJson.phone;
+      serverResponseJson.phone;
   }
-  if (ServerResponseJson.city) {
+  if (serverResponseJson.city) {
     document.getElementById("UserNewCity").placeholder =
-      ServerResponseJson.city;
+      serverResponseJson.city;
   }
-  if (ServerResponseJson.profilePicture) {
-    document.getElementById("userPFP").src = ServerResponseJson.profilePicture;
+  if (serverResponseJson.profilePicture) {
+    document.getElementById("userPFP").src = serverResponseJson.profilePicture;
     document.getElementById("userPFP").classList.remove("hidden");
     document.getElementById("userPFPInitial").classList.add("hidden");
   } else {
-    document.getElementById("userPFPInitial").textContent = ServerResponseJson.name.charAt(0).toUpperCase();
+    document.getElementById("userPFPInitial").textContent = serverResponseJson.name.charAt(0).toUpperCase();
   }
-  if (ServerResponseJson.address) {
+  if (serverResponseJson.address) {
     document.getElementById("UserNewAddress").placeholder =
-      ServerResponseJson.address;
+      serverResponseJson.address;
   }
-  if (ServerResponseJson.postalCode) {
+  if (serverResponseJson.postalCode) {
     document.getElementById("UserNewPostalCode").placeholder =
-      ServerResponseJson.postalCode;
+      serverResponseJson.postalCode;
   }
 }
-GetDefaultInformation();
+getDefaultInformation();
 
 //==========================================================================
 //using the pre-defined pop-up component to display changes saved message
@@ -63,6 +65,9 @@ const button = [
   },
 ];
 
+//=============================================================================================
+// This function converts a File object to a Base64-encoded data URL for storage and preview
+//=============================================================================================
 function readImageAsBase64(file) {
   return new Promise((resolve, reject) => {
     if (!file) {
@@ -91,41 +96,44 @@ uploadImgBtn.addEventListener("click", async () => {
   document.getElementById("userPFPInitial").classList.add("hidden");
 });
 
+//=====================================================================================================
+// This function collects updated fields from the form and sends only the changed values to the server
+//=====================================================================================================
 async function changeData() {
-  const Name = document.getElementById("UserNewName").value;
-  const Email = document.getElementById("UserNewEmail").value;
-  const Phone = document.getElementById("UserNewphone").value;
-  const City = document.getElementById("UserNewCity").value;
-  const Address = document.getElementById("UserNewAddress").value;
-  const PostalCode = document.getElementById("UserNewPostalCode").value;
+  const name = document.getElementById("UserNewName").value;
+  const email = document.getElementById("UserNewEmail").value;
+  const phone = document.getElementById("UserNewphone").value;
+  const city = document.getElementById("UserNewCity").value;
+  const address = document.getElementById("UserNewAddress").value;
+  const postalCode = document.getElementById("UserNewPostalCode").value;
 
   // should be defined outside if statements to be accessible
-  let UserNewName, UserNewEmail, UserNewphone, UserNewCity, UserNewPFP, UserNewAddress, UserNewPostalCode
+  let UserNewName, UserNewEmail, UserNewphone, UserNewCity, UserNewPFP, UserNewAddress, UserNewPostalCode;
 
   // only send the fields that are actually updated (not falsey or empty)
-  if (Name) {
-    UserNewName = Name;
+  if (name) {
+    UserNewName = name;
   }
-  if (Email) {
-    UserNewEmail = Email;
+  if (email) {
+    UserNewEmail = email;
   }
-  if (Phone) {
-    UserNewphone = Phone;
+  if (phone) {
+    UserNewphone = phone;
   }
-  if (City) {
-    UserNewCity = City;
+  if (city) {
+    UserNewCity = city;
   }
   if (currentPFP) {
     UserNewPFP = currentPFP;
   }
-  if (Address){
-    UserNewAddress = Address
+  if (address) {
+    UserNewAddress = address;
   }
-  if (PostalCode){
-    UserNewPostalCode = PostalCode
+  if (postalCode) {
+    UserNewPostalCode = postalCode;
   }
 
-  const Response = await fetch("/ChangeData", {
+  const response = await fetch("/ChangeData", {
     method: "PUT",
     redirect: "follow",
     headers: { "Content-Type": "application/json" },
@@ -139,7 +147,7 @@ async function changeData() {
       UserNewPostalCode
     }),
   });
-  await GetDefaultInformation();
+  await getDefaultInformation();
 }
 
 //==============================================================================
@@ -168,11 +176,13 @@ const buttons = [
   },
 ];
 
-// calling the function to send the delete request
 
+// ============================================================================
+// This function sends the delete request to the server to delete an account
+// ============================================================================
 async function deleteAccount() {
-  const Response = await fetch("/DeleteAccount", { method: "DELETE" });
-  if (Response.ok) {
+  const response = await fetch("/DeleteAccount", { method: "DELETE" });
+  if (response.ok) {
     window.location.href = "/login";
   }
 }

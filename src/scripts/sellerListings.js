@@ -1,6 +1,8 @@
 import { closePopupWindow, displayWindow, displaySimpleWindow } from "./popupWindow.js"
 
-//Display seller's listings
+//==================================================================================================
+// This function fetches the seller listings from the database and displays them
+//===================================================================================================
 const displaySellerListings = async function () {
   try {
     const res = await fetch("/sellerListings");
@@ -38,7 +40,9 @@ const displaySellerListings = async function () {
   }
 };
 
-// checks total closed/unlisted listings, and shows easter egg pop up if requirement is met
+//===========================================================================================================
+// This function checks total closed/unlisted listings, and shows easter egg pop up if requirement is met
+//===========================================================================================================
 const checkForEasterEgg = async function () {
   let totalClosed = 0
   try {

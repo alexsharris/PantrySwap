@@ -2,7 +2,7 @@
 // This function fetches the information from DB when the page is loaded, and display listings that are bookmarked
 //=================================================================================================================
 async function displaySavedListings() {
-  const Response = await (await fetch("/user")).json();
+  const response = await (await fetch("/user")).json();
 
   //get all the listing from the database
   const listingResponse = await fetch("/loadListings");
@@ -10,7 +10,7 @@ async function displaySavedListings() {
 
   // filter down to only the saved ones for a user
   const savedData = allListings.filter((listing) =>
-    Response.savedItems.includes(listing._id),
+    response.savedItems.includes(listing._id),
   );
   const listingHolder = document.getElementById("listingsHolder");
 
@@ -26,7 +26,7 @@ async function displaySavedListings() {
       newListing.price,
       "default",
       [true, false, false],
-      [...Response.savedItems],
+      [...response.savedItems],
     );
     listingHolder.appendChild(newCard);
   });

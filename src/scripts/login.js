@@ -29,7 +29,7 @@ const LoginForm = document
 
     // make the post request to get the user
 
-    const Response = await fetch("/Login", {
+    const response = await fetch("/Login", {
       method: "POST",
       redirect: "follow",
       headers: { "Content-Type": "application/json" },
@@ -39,10 +39,9 @@ const LoginForm = document
     // this is for to check if the response has redirected attribute, set the window location href
     // to the url attribute attached to it
 
-    if (Response.redirected) {
-      window.location.href = Response.url;
-    }
-    else{
+    if (response.redirected) {
+      window.location.href = response.url;
+    } else {
       document.getElementById("errorMsg").classList.remove("hidden");
     }
   });
@@ -117,7 +116,7 @@ const SignUpForm = document
 
     // making the post request to send new user info to the server
 
-    const Response = await fetch("/SignUp", {
+    const response = await fetch("/SignUp", {
       method: "POST",
       redirect: "follow",
       headers: { "Content-Type": "application/json" },
@@ -125,10 +124,10 @@ const SignUpForm = document
     });
 
     // redirecting them to home when signed up successfully
-    if (Response.redirected) {
-      window.location.href = Response.url;
-    } else if (!Response.ok) {
-      const data = await Response.json();
+    if (response.redirected) {
+      window.location.href = response.url;
+    } else if (!response.ok) {
+      const data = await response.json();
       const errorMsg = document.getElementById("signupErrorMsg");
       document.getElementById("signupErrorText").textContent = data.error;
       errorMsg.classList.remove("hidden");
