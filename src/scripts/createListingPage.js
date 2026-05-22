@@ -284,6 +284,11 @@ const buttons = [
     },
 ];
 
+//============================================================================================================================================================================
+//The addFood function takes the data entered by the user in from the Add Food form and creates a new food bar display with that information. 
+//Event listeners are then added to the plus and minus quantity buttons to listen for clicks. It triggers the text displayed to update and the quantity of food in the foodArray
+//If the quantity gets reduced to 0, then food item itself gets removed.
+//============================================================================================================================================================================
 function addFood() {
     const foodForm = document.getElementById("food-form");
     const formData = new FormData(foodForm);
@@ -323,19 +328,25 @@ function addFood() {
         foodBar.querySelector("#minusQuant").addEventListener("click", () => {
             if (quantity > 0) {
                 quantity -= 1;
-                itemQuant.textContent = quantity;
-                foodArray[index].quantity = quantity;
-                if (foodArray[index].quantity == 0) {
-                    foodArray.pop();
-                    foodBar.remove();
-                }
+                itemQuant.textContent = quantity; //update display
+                const currentIndex = foodArray.findIndex(food => food.name == formData.get("name")) //find the current index of the food even after updates
+                
+                foodArray[currentIndex].quantity = quantity; //update array
+
+                    if (quantity == 0) {
+                    foodArray.splice(currentIndex, 1);
+                        foodBar.remove();
+                    }
             }
         });
+
         foodBar.querySelector("#plusQuant").addEventListener("click", () => {
             if (quantity > 0) {
                 quantity += 1;
-                itemQuant.textContent = quantity;
-                foodArray[index].quantity = quantity;
+                itemQuant.textContent = quantity; //update display
+                const currentIndex = foodArray.findIndex(food => food.name == formData.get("name")) //find the current index of the food even after updates
+                foodArray[currentIndex].quantity = quantity; //update array
+                
             }
         });
         foodsList.appendChild(foodBar);

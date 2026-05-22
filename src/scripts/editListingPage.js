@@ -114,7 +114,11 @@ function loadFoods(listingRecord) {
   });
 }
 
-//ADD FOOD FUNCTION
+//============================================================================================================================================================================
+//The addFood function takes the data entered by the user in from the Add Food form and creates a new food bar display with that information. 
+//Event listeners are then added to the plus and minus quantity buttons to listen for clicks. It updates and the quantity of food in the foodArray
+//If the quantity gets reduced to 0, then food item itself gets removed.
+//============================================================================================================================================================================
 function addFood(listingRecord) {
   let foodArray = listingRecord.foods;
 
