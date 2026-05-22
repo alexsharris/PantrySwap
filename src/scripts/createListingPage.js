@@ -295,6 +295,11 @@ const buttons = [
     },
 ];
 
+//============================================================================================================================================================================
+//The addFood function takes the data entered by the user in from the Add Food form and creates a new food bar display with that information. 
+//Event listeners are then added to the plus and minus quantity buttons to listen for clicks. It triggers the text displayed to update and the quantity of food in the foodArray
+//If the quantity gets reduced to 0, then food item itself gets removed.
+//============================================================================================================================================================================
 function addFood() {
     const foodForm = document.getElementById("food-form");
     const formData = new FormData(foodForm);
@@ -329,24 +334,29 @@ function addFood() {
         let quantity = parseInt(formData.get("quantity"));
 
         foodArray.push({ name: formData.get("name"), quantity: quantity });
-        let index = foodArray.length - 1;
 
         foodBar.querySelector("#minusQuant").addEventListener("click", () => {
             if (quantity > 0) {
                 quantity -= 1;
-                itemQuant.textContent = quantity;
-                foodArray[index].quantity = quantity;
-                if (foodArray[index].quantity == 0) {
-                    foodArray.pop();
-                    foodBar.remove();
-                }
+                itemQuant.textContent = quantity; //update display
+                const currentIndex = foodArray.findIndex(food => food.name == formData.get("name")) //find the current index of the food even after updates
+                
+                foodArray[currentIndex].quantity = quantity; //update array
+
+                    if (quantity == 0) {
+                    foodArray.splice(currentIndex, 1);
+                        foodBar.remove();
+                    }
             }
         });
+
         foodBar.querySelector("#plusQuant").addEventListener("click", () => {
             if (quantity > 0) {
                 quantity += 1;
-                itemQuant.textContent = quantity;
-                foodArray[index].quantity = quantity;
+                itemQuant.textContent = quantity; //update display
+                const currentIndex = foodArray.findIndex(food => food.name == formData.get("name")) //find the current index of the food even after updates
+                foodArray[currentIndex].quantity = quantity; //update array
+                
             }
         });
         foodsList.appendChild(foodBar);
@@ -456,7 +466,7 @@ document.querySelector("form").addEventListener("submit", async (event) => {
 
   // //validate required fields not left blank
   if (foodArray.length == 0) {
-    alert("Please add a food item.");
+    displaySimpleWindow("Please add a food item.")
     return;
   }
 
@@ -485,7 +495,7 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     }),
   });
   if (response.ok) {
-    alert("Listing created!");
-    window.location.href = "/sell";
+    displaySimpleWindow("Created!", [{label: "OK", color: "box-color-0", hover: "hover-outline", onClick: ()=> {window.location.href = "/sell"}}])
+    ;
   }
 });

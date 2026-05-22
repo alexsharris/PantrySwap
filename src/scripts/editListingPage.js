@@ -125,7 +125,11 @@ function loadFoods(listingRecord) {
   });
 }
 
-//ADD FOOD FUNCTION
+//============================================================================================================================================================================
+//The addFood function takes the data entered by the user in from the Add Food form and creates a new food bar display with that information. 
+//Event listeners are then added to the plus and minus quantity buttons to listen for clicks. It updates and the quantity of food in the foodArray
+//If the quantity gets reduced to 0, then food item itself gets removed.
+//============================================================================================================================================================================
 function addFood(listingRecord) {
   let foodArray = listingRecord.foods;
 
@@ -167,7 +171,6 @@ function addFood(listingRecord) {
     foodBar.querySelector("#minusQuant").addEventListener("click", () => {
       if (quantity > 0) {
         quantity -= 1;
-        // itemQuant.textContent = quantity
         foodArray[index].quantity = quantity;
         loadFoods(listingRecord);
         if (foodArray[index].quantity == 0) {
@@ -179,7 +182,6 @@ function addFood(listingRecord) {
     foodBar.querySelector("#plusQuant").addEventListener("click", () => {
       if (quantity > 0) {
         quantity += 1;
-        // itemQuant.textContent = quantity
         foodArray[index].quantity = quantity;
         loadFoods(listingRecord);
       }
@@ -251,9 +253,8 @@ async function initializePage() {
 
       if (response.ok) {
         newNotifForConnectedUsers(listingID, NotifTypes.DELETED);
-        displaySimpleWindow("Deleted!");
-        window.location.href = "/sell"
-  }
+        displaySimpleWindow("Deleted!", [{label: "OK", color: "box-color-0", hover: "hover-outline", onClick: ()=> {window.location.href = "/sell"}}])
+      }
       },
   },
   {
@@ -360,7 +361,7 @@ async function getCoordsFromAddress(userAddress){
 //save button
 document.querySelector("form").addEventListener("submit", async (event) => {
   event.preventDefault();
-
+  
   if (!data) {
     return;
   }
@@ -407,8 +408,7 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     }),
   });
   if (response.ok) {
-    // alert("Listing saved!");
-    displaySimpleWindow("Saved!")
+    displaySimpleWindow("Saved!", [{label: "OK", color: "box-color-0", hover: "hover-outline", onClick: ()=> {window.location.href = "/sell"}}])
     initializePage();
   }
 });
