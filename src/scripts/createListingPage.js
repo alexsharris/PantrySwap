@@ -450,7 +450,7 @@ document.querySelector("form").addEventListener("submit", async (event) => {
 
   // //validate required fields not left blank
   if (foodArray.length == 0) {
-    alert("Please add a food item.");
+    displaySimpleWindow("Please add a food item.")
     return;
   }
 
@@ -479,7 +479,7 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     }),
   });
   if (response.ok) {
-    alert("Listing created!");
-    window.location.href = "/sell";
+    displaySimpleWindow("Created!", [{label: "OK", color: "box-color-0", hover: "hover-outline", onClick: ()=> {window.location.href = "/sell"}}])
+    ;
   }
 });

@@ -237,9 +237,8 @@ async function initializePage() {
 
       if (response.ok) {
         newNotifForConnectedUsers(listingID, NotifTypes.DELETED);
-        displaySimpleWindow("Deleted!");
-        window.location.href = "/sell"
-  }
+        displaySimpleWindow("Deleted!", [{label: "OK", color: "box-color-0", hover: "hover-outline", onClick: ()=> {window.location.href = "/sell"}}])
+      }
       },
   },
   {
@@ -393,8 +392,7 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     }),
   });
   if (response.ok) {
-    // alert("Listing saved!");
-    displaySimpleWindow("Saved!")
+    displaySimpleWindow("Saved!", [{label: "OK", color: "box-color-0", hover: "hover-outline", onClick: ()=> {window.location.href = "/sell"}}])
     initializePage();
   }
 });
