@@ -7,10 +7,11 @@ const loadLimit = 10;
 let loadBatch = 1;
 let isLoadingMore = false;
 const loadMoreDelay = 800;
+
 // ===============================================================
-// Get distance between two coordinate pairs
+// This function gets the distance between two coordinate pairs
+// source of the formula: stackoverflow
 // ===============================================================
-// formula from stackoverflow
 let calculateDistance = function (latA, lonA, latB, lonB) {
   var R = 6378.137; // Radius of earth in KM
   var dLat = (latB * Math.PI) / 180 - (latA * Math.PI) / 180;
@@ -88,6 +89,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     rb.addEventListener("change", updateSelection);
   });
 
+  // ===============================================================
+  // This function reads the checked category checkboxes and selected
+  // distance radio button, updates the filter label text, and
+  // re-renders the listings to match the new selection.
+  // ===============================================================
   function updateSelection() {
     selectedCategories = Array.from(checkboxes)
       .filter((cb) => cb.checked)
@@ -123,7 +129,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // ===============================================================
-  // Render
+  // This function filters allListings by selected categories and
+  // distance, then renders the results. If a distance filter is
+  // active it sorts by proximity and renders all matches at once;
+  // otherwise it reverses to newest-first and kicks off batch
+  // loading via displayBatch().
   // ===============================================================
   function renderListings() {
     listingHolder.innerHTML = "";
@@ -231,6 +241,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   renderListings();
 
+  // ===============================================================
+  // This function renders the next page of listings from allListings
+  // using loadBatch and loadLimit to slice the correct range, then
+  // increments loadBatch so the next call advances the window.
+  // Called on initial load and on scroll to implement infinite scroll.
+  // ===============================================================
   function displayBatch() {
     const start = (loadBatch - 1) * loadLimit;
     const end = loadBatch * loadLimit;
