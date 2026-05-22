@@ -14,6 +14,9 @@ const listingID = window.location.pathname.split("/").pop();
 
 let data = null;
 
+// =========================================================================================
+// This functions fetch a specific listing from the database and converts it to json
+// =========================================================================================
 async function loadListingData() {
   //fetch foods
   const response = await fetch(`/LoadListing/${listingID}`);
@@ -21,6 +24,10 @@ async function loadListingData() {
   return listingRecord;
 }
 
+// =================================================================================================================================
+// This function sets default values in the edit listing form pulled from the current information available in the database
+// so the users could understand what information needs to be changed.
+//==================================================================================================================================
 function prefillForm(listingRecord) {
   document.getElementById("editTitle").value = listingRecord.title;
   document.getElementById("editLocation").value = listingRecord.location;
@@ -44,7 +51,9 @@ function prefillForm(listingRecord) {
     listingRecord.image || "images/pantry_share_img_10.jpg";
 }
 
-// translate image file into string
+//=============================================================================================
+// This function converts a File object to a Base64-encoded data URL for storage and preview
+//=============================================================================================
 function readImageAsBase64(file) {
   return new Promise((resolve, reject) => {
     if (!file) {
@@ -71,7 +80,9 @@ uploadImgBtn.addEventListener("click", async () => {
   document.getElementById("listingImg").src = currentImg;
 });
 
-//PRELOADING FOOD FROM THE EXISITNG LISTING
+//=======================================================================================
+//Preloading food from the existing listing in the database
+//=======================================================================================
 function loadFoods(listingRecord) {
   const foodArray = listingRecord.foods;
 
@@ -188,7 +199,9 @@ function addFood(listingRecord) {
   }
 }
 
-// Function for changing the listing status and listing buttons shown on the page
+//==============================================================================================
+// This function changes the listing status and listing buttons shown on the page
+//==============================================================================================
 function listingStatus(listingRecord) {
   let statusCircle = document.getElementById("statusCircle");
   let statusLabel = document.getElementById("statusLabel");
@@ -207,6 +220,9 @@ function listingStatus(listingRecord) {
   }
 }
 
+//====================================================================================================================
+// This function initialized the page by calling other functions to load listings data, status, and pre-fill the form
+//====================================================================================================================
 async function initializePage() {
   data = await loadListingData();
   listingStatus(data);

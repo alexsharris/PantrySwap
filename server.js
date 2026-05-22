@@ -227,6 +227,7 @@ app.post("/send-otp", async (req, res) => {
       return res.status(400).json({ error: "Please use a valid email address." });
   } catch (error) {
     // dymo API failed, fail open
+    console.log(error)
   }
 
   // generate a 6-digit OTP and save it to session with a 2-minute expiry

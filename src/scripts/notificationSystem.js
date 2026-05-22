@@ -25,6 +25,10 @@ export const NotifTypes = Object.freeze({
 // NOTIF LOGIC
 // =============================
 
+//=======================================================================
+// This function fetches all users and sends a notification of the given
+// type to every user who has the specified listing in their saved items
+//=======================================================================
 export async function newNotifForConnectedUsers(listingID, type) {
   try {
     const res = await fetch("/allUsers");
@@ -45,7 +49,9 @@ export async function newNotifForConnectedUsers(listingID, type) {
   }
 }
 
-// Get the reciever from the listing ID thenn send the notif
+//===========================================================================
+// This function gets the reciever from the listing ID thenn send the notif
+//===========================================================================
 export async function newNotificationWithGetReciever(listingID, type) {
   let listing = null;
   try {
@@ -59,7 +65,9 @@ export async function newNotificationWithGetReciever(listingID, type) {
   }
 }
 
-// Generic new notif function. Sends a notification of the type and listing to the reciever
+//===================================================================================================================
+// This function is a generic new notif function. it Sends a notification of the type and listing to the reciever
+//===================================================================================================================
 export async function newNotification(receiverID, listingID, type) {
   if (!listingID || !receiverID) {
     return;
