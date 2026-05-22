@@ -160,7 +160,6 @@ function addFood(listingRecord) {
     foodBar.querySelector("#minusQuant").addEventListener("click", () => {
       if (quantity > 0) {
         quantity -= 1;
-        // itemQuant.textContent = quantity
         foodArray[index].quantity = quantity;
         loadFoods(listingRecord);
         if (foodArray[index].quantity == 0) {
@@ -172,7 +171,6 @@ function addFood(listingRecord) {
     foodBar.querySelector("#plusQuant").addEventListener("click", () => {
       if (quantity > 0) {
         quantity += 1;
-        // itemQuant.textContent = quantity
         foodArray[index].quantity = quantity;
         loadFoods(listingRecord);
       }
@@ -348,7 +346,7 @@ async function getCoordsFromAddress(userAddress){
 //save button
 document.querySelector("form").addEventListener("submit", async (event) => {
   event.preventDefault();
-
+  
   if (!data) {
     return;
   }

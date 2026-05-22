@@ -323,7 +323,6 @@ function addFood() {
         let quantity = parseInt(formData.get("quantity"));
 
         foodArray.push({ name: formData.get("name"), quantity: quantity });
-        let index = foodArray.length - 1;
 
         foodBar.querySelector("#minusQuant").addEventListener("click", () => {
             if (quantity > 0) {
