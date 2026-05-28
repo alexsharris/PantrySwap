@@ -74,6 +74,9 @@
   p {
     @apply text-[13px];
   }
+  body {
+    background-color: #f4eded;
+  }
 }
 
 /* ===================================================================== */
@@ -84,6 +87,10 @@
   textarea,
   select {
     @apply w-full rounded-xl border border-light-brown bg-white px-4 py-3 text-sm text-black outline-none transition;
+  }
+
+  site-navbar {
+    @apply sticky top-0 z-50 w-full bg-white md:drop-shadow-xl;
   }
 
   input:focus,
@@ -131,7 +138,7 @@
 @layer components {
   /* For x margins on each page */
   .site-margins {
-    @apply py-5 md:py-10 md:px-20 px-5 min-w-screen;
+    @apply py-5 px-5 md:py-10 max-w-5xl;
   }
 
   /* Cards and windows */
@@ -142,12 +149,15 @@
     @apply border-t border-peach px-4 py-4 -mx-4;
   }
   .card-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mx-auto mb-20 w-full;
+    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mx-auto mb-20 max-w-5xl;
   }
 
   /* Buttons */
   button {
     @apply py-3 px-10 rounded-xl font-semibold;
+  }
+  .menu-button{
+    @apply py-3 px-5 rounded-xl font-semibold cursor-pointer;
   }
   .hover-bright {
     @apply hover:brightness-120 hover:drop-shadow-lg hover:saturate-150 transition;

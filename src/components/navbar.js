@@ -22,30 +22,30 @@ class Navbar extends HTMLElement {
 
   renderNavbar() {
     this.innerHTML = `
-    <nav class="bg-white text-[#FF6700] font-extrabold z-20 relative p-6 md:drop-shadow-xl">
-        <div class="flex min-w-full md:relative md:w-auto justify-between">
+    <nav class="bg-white text-[#FF6700] font-extrabold z-20 py-6 px-5 max-w-5xl mx-auto">
+        <div class="flex md:relative justify-between">
             <button id="homeButton" class="flex gap-2 text-2xl self-center p-0">
                 <img src="/images/Pantry_Swap_Icon.png" class="size-9">
                 <h1>
                 Pantry Swap
                 </h1>
             </button>
-            <div class="flex justify-end gap-3 items-center">
-                <div class="flex gap-12 self-center">
-                    <div class="flex gap-6 md:visible md:w-auto w-0 invisible overflow-hidden">
-                        <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.buy[0]}">
+            <div class="flex justify-end gap-1 items-center">
+                <div class="flex gap-2 self-center">
+                    <div class="flex gap-2 md:visible md:w-auto w-0 invisible overflow-hidden">
+                        <button class="menu-button box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.buy[0]}">
                         Buy
                         </button>
-                        <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.sell[0]}">
+                        <button class="menu-button box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.sell[0]}">
                         Sell
                         </button>
-                        <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.saved[0]}">
-                        Saved
+                        <button class="menu-button box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.saved[0]}">
+                        Chats
                         </button>
-                        <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.account[0]}">
+                        <button class="menu-button box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.account[0]}">
                         Account
                         </button>
-                        <button class="box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.logout[0]}">
+                        <button class="menu-button box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.logout[0]}">
                         Logout
                         </button>
                 
@@ -63,7 +63,7 @@ class Navbar extends HTMLElement {
             Sell
             </button>
             <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.saved[1]}">
-            Saved
+            Chats
             </button>
             <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.account[1]}">
             Account

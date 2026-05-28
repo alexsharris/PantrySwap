@@ -16,104 +16,109 @@
   <body class="min-h-screen flex flex-col">
     <site-navbar></site-navbar>
     <!-- main body starts here -->
-    <div class="site-margins mx-auto">
+    <div class="site-margins mx-auto w-full max-w-5xl">
       <!-- category and distance buttons -->
-      <div class="flex gap-2 mb-8 ml-8 md:ml-0 w-full">
+      <div class="flex flex-col sm:flex-row justify-between mb-8 md:ml-0 w-full">
         <!-- ================================== -->
         <!-- Category dropdown -->
         <!-- ================================== -->
-        <div class="relative" id="categories">
-          <button
-            type="button"
-            class="border-2 border-light-grey rounded-full px-4 py-2"
-            id="catDropdownButton"
-          >
-            <h5 id="catSelectedText" class="font-semibold">Categories</h5>
-          </button>
+        <!--Categories left-->
+        <div class="flex flex-col sm:flex-row gap-2">
+          <div class="relative" id="categories">
+              <button type="button" class="w-full sm:w-auto bg-white border-2 border-light-grey rounded-full px-4 py-2" id="catDropdownButton">
+                <h5 id="catSelectedText" class="font-semibold text-left">Categories</h5>
+              </button>
+              <div id="catDropdown" class="absolute mt-2 card hidden z-50 w-56">
+                
+                <label
+                  class="checkbox-item flex items-center gap-2 cursor-pointer card-item"
+                >
+                  <input type="checkbox" value="Meat" class="hidden catItem" />
+                  <span class="circle-checkbox"
+                    ><span class="circle-checkbox-dot"></span
+                  ></span>
+                  <span class="small-label">Meat</span>
+                </label>
 
-          <div id="catDropdown" class="absolute mt-2 card hidden z-50 w-56">
-             
-            <label
-              class="checkbox-item flex items-center gap-3 cursor-pointer card-item"
-            >
-              <input type="checkbox" value="Meat" class="hidden catItem" />
-              <span class="circle-checkbox"
-                ><span class="circle-checkbox-dot"></span
-              ></span>
-              <span class="small-label">Meat</span>
-            </label>
+                <label
+                  class="checkbox-item flex items-center gap-3 cursor-pointer card-item"
+                >
+                  <input type="checkbox" value="Dairy" class="hidden catItem" />
+                  <span class="circle-checkbox"
+                    ><span class="circle-checkbox-dot"></span
+                  ></span>
+                  <span class="small-label">Dairy</span>
+                </label>
 
-            <label
-              class="checkbox-item flex items-center gap-3 cursor-pointer card-item"
-            >
-              <input type="checkbox" value="Dairy" class="hidden catItem" />
-              <span class="circle-checkbox"
-                ><span class="circle-checkbox-dot"></span
-              ></span>
-              <span class="small-label">Dairy</span>
-            </label>
+                <label
+                  class="checkbox-item flex items-center gap-3 cursor-pointer card-item"
+                >
+                  <input
+                    type="checkbox"
+                    value="Cooked Meals"
+                    class="hidden catItem"
+                  />
+                  <span class="circle-checkbox"
+                    ><span class="circle-checkbox-dot"></span
+                  ></span>
+                  <span class="small-label">Cooked Meals</span>
+                </label>
 
-            <label
-              class="checkbox-item flex items-center gap-3 cursor-pointer card-item"
-            >
-              <input
-                type="checkbox"
-                value="Cooked Meals"
-                class="hidden catItem"
-              />
-              <span class="circle-checkbox"
-                ><span class="circle-checkbox-dot"></span
-              ></span>
-              <span class="small-label">Cooked Meals</span>
-            </label>
-
-            <label
-              class="checkbox-item flex items-center gap-3 cursor-pointer card-item"
-            >
-              <input
-                type="checkbox"
-                value="Baked Goods"
-                class="hidden catItem"
-              />
-              <span class="circle-checkbox"
-                ><span class="circle-checkbox-dot"></span
-              ></span>
-              <span class="small-label">Baked Goods</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="relative" id="distance">
-          <!-- Distance Dropdown -->
-          <button class="border-2 rounded-full py-2 px-4 border-[#DCDCDC] font-semibold min-w-24 cursor-pointer" id="distanceBtn">
-            <h5 id="distanceSelectedText" class="font-semibold">Distance</h5>
-          </button>
-
-          <div id="distanceDropdown" class="absolute mt-2 card hidden z-50 w-56">
-             
-            <label class="checkbox-item flex items-center gap-3 cursor-pointer card-item">
-              <input type="radio" value="1" name="distance" class="hidden distanceItem" />
-              <span class="circle-checkbox"><span class="circle-checkbox-dot"></span></span>
-              <span class="small-label">less than 1 km</span>
-            </label>
-            <label class="checkbox-item flex items-center gap-3 cursor-pointer card-item">
-              <input type="radio" value="5" name="distance" class="hidden distanceItem" />
-              <span class="circle-checkbox"><span class="circle-checkbox-dot"></span></span>
-              <span class="small-label">less than 5 km</span>
-            </label>
-            <label class="checkbox-item flex items-center gap-3 cursor-pointer card-item">
-              <input type="radio" value="10" name="distance" class="hidden distanceItem" />
-              <span class="circle-checkbox"><span class="circle-checkbox-dot"></span></span>
-              <span class="small-label">less than 10 km</span>
-            </label>
-            <label class="checkbox-item flex items-center gap-3 cursor-pointer card-item">
-              <input type="radio" value="1000" name="distance" class="hidden distanceItem" />
-              <span class="circle-checkbox"><span class="circle-checkbox-dot"></span></span>
-              <span class="small-label">No limit</span>
-            </label>
-
+                <label
+                  class="checkbox-item flex items-center gap-3 cursor-pointer card-item"
+                >
+                  <input
+                    type="checkbox"
+                    value="Baked Goods"
+                    class="hidden catItem"
+                  />
+                  <span class="circle-checkbox"
+                    ><span class="circle-checkbox-dot"></span
+                  ></span>
+                  <span class="small-label">Baked Goods</span>
+                </label>
+              </div>
           </div>
 
+          <div class="relative" id="distance">
+            <!-- Distance Dropdown -->
+            <button class="w-full sm:w-auto bg-white border-2 rounded-full py-2 px-4 border-[#DCDCDC] font-semibold min-w-24 cursor-pointer" id="distanceBtn">
+              <h5 id="distanceSelectedText" class="font-semibold text-left">Distance</h5>
+            </button>
+
+            <div id="distanceDropdown" class="absolute mt-2 card hidden z-50 w-56">
+              
+              <label class="checkbox-item flex items-center gap-3 cursor-pointer card-item">
+                <input type="radio" value="1" name="distance" class="hidden distanceItem" />
+                <span class="circle-checkbox"><span class="circle-checkbox-dot"></span></span>
+                <span class="small-label">less than 1 km</span>
+              </label>
+              <label class="checkbox-item flex items-center gap-3 cursor-pointer card-item">
+                <input type="radio" value="5" name="distance" class="hidden distanceItem" />
+                <span class="circle-checkbox"><span class="circle-checkbox-dot"></span></span>
+                <span class="small-label">less than 5 km</span>
+              </label>
+              <label class="checkbox-item flex items-center gap-3 cursor-pointer card-item">
+                <input type="radio" value="10" name="distance" class="hidden distanceItem" />
+                <span class="circle-checkbox"><span class="circle-checkbox-dot"></span></span>
+                <span class="small-label">less than 10 km</span>
+              </label>
+              <label class="checkbox-item flex items-center gap-3 cursor-pointer card-item">
+                <input type="radio" value="1000" name="distance" class="hidden distanceItem" />
+                <span class="circle-checkbox"><span class="circle-checkbox-dot"></span></span>
+                <span class="small-label">No limit</span>
+              </label>
+
+            </div>
+
+          </div>
+        </div> 
+        <!--Categories right-->
+        <div> 
+          <button class="w-full sm:w-auto flex items-center gap-3 border-2 rounded-full py-2 px-4 mt-2 sm:mt-0 border-[#DCDCDC] bg-white font-semibold min-w-24 cursor-pointer" id="savedFilter">
+            <div id="bookmarkIcon"></div>  
+            <h5 class="font-semibold">My saved</h5>
+          </button>
         </div>
         
       </div>

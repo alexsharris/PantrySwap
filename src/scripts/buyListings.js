@@ -7,6 +7,20 @@ const loadLimit = 10;
 let loadBatch = 1;
 let isLoadingMore = false;
 const loadMoreDelay = 800;
+bookmarkIcon.innerHTML = `<svg 
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6 shrink-0"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+              />
+            </svg>`;
 
 // ===============================================================
 // This function gets the distance between two coordinate pairs
@@ -95,6 +109,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   // re-renders the listings to match the new selection.
   // ===============================================================
   function updateSelection() {
+    let savedButton = document.getElementById("savedFilter");
+    savedButton.classList.add("bg-white");
+    savedButton.classList.remove("bg-orange");
+    savedButton.classList.remove("text-white");
+
     selectedCategories = Array.from(checkboxes)
       .filter((cb) => cb.checked)
       .map((cb) => cb.value);
@@ -180,11 +199,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     if (filtered.length === 0) {
-      listingHolder.innerHTML = `
-      <div class="col-span-full text-center text-medium-grey py-10">
-        No listings match your filters...
-      </div>
-    `;
+      listingHolder.innerHTML =  `
+          <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-4 text-center text-medium-grey py-10">
+            No listings match your filters...
+          </div>
+        `
       return;
     }
 
@@ -295,3 +314,62 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+
+
+document.getElementById("savedFilter").addEventListener("click", async () => {
+  listingsHolder.innerHTML = "";
+
+  let savedButton = document.getElementById("savedFilter");
+  savedButton.classList.remove("bg-white");
+  savedButton.classList.add("bg-orange");
+  savedButton.classList.add("text-white");
+
+  // Reset filters
+  document.querySelectorAll('input[type="checkbox"]:checked').forEach((checkbox) => {
+    checkbox.checked = false;
+  });
+  const checkedRadioButton = document.querySelector('input[name="distance"]:checked');
+  if(checkedRadioButton) {
+    checkedRadioButton.checked = false
+  }
+
+  const selectedText = document.getElementById("catSelectedText");
+  const selectedDistanceText = document.getElementById("distanceSelectedText");
+  selectedText.textContent = "Categories"
+  selectedDistanceText.textContent = "Distance"
+
+  //Get response
+  const response = await (await fetch("/user")).json();
+
+  //get all the listing from the database
+  const listingResponse = await fetch("/loadListings");
+  const allListings = await listingResponse.json();
+
+  // filter down to only the saved ones for a user
+  const savedData = allListings.filter((listing) =>
+    response.savedItems.includes(listing._id),
+  );
+  const listingHolder = document.getElementById("listingsHolder");
+
+  savedData.reverse().forEach((newListing) => {
+    if (!newListing || newListing.status !== "listed") return;
+
+    const newCard = document.createElement("listing-card");
+
+    newCard.setListingInfo(
+      newListing._id,
+      newListing.title,
+      newListing.image,
+      newListing.price,
+      "default",
+      [true, false, false],
+      [...response.savedItems],
+    );
+    listingHolder.appendChild(newCard);
+  });
+
+  if (listingHolder.children.length === 0) {
+    document.getElementById("emptyStateBanner").classList.remove("hidden");
+  }
+
+})
