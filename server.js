@@ -73,7 +73,7 @@ const UserSchema = new mongoose.Schema({
     },
   ],
   tutorials: [String],
-  easterEgg: Boolean,
+  easterEgg: Boolean
 });
 
 // schema of listings
@@ -105,7 +105,8 @@ const ListingsSchema = new mongoose.Schema({
   },
 });
 
-//schema of review collection
+
+// schema of review collection
 const reviewsSchema = new mongoose.Schema({
   reviewer: String, // user ID of the writer
   reviewerName: String, // display name of the writer
@@ -117,6 +118,24 @@ const reviewsSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+
+// schema of rooms. Index of unread matches index of member
+const RoomsSchema = new mongoose.Schema({
+  roomMembers: [{type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true}],
+  dateCreated: {type: Date, default: Date.now},
+  lastMessage: {
+    senderID: {type: mongoose.Schema.Types.ObjectId, ref: "Users"},
+    text: String,
+    date: {type: Date, default: Date.now}
+  },
+  chatLog: [{
+    senderID: {type: mongoose.Schema.Types.ObjectId, ref: "Users"},
+    date: {type: Date, default: Date.now},
+    message: String
+  }],
+  unread:[{type: Number, default: 0}]
+});
+
 const ImageModel = mongoose.model("Images", ImageSchema);
 
 const UserModel = mongoose.model("Users", UserSchema);
@@ -125,20 +144,62 @@ const ListingModel = mongoose.model("Listings", ListingsSchema);
 
 const ReviewModel = mongoose.model("Reviews", reviewsSchema);
 
-// setting up session
-app.use(
-  session({
-    store: new FileStore({
-      path: "./sessions",
-      secret: "keyboard cat", // optional to encrypt the session data
-      retries: 1,
-    }),
-    secret: "my secret key",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
+const RoomModel = mongoose.model("Rooms", RoomsSchema);
+
+const sessionMiddleware = session({
+  store: new FileStore({
+    path: "./sessions",
+    secret: "keyboard cat",
+    retries: 1,
   }),
-);
+  secret: "my secret key",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 60 * 60 * 1000 },
+  sameSite: "lax"
+});
+
+// setting up session
+app.use(sessionMiddleware);
+
+// Socket.io
+const {Server} = require("socket.io");
+const io = new Server({
+  cors: {
+    origin: ["http://localhost:3000", "http://127.0.0.1:5500"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  }
+})
+
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, {}, next);
+});
+
+// socket connection
+io.on("connection", async (socket) => {
+
+  console.log("Socket connection running")
+  // Connect to all rooms
+  socket.on("joinUserRooms", async () => {
+
+    const userID = socket.request.session?.UserID;
+    // console.log(`UserID: ${userID}`);
+
+    const rooms = await RoomModel.find({
+      roomMembers: userID
+    });
+
+    rooms.forEach(room => {
+      socket.join(room._id.toString());
+    });
+
+  });
+
+})
+
+io.listen(3001);
+
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -570,6 +631,93 @@ app.get("/loadListings", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+// ==================================================================
+// Routes for Chats page
+// ==================================================================
+
+// Render chats page from main nav
+app.get("/chats", (req, res) => {
+  res.render("chatsPage.ejs");
+})
+
+app.get("/chats/:roomID", (req, res) => {
+  res.render("chatsPage.ejs");
+})
+
+// Create room
+app.get("/createRoom/:sellerID", async (req, res) => {
+  try {
+    //Check if room exists and create one if not found
+    const userID = req.session.UserID;
+    const {sellerID} = req.params;
+    if(!userID) return res.redirect("/Login");
+
+    if(userID == sellerID) {
+      return res.status(400).send("Seller and user ID can't be the same");
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(sellerID)) {
+      return res.status(400).send("Invalid seller ID");
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userID)) {
+      return res.status(400).send("Invalid user ID");
+    }
+
+    const userObjId = new mongoose.Types.ObjectId(userID);
+    const sellerObjId = new mongoose.Types.ObjectId(sellerID);
+
+    // try and find active room
+    roomFound = await RoomModel.findOne({roomMembers: {$all:[userObjId, sellerObjId]}}).populate("roomMembers");
+    
+    if(roomFound) {
+      res.redirect(`/chats/${roomFound._id}`);
+    }
+
+    else {
+      //Create room 
+      newRoom = await RoomModel.create({
+        roomMembers:[userObjId, sellerObjId],
+        chatLog: [],
+        unread:[0,0]
+      });
+
+      res.redirect(`/chats/${newRoom._id}`);
+    }
+  }
+  catch (err) {
+    console.error(err);
+    res.status(500).send("Error creating room");
+  }
+})
+
+
+// Get all rooms associated with current user
+app.get("/getRooms", async (req, res) => {
+  try {
+    const userID = req.session.UserID;
+    const userObjId = new mongoose.Types.ObjectId(userID);
+
+    if(!userID) return res.redirect("/Login");
+
+    // Load user's rooms
+    const rooms = await RoomModel.find({roomMembers: userID}).populate("roomMembers");
+    res.json(rooms);
+  }
+    catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading rooms");
+  }
+
+});
+
+
+// ==================================================================
+// User related routes
+// ==================================================================
+
 
 //get current user info
 app.get("/user", async (req, res) => {

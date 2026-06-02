@@ -14,7 +14,7 @@
   --color-light-grey: #d9d9d9;
   --color-medium-grey: #9b9b9b;
   /* Main Colors */
-  --color-orange: #ff6700;
+  --color-orange: #ea6911;
   --color-peach: #f6e8e8;
   --color-light-brown: #a07564;
   --color-red: #d22e2e;
@@ -154,7 +154,13 @@
 
   /* Buttons */
   button {
-    @apply py-3 px-10 rounded-xl font-semibold;
+    @apply cursor-pointer py-3 px-10 rounded-xl font-semibold;
+  }
+  .convoActions {
+    @apply px-3 py-1 justify-center items-center;
+  }
+  .convoActions:hover {
+    @apply bg-peach;
   }
   .menu-button{
     @apply py-3 px-5 rounded-xl font-semibold cursor-pointer;
@@ -167,5 +173,51 @@
   }
   .hover-accent-text {
     @apply hover:text-orange transition;
+  }
+
+  /*Chat page*/
+  .convoContainer {
+    @apply -mt-5 md:-mt-10;
+  }
+
+  .sentMessageBox {
+    @apply relative w-[75%] ml-auto bg-orange p-5 rounded-xl text-white;
+  }
+
+  .receivedMessageBox {
+    @apply relative w-[75%] mr-auto bg-[#e5d6d6] p-5 rounded-xl;
+  }
+
+  .receivedMessage {
+    @apply pb-5;
+  }
+
+  .sentMessage {
+    @apply pb-5;
+  }
+
+  .newMessageBox {
+    @apply flex gap-3 justify-center p-10 shadow-[0_4px_10px_rgba(0,0,0,0.10)] bg-white rounded-xl mb-5;
+  }
+
+  .messageDate {
+    @apply text-[8px];
+  }
+
+  .chat-bubble-tail-right {
+    @apply absolute w-0 h-0 border-t-10 border-t-transparent border-b-10 border-b-transparent border-r-10 border-r-orange bottom-[-10px] right-0;
+  }
+
+  .chat-bubble-tail-left {
+    @apply absolute w-0 h-0 border-t-10 border-t-transparent border-b-10 border-b-transparent border-l-10 border-l-[#e5d6d6] bottom-[-10px] left-0;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and old Edge */
+    scrollbar-width: none;     /* Firefox */
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 }

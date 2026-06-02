@@ -3,7 +3,7 @@ import "./notificationButton.js";
 const buttonIDs = {
   buy: ["buyBtnDesktop", "buyBtnMobile"],
   sell: ["sellBtnDesktop", "sellBtnMobile"],
-  saved: ["savedBtnDesktop", "savedBtnMobile"],
+  chats: ["chatsBtnDesktop", "chatsBtnMobile"],
   account: ["accountBtnDesktop", "accountBtnMobile"],
   logout: ["logoutBtnDesktop", "logoutBtnMobile"],
 };
@@ -39,7 +39,7 @@ class Navbar extends HTMLElement {
                         <button class="menu-button box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.sell[0]}">
                         Sell
                         </button>
-                        <button class="menu-button box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.saved[0]}">
+                        <button class="menu-button box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.chats[0]}">
                         Chats
                         </button>
                         <button class="menu-button box-color-5 hover:text-orange hover:bg-peach" id="${buttonIDs.account[0]}">
@@ -62,7 +62,7 @@ class Navbar extends HTMLElement {
             <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.sell[1]}">
             Sell
             </button>
-            <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.saved[1]}">
+            <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.chats[1]}">
             Chats
             </button>
             <button class="box-color-5 px-0 hover:text-orange hover:bg-peach flex-1" id="${buttonIDs.account[1]}">
@@ -80,7 +80,7 @@ class Navbar extends HTMLElement {
     const routes = {
       buy: "/buy",
       sell: "/sell",
-      saved: "/bookmark",
+      chats: "/chats",
       account: "/account",
       logout: "/logout",
     };
@@ -127,7 +127,7 @@ class Navbar extends HTMLElement {
 
     if (path.startsWith("/buy")) return "buy";
     if (path.startsWith("/sell")) return "sell";
-    if (path.startsWith("/bookmark")) return "saved";
+    if (path.startsWith("/chats")) return "chats";
     if (path.startsWith("/account")) return "account";
     if (path.startsWith("/logout")) return "logout";
 
