@@ -14,104 +14,38 @@
     <!-- navbar -->
     <site-navbar></site-navbar>
     <!-- main content -->
-    <div class="mx-auto w-full max-w-5xl -mt-24">
+    <div class="flex justify-center items-center w-full max-w-5xl -mt-24 mx-auto">
+
+        <div id="emptyStatePage" class="absolute flex flex-col justify-center items-center z-10 mx-auto hidden">
+            <div class="bg-[#ede2e2] flex flex-col justify-between gap-10 items-center rounded-3xl px-10 pt-20 mx-10 max-w-100 overflow-hidden">
+                <div class="relative bg-white rounded-full px-10 py-10">
+                    <img src="/images/chat-box-tail-white.png" class="absolute left-12 -bottom-10">
+                    <h2 class="text-[#9b9b9b] text-center leading-6">Select a seller you want to chat with from a listing page</h3>
+                </div>
+                <img src="/images/mr-orange-01.png" class="max-w-100 px-10">
+            </div>
+        </div>
+
         <!-- Add main content here! -->
-        <div class="relative flex gap-15 px-5">
+        <div class="relative flex gap-15 px-5 w-full">
+            <div id="activeRoomDiv" class="absolute invisible"><p><%=activeRoomID%></p></div>
+
             <aside id="convoList" class="h-[100vh] hide-scrollbar flex flex-1 flex-col gap-3 overflow-y-auto pt-30 pb-30">
-            
-                <div class="convoCard flex items-center justify-between bg-white rounded-xl py-5 pl-5 pr-10 min-w-50">
-                    <!--Left-->
-                    <div class="flex gap-5">
-                        <button class="convoActions flex flex-col gap-1 cursor-pointer max-w-2">
-                            <div class="bg-[#dbc3c3] w-2 h-2 rounded-full"></div>
-                            <div class="bg-[#dbc3c3] w-2 h-2 rounded-full"></div>
-                            <div class="bg-[#dbc3c3] w-2 h-2 rounded-full"></div>
-                        </button>
-                        <img src="/images/sample-portrait-01.jpg"  class="object-cover rounded-full size-15"></img>
-                        <div>
-                            <h2>Alex</h2>
-                            <p>Vancouver</p>
-                        </div>
-                    </div>
-                    <!--Right-->
-                    <div class="messageCount bg-orange rounded-full pt-1 w-6 h-6">
-                        <p class="text-xs text-center text-white">3</p>
-                    </div>
-                </div>
-                <div class="convoCard flex items-center justify-between bg-white rounded-xl py-5 px-10 min-w-50">
-                    <!--Left-->
-                    <div class="flex gap-6">
-                        <img src="/images/sample-portrait-01.jpg"  class="object-cover rounded-full size-15"></img>
-                        <div>
-                            <h2>Alex</h2>
-                            <p>Vancouver</p>
-                        </div>
-                    </div>
-                    <!--Right-->
-                    <div class="messageCount bg-orange rounded-full pt-1 w-6 h-6">
-                        <p class="text-xs text-center text-white">3</p>
-                    </div>
-                </div>
             </aside>
             
             <!--Conversation container-->
             <div id="convoContainer" class="absolute top-0 left-0 md:relative h-screen hide-scrollbar flex-1 flex flex-col gap-10 px-5 md:px-0 overflow-y-auto pt-30 pb-30 bg-[#f4eded]">
-                <div class="text-center bg-[#e5d6d6] rounded-xl px-10 py-10">
-                    <p id="convoStartText">This is the beginning of your conversation with Alex</p>
-                </div>
-                <div class="receivedMessageBox">
-                    <div class="chat-bubble-tail-left"></div>
-                    <p class="receivedMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                    <p class="messageDate">May 8, 2026</p>
-                </div>
-                <div class="sentMessageBox">
-                    <div class="chat-bubble-tail-right"></div>
-                    <p class="sentMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                    <p class="messageDate">May 8, 2026</p>
-                </div>
-                <div class="sentMessageBox">
-                    <div class="chat-bubble-tail-right"></div>
-                    <p class="sentMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                    <p class="messageDate">May 8, 2026</p>
-                </div>
-                <div class="receivedMessageBox">
-                    <div class="chat-bubble-tail-left"></div>
-                    <p class="receivedMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                    <p class="messageDate">May 8, 2026</p>
-                </div>
-                <div class="sentMessageBox">
-                    <div class="chat-bubble-tail-right"></div>
-                    <p class="sentMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                    <p class="messageDate">May 8, 2026</p>
-                </div>
-                <div class="receivedMessageBox">
-                    <div class="chat-bubble-tail-left"></div>
-                    <p class="receivedMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                    <p class="messageDate">May 8, 2026</p>
-                </div>
-                <div class="sentMessageBox">
-                    <div class="chat-bubble-tail-right"></div>
-                    <p class="sentMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                    <p class="messageDate">May 8, 2026</p>
-                </div>
-                <div class="receivedMessageBox">
-                    <div class="chat-bubble-tail-left"></div>
-                    <p class="receivedMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                    <p class="messageDate">May 8, 2026</p>
-                </div>
-                <div class="sentMessageBox">
-                    <div class="chat-bubble-tail-right"></div>
-                    <p class="sentMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
-                    <p class="messageDate">May 8, 2026</p>
-                </div>
-                <!--New message-->
-                <form class="overflow-visible">
-                    <div class="newMessageBox">
-                        <img src="/images/sample-portrait-02.jpg"  class="object-cover rounded-full size-15"></img>
-                        <textarea id="newMessage" type="text" class="border-0" placeholder="New message"></textarea>
+                
+                <div id="emptyStateChat" class="absolute flex flex-col justify-center items-center z-10 mx-auto hidden">
+                    <div class="bg-[#ede2e2] flex flex-col justify-between gap-10 items-center rounded-3xl px-10 pt-20 mx-10 max-w-100 overflow-hidden">
+                        <div class="relative bg-white rounded-full px-10 py-10">
+                            <img src="/images/chat-box-tail-white.png" class="absolute left-12 -bottom-10">
+                            <h2 class="text-[#9b9b9b] text-center leading-6">Select a conversation to start the chat</h3>
+                        </div>
+                        <img src="/images/mr-orange-01.png" class="max-w-100 px-10">
                     </div>
-                    <button class="bg-orange hover-outline">Send message</button>
-                </form>
+                </div>
+
             </div>
             <!--Back button-->
             <button class="fixed top-30 left-5 bg-white p-2 rounded-xl md:hidden">← back to list</button>
@@ -120,7 +54,9 @@
     </div>
 
     <template id="convoCard">
-        <div class="convoCard flex items-center justify-between bg-white rounded-xl py-5 pl-5 pr-10 min-w-50">
+        <div class="convoCard relative flex items-center justify-between bg-white rounded-xl py-5 pl-5 pr-10 min-w-50 overflow-hidden cursor-pointer">
+            <!--Highlight-->
+            <div class="absolute left-0 top-0 h-full w-2"></div>
             <!--Left-->
             <div class="flex gap-5">
                 <button class="convoActions flex flex-col gap-1 cursor-pointer max-w-2">
@@ -140,6 +76,40 @@
             </div>
         </div>
     </template>
+
+    <template id="chatHeaderTemplate">
+        <div id="chatHeader" class="text-center bg-[#e5d6d6] rounded-xl px-10 py-10">
+            <p id="chatHeaderText">This is the beginning of the chat</p>
+        </div>
+    </template>
+
+    <template id="senderTemplate">
+        <div class="sentMessageBox">
+            <div class="chat-bubble-tail-right"></div>
+            <p class="sentMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+            <p class="messageDate">May 8, 2026</p>
+        </div>
+    </template>
+
+    <template id="recipientTemplate">
+        <div class="receivedMessageBox">
+            <div class="chat-bubble-tail-left"></div>
+            <p class="receivedMessage">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+            <p class="messageDate">May 8, 2026</p>
+        </div>
+    </template>
+
+    <template id="newMessageTemplate">
+        <div class="newMessageBox flex flex-col gap-4">
+            <div class="flex gap-2">
+                <img id="senderProfileImage" src="/images/sample-portrait-02.jpg" class="object-cover rounded-full size-15"></img>
+                <textarea id="newMessage" type="text" class="border-0" placeholder="New message"></textarea>
+            </div>
+            <button id="" class="messageButton bg-orange hover-outline">Send message</button>
+            <p id="errorMessage" class="hidden">Message cannot be empty</p>
+        </div>
+    </template>
+
     <!-- scripts -->
   </body>
 </html>

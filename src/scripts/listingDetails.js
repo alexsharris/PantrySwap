@@ -49,6 +49,7 @@ async function renderBookmarkButton() {
 
 renderBookmarkButton();
 
+
 //=======================================================================================
 // This function fetches the current user and compares their ID to the seller ID stored on the button.
 // If they match, the button is disabled and grayed out to prevent self-reviews.

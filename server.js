@@ -123,11 +123,6 @@ const reviewsSchema = new mongoose.Schema({
 const RoomsSchema = new mongoose.Schema({
   roomMembers: [{type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true}],
   dateCreated: {type: Date, default: Date.now},
-  lastMessage: {
-    senderID: {type: mongoose.Schema.Types.ObjectId, ref: "Users"},
-    text: String,
-    date: {type: Date, default: Date.now}
-  },
   chatLog: [{
     senderID: {type: mongoose.Schema.Types.ObjectId, ref: "Users"},
     date: {type: Date, default: Date.now},
@@ -162,7 +157,11 @@ const sessionMiddleware = session({
 // setting up session
 app.use(sessionMiddleware);
 
+
+// ==================================================================
 // Socket.io
+// ==================================================================
+
 const {Server} = require("socket.io");
 const io = new Server({
   cors: {
@@ -179,22 +178,25 @@ io.use((socket, next) => {
 // socket connection
 io.on("connection", async (socket) => {
 
-  console.log("Socket connection running")
+  //console.log("Socket connection running", socket.id);
+
   // Connect to all rooms
   socket.on("joinUserRooms", async () => {
-
     const userID = socket.request.session?.UserID;
-    // console.log(`UserID: ${userID}`);
-
     const rooms = await RoomModel.find({
       roomMembers: userID
     });
-
     rooms.forEach(room => {
       socket.join(room._id.toString());
     });
 
   });
+
+  // Send new message
+  socket.on("message", (data) => {
+    //console.log(`Message received from client ${data.room}`);
+    io.to(data.room).emit("message", {messageContent: data.messageContent, room: data.room, sender: data.senderID, date: data.date});
+  })
 
 })
 
@@ -637,22 +639,28 @@ app.get("/loadListings", async (req, res) => {
 // Routes for Chats page
 // ==================================================================
 
+app.get("/chats", async (req, res) => {
+  res.render("chatsPage.ejs", {
+    activeRoomID: null
+  });
+});
+
 // Render chats page from main nav
-app.get("/chats", (req, res) => {
-  res.render("chatsPage.ejs");
-})
+app.post("/chats", async (req, res) => {
 
-app.get("/chats/:roomID", (req, res) => {
-  res.render("chatsPage.ejs");
-})
-
-// Create room
-app.get("/createRoom/:sellerID", async (req, res) => {
   try {
-    //Check if room exists and create one if not found
     const userID = req.session.UserID;
-    const {sellerID} = req.params;
+    const {sellerID} = req.body;
     if(!userID) return res.redirect("/Login");
+    //console.log(sellerID);
+
+    // If no seller ID, just load default chat page
+    if(!sellerID) {
+      //console.log("No seller route activated")
+      return res.render("chatsPage.ejs", {
+        activeRoomID: "empty"
+      });
+    }
 
     if(userID == sellerID) {
       return res.status(400).send("Seller and user ID can't be the same");
@@ -673,18 +681,24 @@ app.get("/createRoom/:sellerID", async (req, res) => {
     roomFound = await RoomModel.findOne({roomMembers: {$all:[userObjId, sellerObjId]}}).populate("roomMembers");
     
     if(roomFound) {
-      res.redirect(`/chats/${roomFound._id}`);
+      return res.render("chatsPage.ejs", {
+        activeRoomID: roomFound._id
+      });
     }
-
     else {
       //Create room 
       newRoom = await RoomModel.create({
         roomMembers:[userObjId, sellerObjId],
-        chatLog: [],
+        chatLog: [{
+          senderID: userObjId,
+          date: Date.now(),
+          message: `New chat created at ${new Date(Date.now()).toLocaleString()}`
+        }],
         unread:[0,0]
       });
-
-      res.redirect(`/chats/${newRoom._id}`);
+      return res.render("chatsPage.ejs", {
+        activeRoomID: newRoom._id
+      });
     }
   }
   catch (err) {
@@ -714,12 +728,53 @@ app.get("/getRooms", async (req, res) => {
 });
 
 
+// Append new message
+app.post("/newMessage", async (req, res) => {
+  try {
+    const userID = req.session.UserID;
+    const { roomID, message, date, recipientIndex} = req.body;
+
+    const result = await RoomModel.updateOne(
+      {_id : roomID},
+      {
+        $push: {chatLog: { senderID: new mongoose.Types.ObjectId(userID), date: date, message: message}},
+        $inc: {[`unread.${recipientIndex}`]: 1}
+      }
+    );
+    return res.status(200).json({ success: true });
+  }
+  catch (err) {
+    console.error(err);
+    return res.sendStatus(500);
+  }
+});
+
+app.post("/resetUnread", async (req, res) => {
+  try {
+    const { roomID, recipientIndex} = req.body;
+
+    const result = await RoomModel.updateOne(
+      {_id : roomID},
+      {
+        $set: {[`unread.${recipientIndex}`]: 0}
+      }
+    );
+    return res.status(200).json({ success: true });
+  }
+  catch (err) {
+    console.error(err);
+    return res.sendStatus(500);
+  }
+  
+})
+
+
+
 // ==================================================================
 // User related routes
 // ==================================================================
 
-
-//get current user info
+// Get current user info
 app.get("/user", async (req, res) => {
   try {
     if (!req.session.UserID) {

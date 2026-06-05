@@ -180,6 +180,11 @@
     @apply -mt-5 md:-mt-10;
   }
 
+  .convoCard.convoCardActive {
+    color: #ea6911;
+    /*background-image: linear-gradient(to right, #f8f3f3, white);*/
+  }
+
   .sentMessageBox {
     @apply relative w-[75%] ml-auto bg-orange p-5 rounded-xl text-white;
   }

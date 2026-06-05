@@ -64,8 +64,11 @@
           </div>
 
           <!-- button for bookmarking -->
-           <div id="save-button-div"></div>
-          <a href="/createRoom/<%=listing.seller%>"><button id="messageButton">Message seller</button></a>
+          <div id="save-button-div"></div>
+          <form action="/chats" method="POST">
+            <input type="hidden" name="sellerID" value="<%=listing.seller%>">
+            <button type="submit" class="box-color-0 hover-outline max-w-50">Message seller</button>
+          </form>
           <!-- <button
             type="button"
             id="bookmark"
