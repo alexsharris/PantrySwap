@@ -195,7 +195,7 @@ io.on("connection", async (socket) => {
   // Send new message
   socket.on("message", (data) => {
     //console.log(`Message received from client ${data.room}`);
-    io.to(data.room).emit("message", {messageContent: data.messageContent, room: data.room, sender: data.senderID, date: data.date});
+    io.to(data.room).emit("message", {messageContent: data.messageContent, room: data.room, senderID: data.senderID, date: data.date});
   })
 
 })
@@ -730,10 +730,11 @@ app.get("/getRooms", async (req, res) => {
 
 // Append new message
 app.post("/newMessage", async (req, res) => {
+  console.log("New message route activated");
   try {
     const userID = req.session.UserID;
     const { roomID, message, date, recipientIndex} = req.body;
-
+    console.log(`Recipient index: ${recipientIndex}`);
     const result = await RoomModel.updateOne(
       {_id : roomID},
       {

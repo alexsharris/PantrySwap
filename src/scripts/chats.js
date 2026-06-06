@@ -12,7 +12,7 @@ const userID = userData._id;
 let userRooms = null;
 let activeRoom = activeRoomDiv.textContent;
 
-//console.log(`userID: ${userID}`)
+console.log(`userID: ${userID}`)
 
 // Render room links
 let renderRoomLinks = function(userRooms) {
@@ -23,10 +23,10 @@ let renderRoomLinks = function(userRooms) {
 
     userRooms.forEach((room) => {
         let sellerData = room.roomMembers.find(member => member._id.toString() !== userID);
-        let sellerIndex = room.roomMembers.findIndex(member => member._id.toString() === sellerData._id.toString());
-        let unreadMessages = room.unread[sellerIndex];
+        let recipientIndex = room.roomMembers.findIndex(member => member._id.toString() !== sellerData._id.toString());
+        let unreadMessages = room.unread[recipientIndex];
         // console.log(room)
-        // console.log(sellerData)
+        console.log(sellerData)
         // console.log(sellerIndex)
         // console.log(unreadMessages)
 
@@ -41,10 +41,16 @@ let renderRoomLinks = function(userRooms) {
 
         // Show corresponding room if selected
         clone.querySelector(".convoCard").addEventListener("click", (event) => {
-            console.log("room clicked");
+
+            document.getElementById("convoContainer").classList.remove("hidden");
+            if(window.innerWidth < 768) {
+                document.getElementById("backButton").classList.remove("hidden")
+            }
+
+            //console.log("room clicked");
             activeRoom = event.currentTarget.id;
             renderChat(activeRoom);
-            console.log(`New active room: ${activeRoom}`)
+            //console.log(`New active room: ${activeRoom}`)
 
             // Unhighlight all rooms, 
             const cardDivs = document.querySelectorAll(".convoCard")
@@ -68,8 +74,9 @@ let renderRoomLinks = function(userRooms) {
 // Render chat log
 let renderChat = function(selectedRoomID) {
     if(!selectedRoomID) {
-        //empty state for chat
+        // Empty state for chat
         emptyStateChat.classList.remove("hidden")
+        //document.getElementById("convoContainer").classList.add("hidden");
         return;
     }
     const convoContainer = document.getElementById("convoContainer");
@@ -131,7 +138,7 @@ let renderChat = function(selectedRoomID) {
 
 // Send message
 let sendMessage = async function(roomID) {
-    console.log(`Sending to ${roomID}`)
+    //console.log(`Sending to ${roomID}`)
     const messageContent = document.getElementById("newMessage").value;
 
     if(!messageContent) {
@@ -149,11 +156,11 @@ let sendMessage = async function(roomID) {
         const recipient = currentRoom.roomMembers.find(member => member._id.toString() !== userID);
         const recipientIndex = currentRoom.roomMembers.findIndex(member => member._id.toString() === recipient._id.toString());
         
-        // console.log(recipient)
-        // console.log(currentRoom)
+        console.log(`RecipientID: ${recipient._id}`)
+        console.log(currentRoom.roomMembers)
         // console.log(roomID)
         // console.log(messageContent)
-        // console.log(recipientIndex)
+        console.log(recipientIndex)
 
         try {
             const response = await fetch(`/newMessage`, {
@@ -193,7 +200,7 @@ let sendMessage = async function(roomID) {
 // Receive message
 socket.on("message", async (data) => {
 
-    console.log(data);
+    //console.log(`Received message data: ${data}`);
     const messageBox = document.querySelector(".newMessageBox");
 
     // Save message to local data
@@ -207,9 +214,15 @@ socket.on("message", async (data) => {
         message: data.messageContent
     })
 
-    // If room ID of incoming message matches active room, append message box and reset unread to 0
-    if(data.room == activeRoom) {
+    // console.log(`Room: ${data.room}`)
+    // console.log(`Active Room: ${activeRoom}`)
+    // console.log(`SenderID: ${data.senderID}`)
+    // console.log(`User ID: ${userID}`)
 
+    // If room ID of incoming message matches active room, append message box and reset unread to 0
+    if(data.room == activeRoom && data.senderID !== userID) {
+
+        console.log("reset route triggered");
         // Reset unread count in DB
         try {
             const response = await fetch(`/resetUnread`, {
@@ -229,7 +242,7 @@ socket.on("message", async (data) => {
         }    
 
         // Reset in local copy
-
+        currentRoom.unread[recipientIndex] = 0;
 
         // format as sender
         if(data.sender == userID) {
@@ -256,10 +269,36 @@ socket.on("message", async (data) => {
             messageBox.before(cloneRecipient);
         }
     }
+    else if (data.room == activeRoom){
+        // format as sender
+        if(data.senderID == userID) {
+            const cloneSender = senderTemplate.content.cloneNode(true);
+            cloneSender.querySelector(".sentMessage").textContent = data.messageContent;
+            cloneSender.querySelector(".messageDate").textContent = new Date(data.date).toLocaleDateString("en-CA", {
+                weekday: "short",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            });
+            messageBox.before(cloneSender);
+        }
+        // format as recipient
+        else {
+            const cloneRecipient = recipientTemplate.content.cloneNode(true);
+            cloneRecipient.querySelector(".receivedMessage").textContent = data.messageContent;
+            cloneRecipient.querySelector(".messageDate").textContent = new Date(data.date).toLocaleDateString("en-CA", {
+                weekday: "short",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            });
+            messageBox.before(cloneRecipient);
+        }
+    }
     else {
         // Else, increment unread count locally and update count div
         currentRoom.unread[recipientIndex]++;
-        console.log(data.room)
+        //console.log(data.room)
         const roomCard = document.getElementById(data.room);
         roomCard.querySelector(".messageCount").querySelector("p").textContent = currentRoom.unread[recipientIndex];
         roomCard.querySelector(".messageCount").classList.add("bg-orange");
@@ -270,7 +309,7 @@ socket.on("message", async (data) => {
 
 // Initial page setup
 let pageSetup = async function () {
-    console.log("Page setup running")
+    //console.log("Page setup running")
     const data = await fetch("/getRooms");
     const roomsData = await data.json();
     userRooms = roomsData.sort((a,b) => {
@@ -278,10 +317,16 @@ let pageSetup = async function () {
     })
     
     if(userRooms.length > 0) {
-        console.log(userRooms)
+        //console.log(userRooms)
         renderRoomLinks(userRooms);
-        renderChat(activeRoom);
-
+        if(window.innerWidth < 768) {
+            document.getElementById("convoContainer").classList.add("hidden");
+            backButton.classList.add("hidden");
+        }
+        else {
+            renderChat(activeRoom);
+        }
+        
         // Highlight active room
         let selectedDiv = document.getElementById(`${activeRoom}`)
         if(selectedDiv) {
@@ -305,3 +350,51 @@ document.addEventListener("click", (event) => {
     sendMessage(sendTo);
 });
 
+
+// Event listener for back button
+document.getElementById("backButton").addEventListener("click", (event) => {
+
+    document.getElementById("convoContainer").classList.add("hidden");
+    event.currentTarget.classList.add("hidden")
+
+    // Deselect active room
+    const activeDiv = document.getElementById(activeRoom);
+    if(activeDiv) {
+        activeDiv.classList.remove("convoCardActive");
+        activeDiv.querySelector("div").classList.remove("bg-orange");
+    }
+    
+    activeRoom = null;
+
+    // Clear chat container
+    document.getElementById("convoContainer").innerHTML = "";
+
+})
+
+
+// Event listener for window width
+let currentWidth = window.innerWidth;
+
+window.addEventListener("resize", () => {
+    currentWidth = window.innerWidth;
+    // Sizing up with active room
+    if(currentWidth > 768) {
+        document.getElementById("convoContainer").classList.remove("hidden");
+    }
+    // Sizing up with no active room
+    if(currentWidth > 768 && !activeRoom) {
+        document.getElementById("convoContainer").classList.remove("hidden");
+        const emptyStateTemplate = document.getElementById("emptyStateChatTemplate");
+        const emptyStateClone = emptyStateTemplate.content.cloneNode(true);
+        document.getElementById("convoContainer").appendChild(emptyStateClone);
+    }
+    // Sizing down with no active room
+    if(currentWidth < 768 && !activeRoom) {
+        document.getElementById("convoContainer").classList.add("hidden")
+        backButton.classList.add("hidden");
+    }
+    // Sizing down with active room
+    if(currentWidth < 768 && activeRoom) {
+        backButton.classList.remove("hidden");
+    }
+});
