@@ -154,7 +154,7 @@
 
   /* Buttons */
   button {
-    @apply cursor-pointer py-3 px-10 rounded-xl font-semibold;
+    @apply cursor-pointer py-3 px-5 rounded-xl font-semibold;
   }
   .convoActions {
     @apply px-3 py-1 justify-center items-center;

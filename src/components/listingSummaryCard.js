@@ -69,7 +69,7 @@ class ListingCard extends HTMLElement {
       const viewButton = document.createElement("button");
       viewButton.className =
         "view-button box-color-0 hover-bright font-bold w-full";
-      viewButton.innerHTML = "View Listing";
+      viewButton.innerHTML = "View";
       viewButton.addEventListener("click", () => {
         window.location.assign(`/listingDetails/${this.listingID}`);
       });

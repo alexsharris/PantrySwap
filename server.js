@@ -202,7 +202,6 @@ io.on("connection", async (socket) => {
 
 io.listen(3001);
 
-
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -692,7 +691,7 @@ app.post("/chats", async (req, res) => {
         chatLog: [{
           senderID: userObjId,
           date: Date.now(),
-          message: `New chat created at ${new Date(Date.now()).toLocaleString()}`
+          message: "Hello! This is an automated message to break the ice. Over to you."
         }],
         unread:[0,0]
       });

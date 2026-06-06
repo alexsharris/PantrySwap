@@ -43,6 +43,7 @@ let renderRoomLinks = function(userRooms) {
         clone.querySelector(".convoCard").addEventListener("click", (event) => {
 
             document.getElementById("convoContainer").classList.remove("hidden");
+
             if(window.innerWidth < 768) {
                 document.getElementById("backButton").classList.remove("hidden")
             }
@@ -72,13 +73,52 @@ let renderRoomLinks = function(userRooms) {
 }
 
 // Render chat log
-let renderChat = function(selectedRoomID) {
+let renderChat = async function(selectedRoomID) {
+
     if(!selectedRoomID) {
         // Empty state for chat
         emptyStateChat.classList.remove("hidden")
         //document.getElementById("convoContainer").classList.add("hidden");
         return;
     }
+
+    // Reset unread count if not zero in current room for current user
+    const currentRoom = userRooms.find(room => room._id.toString() === selectedRoomID);
+    const userIndex = currentRoom.roomMembers.findIndex(member => member._id.toString() === userID);
+
+    console.log(`Rendering: ${currentRoom._id}`)
+    console.log(`Unread count: ${currentRoom.unread[userIndex]}`)
+
+    //console.log(currentRoom.unread[userIndex]);
+
+    if (currentRoom.unread[userIndex] > 0) {
+        console.log("Condition Met")
+        try {
+            const response = await fetch(`/resetUnread`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                roomID: selectedRoomID,
+                recipientIndex: userIndex
+            }),
+            });
+
+            if (response.ok) console.log("Unread reset");   
+            else console.error("Failed to reset count"); 
+        }
+        catch (err) {
+            console.error("Network error:", err);
+        }    
+
+        // Reset in local copy and modify CSS
+        
+        const roomCard = document.getElementById(activeRoom);
+        roomCard.querySelector(".messageCount").querySelector("p").textContent = 0;
+        roomCard.querySelector(".messageCount").classList.remove("bg-orange");
+        roomCard.querySelector(".messageCount").classList.add("bg-[#c7c7c7]");
+    }
+
+
     const convoContainer = document.getElementById("convoContainer");
     convoContainer.innerHTML = "";
     let chatData = userRooms.find(room => room._id.toString() === selectedRoomID);
@@ -133,6 +173,9 @@ let renderChat = function(selectedRoomID) {
     cloneNewMessageBox.getElementById("senderProfileImage").src = userData.profilePicture;
     cloneNewMessageBox.querySelector("button").id = `sendTo-${chatData._id}`
     convoContainer.appendChild(cloneNewMessageBox);
+
+    convoContainer.scrollTop = convoContainer.scrollHeight;
+
 }
 
 
@@ -160,7 +203,7 @@ let sendMessage = async function(roomID) {
         console.log(currentRoom.roomMembers)
         // console.log(roomID)
         // console.log(messageContent)
-        console.log(recipientIndex)
+        //console.log(recipientIndex)
 
         try {
             const response = await fetch(`/newMessage`, {
@@ -219,7 +262,7 @@ socket.on("message", async (data) => {
     // console.log(`SenderID: ${data.senderID}`)
     // console.log(`User ID: ${userID}`)
 
-    // If room ID of incoming message matches active room, append message box and reset unread to 0
+    // If received by user that didn't send the message, render new messages and reset unread to 0
     if(data.room == activeRoom && data.senderID !== userID) {
 
         console.log("reset route triggered");
@@ -269,7 +312,8 @@ socket.on("message", async (data) => {
             messageBox.before(cloneRecipient);
         }
     }
-    else if (data.room == activeRoom){
+    // If received by the same user that sent the message
+    else if (data.room == activeRoom && data.senderID == userID){
         // format as sender
         if(data.senderID == userID) {
             const cloneSender = senderTemplate.content.cloneNode(true);
@@ -296,14 +340,16 @@ socket.on("message", async (data) => {
         }
     }
     else {
-        // Else, increment unread count locally and update count div
+        // Else, increment unread count locally to match DB and update count div
         currentRoom.unread[recipientIndex]++;
-        //console.log(data.room)
+        console.log(`Unread incremented: ${currentRoom.unread}`)
         const roomCard = document.getElementById(data.room);
         roomCard.querySelector(".messageCount").querySelector("p").textContent = currentRoom.unread[recipientIndex];
         roomCard.querySelector(".messageCount").classList.add("bg-orange");
         roomCard.querySelector(".messageCount").classList.remove("bg-[#c7c7c7]");        
     }
+
+    document.getElementById("convoContainer").scrollTop = document.getElementById("convoContainer").scrollHeight;
 });
 
 
