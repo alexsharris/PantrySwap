@@ -178,8 +178,6 @@ io.use((socket, next) => {
 // socket connection
 io.on("connection", async (socket) => {
 
-  //console.log("Socket connection running", socket.id);
-
   // Connect to all rooms
   socket.on("joinUserRooms", async () => {
     const userID = socket.request.session?.UserID;
@@ -194,7 +192,6 @@ io.on("connection", async (socket) => {
 
   // Send new message
   socket.on("message", (data) => {
-    //console.log(`Message received from client ${data.room}`);
     io.to(data.room).emit("message", {messageContent: data.messageContent, room: data.room, senderID: data.senderID, date: data.date});
   })
 
@@ -651,11 +648,9 @@ app.post("/chats", async (req, res) => {
     const userID = req.session.UserID;
     const {sellerID} = req.body;
     if(!userID) return res.redirect("/Login");
-    //console.log(sellerID);
 
     // If no seller ID, just load default chat page
     if(!sellerID) {
-      //console.log("No seller route activated")
       return res.render("chatsPage.ejs", {
         activeRoomID: "empty"
       });
@@ -729,11 +724,11 @@ app.get("/getRooms", async (req, res) => {
 
 // Append new message
 app.post("/newMessage", async (req, res) => {
-  console.log("New message route activated");
+
   try {
     const userID = req.session.UserID;
     const { roomID, message, date, recipientIndex} = req.body;
-    console.log(`Recipient index: ${recipientIndex}`);
+
     const result = await RoomModel.updateOne(
       {_id : roomID},
       {
